@@ -1,0 +1,43 @@
+# Documentation files (not needed for deployment)
+*.md
+*.txt
+
+# Development files
+node_modules/
+.git/
+.gitignore
+.env
+.env.local
+.env.*.local
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Python files (favicon generation script)
+create_favicon.py
+__pycache__/
+*.pyc
+
+# Build artifacts
+dist/
+build/
+
+# Logs
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+
+# Package manager files
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# OS files
+Thumbs.db
+.DS_Store
+
