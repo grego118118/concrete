@@ -1,10 +1,8 @@
 {
   "version": 2,
-  "name": "concrete-coating-specialists",
   "public": true,
-  "buildCommand": "echo 'Static site - no build needed'",
+  "buildCommand": "",
   "outputDirectory": ".",
-  "framework": "static",
   "env": {
     "VERCEL_ENV": "production"
   },
