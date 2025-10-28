@@ -2,7 +2,7 @@
 
 ## ✅ What Was Prepared
 
-Your Concrete Coating Specialists website is now fully configured and ready to deploy to Vercel!
+Your Commonwealth Concrete Coating website is now fully configured and ready to deploy to Vercel!
 
 ---
 

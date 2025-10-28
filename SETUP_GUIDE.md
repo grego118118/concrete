@@ -118,7 +118,7 @@ Example:
 
 ### 3. Update Company Name (Optional)
 
-Search for "Concrete Coating Specialists" and replace with your company name.
+Search for "Commonwealth Concrete Coating" and replace with your company name.
 
 ### 4. Customize Colors (Optional)
 

@@ -7,7 +7,7 @@ Home (index.html)
 ├── Home Section (#home)
 │   ├── Hero Banner
 │   ├── Why Polyaspartic Over Epoxy?
-│   └── Why Concrete Coating Specialists?
+│   └── Why Commonwealth Concrete Coating?
 ├── Our Services (#services)
 │   ├── Garage Floor Coatings
 │   └── Basement Floor Coatings
@@ -85,7 +85,7 @@ Home (index.html)
 ## Content Inventory
 
 ### Text Content
-- **Company Name**: Concrete Coating Specialists
+- **Company Name**: Commonwealth Concrete Coating
 - **Service Area**: Western Massachusetts (Hampden, Hampshire, Franklin, Berkshire counties)
 - **Phone**: (413) 668-8126
 - **Email**: contact@concretecoatingspecialists.com
@@ -219,7 +219,7 @@ Home (index.html)
 
 ## SEO Elements
 
-- **Title**: "Concrete Coating Specialists | Western Massachusetts"
+- **Title**: "Commonwealth Concrete Coating | Western Massachusetts"
 - **Meta Description**: (Add in head section)
 - **Keywords**: Concrete coating, garage floor, basement floor, polyaspartic, Western Massachusetts
 - **Headings**: Proper H1, H2, H3 hierarchy

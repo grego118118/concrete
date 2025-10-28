@@ -2,7 +2,7 @@
 
 ## Overview
 
-A professional favicon has been created for the Concrete Coating Specialists website. The favicon represents the concrete coating business with a modern design featuring the brand's blue color scheme (#3b82f6).
+A professional favicon has been created for the Commonwealth Concrete Coating website. The favicon represents the concrete coating business with a modern design featuring the brand's blue color scheme (#3b82f6).
 
 ---
 

@@ -1,5 +1,5 @@
 # Quick Start: SEO/AEO Implementation Guide
-## Concrete Coating Specialists Website
+## Commonwealth Concrete Coating Website
 
 ---
 
@@ -36,7 +36,7 @@ These 5 changes will have the biggest immediate impact:
 **File:** index.html, line 5  
 **Add:**
 ```html
-<meta property="og:title" content="Concrete Coating Specialists | Western Massachusetts">
+<meta property="og:title" content="Commonwealth Concrete Coating | Western Massachusetts">
 <meta property="og:description" content="Transform your garage & basement floors in just one day with premium polyaspartic coatings.">
 <meta property="og:image" content="https://concretecoatingspecialists.com/assets/images/hero-garage.jpg.jpg">
 <meta property="og:url" content="https://concretecoatingspecialists.com/">
@@ -61,7 +61,7 @@ These 5 changes will have the biggest immediate impact:
 ### 6. Add Twitter Card Tags
 ```html
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Concrete Coating Specialists | Western Massachusetts">
+<meta name="twitter:title" content="Commonwealth Concrete Coating | Western Massachusetts">
 <meta name="twitter:description" content="Premium polyaspartic concrete coatings. 1-day installation. Free quote!">
 <meta name="twitter:image" content="https://concretecoatingspecialists.com/assets/images/hero-garage.jpg.jpg">
 ```

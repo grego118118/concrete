@@ -1,4 +1,4 @@
-# Concrete Coating Specialists Website
+# Commonwealth Concrete Coating Website
 
 A professional, responsive website for a concrete coating company serving Western Massachusetts.
 

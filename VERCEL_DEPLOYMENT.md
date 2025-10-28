@@ -2,7 +2,7 @@
 
 ## Overview
 
-This guide provides complete instructions for deploying the Concrete Coating Specialists website to Vercel.
+This guide provides complete instructions for deploying the Commonwealth Concrete Coating website to Vercel.
 
 **Status:** ✅ Ready for Deployment
 
@@ -84,7 +84,7 @@ git init
 git add .
 
 # Commit files
-git commit -m "Initial commit: Concrete Coating Specialists website"
+git commit -m "Initial commit: Commonwealth Concrete Coating website"
 
 # Add remote repository
 git remote add origin https://github.com/YOUR_USERNAME/concrete-coating-specialists.git
@@ -212,7 +212,7 @@ The following URLs in index.html are hardcoded for the custom domain:
 <meta property="og:image" content="https://concretecoatingspecialists.com/assets/images/hero-garage.jpg.jpg">
 <meta property="og:url" content="https://concretecoatingspecialists.com/">
 <meta property="og:type" content="business.business">
-<meta property="og:site_name" content="Concrete Coating Specialists">
+<meta property="og:site_name" content="Commonwealth Concrete Coating">
 <meta name="twitter:image" content="https://concretecoatingspecialists.com/assets/images/hero-garage.jpg.jpg">
 <link rel="alternate" hreflang="en-US" href="https://concretecoatingspecialists.com/">
 ```

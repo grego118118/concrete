@@ -104,7 +104,7 @@
 ## 📞 Contact Information
 
 **Business:**
-- Name: Concrete Coating Specialists
+- Name: Commonwealth Concrete Coating
 - Phone: (413) 668-8126
 - Email: contact@concretecoatingspecialists.com
 - Website: https://concretecoatingspecialists.com/

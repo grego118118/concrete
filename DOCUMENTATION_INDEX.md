@@ -1,6 +1,6 @@
 # Documentation Index
 
-Complete guide to all documentation files for the Concrete Coating website.
+Complete guide to all documentation files for the Commonwealth Concrete Coating website.
 
 ---
 

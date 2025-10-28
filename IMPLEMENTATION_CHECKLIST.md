@@ -1,5 +1,5 @@
 # SEO/AEO Implementation Checklist
-## Concrete Coating Specialists Website
+## Commonwealth Concrete Coating Website
 
 ---
 

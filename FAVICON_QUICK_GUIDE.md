@@ -4,7 +4,7 @@
 
 **Status:** ✅ COMPLETE
 
-A professional favicon has been created for the Concrete Coating Specialists website with full cross-browser and mobile support.
+A professional favicon has been created for the Commonwealth Concrete Coating website with full cross-browser and mobile support.
 
 ---
 

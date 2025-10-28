@@ -1,7 +1,7 @@
 {
   "name": "concrete-coating-website",
   "version": "1.0.0",
-  "description": "Professional website for Concrete Coating Specialists in Western Massachusetts",
+  "description": "Professional website for Commonwealth Concrete Coating in Western Massachusetts",
   "main": "index.html",
   "scripts": {
     "start": "npx http-server -p 8000 -o",
@@ -14,7 +14,7 @@
     "basement",
     "polyaspartic"
   ],
-  "author": "Concrete Coating Specialists",
+  "author": "Commonwealth Concrete Coating",
   "license": "MIT"
 }
 

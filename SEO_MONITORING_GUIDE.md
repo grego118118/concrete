@@ -59,7 +59,7 @@ Choose one verification method:
 ### **Step 1: Create Property**
 1. Go to https://analytics.google.com
 2. Click "Create" → "Property"
-3. Enter property name: "Concrete Coating Specialists"
+3. Enter property name: "Commonwealth Concrete Coating"
 4. Select timezone and currency
 
 ### **Step 2: Add Data Stream**
@@ -108,7 +108,7 @@ Add this to your website `<head>` section:
 2. Search for your business
 3. Click "Manage now" or "Create business"
 4. Enter business information:
-   - Business name: Concrete Coating Specialists
+   - Business name: Commonwealth Concrete Coating
    - Address: (if applicable)
    - Phone: (413) 668-8126
    - Website: https://concretecoatingspecialists.com/

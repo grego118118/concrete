@@ -104,7 +104,7 @@ This guide helps you customize and adjust the SEO/AEO implementation based on yo
   "description": "Professional polyaspartic coatings for commercial spaces...",
   "provider": {
     "@type": "LocalBusiness",
-    "name": "Concrete Coating Specialists",
+    "name": "Commonwealth Concrete Coating",
     "telephone": "(413) 668-8126"
   },
   "areaServed": "Western Massachusetts",
