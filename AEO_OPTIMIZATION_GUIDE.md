@@ -1,5 +1,5 @@
 # Answer Engine Optimization (AEO) Guide
-## Commonwealth Concrete Coating Website
+## Commonwealth Concrete Coatings Website
 
 ---
 
