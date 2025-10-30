@@ -1,8 +1,8 @@
 # SEO & AEO Analysis Report
-## Commonwealth Concrete Coatings Website
+## Pioneer Concrete Coatings LLC Website
 
 **Analysis Date:** October 23, 2025
-**Website:** Commonwealth Concrete Coatings (Western Massachusetts)
+**Website:** Pioneer Concrete Coatings LLC (Western Massachusetts)
 **Current Status:** Single-page application with good foundational structure
 
 ---
@@ -19,7 +19,7 @@ The website has a solid foundation with good semantic HTML, responsive design, a
 ## ✅ CURRENT STRENGTHS
 
 ### SEO Strengths
-1. **Good Page Title** - "Commonwealth Concrete Coatings | Western Massachusetts" includes location keyword
+1. **Good Page Title** - "Pioneer Concrete Coatings LLC | Western Massachusetts" includes location keyword
 2. **Semantic HTML** - Proper use of `<header>`, `<nav>`, `<main>`, `<section>`, `<footer>`
 3. **Mobile Responsive** - Viewport meta tag and responsive design with Tailwind CSS
 4. **Heading Hierarchy** - Generally good H1-H6 structure (H1 in hero, H2 for sections, H3 for subsections)
@@ -74,7 +74,7 @@ The website has a solid foundation with good semantic HTML, responsive design, a
 **Recommendation:** Add OG tags for social sharing
 
 ```html
-<meta property="og:title" content="Commonwealth Concrete Coatings | Western Massachusetts">
+<meta property="og:title" content="Pioneer Concrete Coatings LLC | Western Massachusetts">
 <meta property="og:description" content="Transform your garage & basement floors in just one day with premium polyaspartic coatings.">
 <meta property="og:image" content="https://concretecoatingspecialists.com/assets/images/hero-garage.jpg.jpg">
 <meta property="og:url" content="https://concretecoatingspecialists.com/">
@@ -88,7 +88,7 @@ The website has a solid foundation with good semantic HTML, responsive design, a
 
 ```html
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Commonwealth Concrete Coatings | Western Massachusetts">
+<meta name="twitter:title" content="Pioneer Concrete Coatings LLC | Western Massachusetts">
 <meta name="twitter:description" content="Premium polyaspartic concrete coatings. 1-day installation. Free quote!">
 <meta name="twitter:image" content="https://concretecoatingspecialists.com/assets/images/hero-garage.jpg.jpg">
 ```
@@ -176,7 +176,7 @@ See HIGH PRIORITY section above for specific meta tags to add.
 {
   "@context": "https://schema.org",
   "@type": "LocalBusiness",
-  "name": "Commonwealth Concrete Coatings",
+  "name": "Pioneer Concrete Coatings LLC",
   "image": "https://concretecoatingspecialists.com/assets/images/logo.svg",
   "description": "Premium polyaspartic concrete coatings for garage and basement floors",
   "telephone": "(413) 668-8126",
@@ -220,7 +220,7 @@ See HIGH PRIORITY section above for specific meta tags to add.
   "description": "Professional polyaspartic garage floor coating installation",
   "provider": {
     "@type": "LocalBusiness",
-    "name": "Commonwealth Concrete Coatings"
+    "name": "Pioneer Concrete Coatings LLC"
   },
   "areaServed": "Western Massachusetts",
   "serviceType": "Floor Coating"

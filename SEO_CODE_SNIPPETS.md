@@ -15,16 +15,16 @@ Add these tags after the existing `<meta name="viewport">` tag (around line 5):
 <link rel="canonical" href="https://concretecoatingspecialists.com/">
 
 <!-- Open Graph Tags (Social Media) -->
-<meta property="og:title" content="Commonwealth Concrete Coatings | Western Massachusetts">
+<meta property="og:title" content="Pioneer Concrete Coatings LLC | Western Massachusetts">
 <meta property="og:description" content="Transform your garage & basement floors in just one day with premium polyaspartic coatings. 4x more durable than epoxy. Free quote!">
 <meta property="og:image" content="https://concretecoatingspecialists.com/assets/images/hero-garage.jpg.jpg">
 <meta property="og:url" content="https://concretecoatingspecialists.com/">
 <meta property="og:type" content="business.business">
-<meta property="og:site_name" content="Commonwealth Concrete Coatings">
+<meta property="og:site_name" content="Pioneer Concrete Coatings LLC">
 
 <!-- Twitter Card Tags -->
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Commonwealth Concrete Coatings | Western Massachusetts">
+<meta name="twitter:title" content="Pioneer Concrete Coatings LLC | Western Massachusetts">
 <meta name="twitter:description" content="Premium polyaspartic concrete coatings. 1-day installation. UV-stable. Free quote!">
 <meta name="twitter:image" content="https://concretecoatingspecialists.com/assets/images/hero-garage.jpg.jpg">
 ```
@@ -41,7 +41,7 @@ Add these `<script>` tags before the closing `</body>` tag (after existing scrip
 {
   "@context": "https://schema.org",
   "@type": "LocalBusiness",
-  "name": "Commonwealth Concrete Coatings",
+  "name": "Pioneer Concrete Coatings LLC",
   "image": "https://concretecoatingspecialists.com/assets/images/logo.svg",
   "description": "Premium polyaspartic concrete coatings for garage and basement floors in Western Massachusetts",
   "telephone": "(413) 668-8126",
@@ -97,7 +97,7 @@ Add these `<script>` tags before the closing `</body>` tag (after existing scrip
 {
   "@context": "https://schema.org",
   "@type": "Organization",
-  "name": "Commonwealth Concrete Coatings",
+  "name": "Pioneer Concrete Coatings LLC",
   "url": "https://concretecoatingspecialists.com/",
   "logo": "https://concretecoatingspecialists.com/assets/images/logo.svg",
   "description": "Premium polyaspartic concrete coatings for garage and basement floors",
@@ -122,7 +122,7 @@ Add these `<script>` tags before the closing `</body>` tag (after existing scrip
   "description": "Professional polyaspartic garage floor coating installation with 1-day turnaround. UV-stable, chemical resistant, 4x more durable than epoxy.",
   "provider": {
     "@type": "LocalBusiness",
-    "name": "Commonwealth Concrete Coatings",
+    "name": "Pioneer Concrete Coatings LLC",
     "telephone": "(413) 668-8126"
   },
   "areaServed": "Western Massachusetts",
@@ -141,7 +141,7 @@ Add these `<script>` tags before the closing `</body>` tag (after existing scrip
   "description": "Professional polyaspartic basement floor coating installation. Waterproof, mold-resistant, creates bright finished look.",
   "provider": {
     "@type": "LocalBusiness",
-    "name": "Commonwealth Concrete Coatings",
+    "name": "Pioneer Concrete Coatings LLC",
     "telephone": "(413) 668-8126"
   },
   "areaServed": "Western Massachusetts",

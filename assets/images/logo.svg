@@ -24,15 +24,18 @@
   </g>
   
   <!-- Company Name -->
-  <text x="55" y="22" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#1e40af">
-    Commonwealth
+  <text x="55" y="18" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#1e40af">
+    Pioneer
   </text>
-  <text x="55" y="38" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#1e40af">
+  <text x="55" y="32" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#1e40af">
     Concrete Coatings
+  </text>
+  <text x="55" y="46" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="#1e40af">
+    LLC
   </text>
   
   <!-- Tagline -->
-  <text x="55" y="50" font-family="Arial, sans-serif" font-size="8" fill="#64748b" letter-spacing="0.5">
+  <text x="55" y="56" font-family="Arial, sans-serif" font-size="7" fill="#64748b" letter-spacing="0.3">
     WESTERN MASSACHUSETTS
   </text>
 </svg>
