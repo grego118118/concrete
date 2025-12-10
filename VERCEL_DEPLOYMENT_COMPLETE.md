@@ -169,7 +169,7 @@ git push origin main
 
 ## 🌐 **CUSTOM DOMAIN SETUP (Optional)**
 
-To connect your custom domain `concretecoatingspecialists.com`:
+To connect your custom domain `pioneerconcretecoatings.com`:
 
 1. **Go to Vercel Dashboard**
    - https://vercel.com/dashboard
@@ -178,8 +178,8 @@ To connect your custom domain `concretecoatingspecialists.com`:
    - Click on "concrete-coating-specialists"
 
 3. **Add Custom Domain**
-   - Settings → Domains
-   - Add: `concretecoatingspecialists.com`
+  - Settings → Domains
+  - Add: `pioneerconcretecoatings.com`
 
 4. **Update DNS Records**
    - Go to your domain registrar
@@ -187,8 +187,8 @@ To connect your custom domain `concretecoatingspecialists.com`:
    - Wait 24-48 hours for propagation
 
 5. **Verify Connection**
-   - Check Vercel Dashboard for status
-   - Visit https://concretecoatingspecialists.com
+  - Check Vercel Dashboard for status
+  - Visit https://pioneerconcretecoatings.com
    - Verify SSL certificate is valid
 
 ---

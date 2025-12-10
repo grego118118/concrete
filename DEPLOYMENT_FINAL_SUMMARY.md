@@ -160,12 +160,12 @@ See: VERCEL_DEPLOYMENT_COMPLETE.md → Testing Checklist
 
 ## 🌐 **CUSTOM DOMAIN (Optional)**
 
-To connect your custom domain `concretecoatingspecialists.com`:
+To connect your custom domain `pioneerconcretecoatings.com`:
 
 1. Go to Vercel Dashboard
 2. Select your project
 3. Settings → Domains
-4. Add: `concretecoatingspecialists.com`
+4. Add: `pioneerconcretecoatings.com`
 5. Update DNS records at your registrar
 6. Wait 24-48 hours for propagation
 

@@ -106,8 +106,8 @@
 **Business:**
 - Name: Commonwealth Concrete Coating
 - Phone: (413) 668-8126
-- Email: contact@concretecoatingspecialists.com
-- Website: https://concretecoatingspecialists.com/
+- Email: contact@pioneerconcretecoatings.com
+- Website: https://pioneerconcretecoatings.com/
 
 **Service Area:**
 - Hampden County
@@ -125,7 +125,7 @@ Replace with: `[NEW NUMBER]`
 Files: index.html + all schemas
 
 ### **To Update Email:**
-Search for: `contact@concretecoatingspecialists.com`
+Search for: `contact@pioneerconcretecoatings.com`
 Replace with: `[NEW EMAIL]`
 Files: index.html + all schemas
 

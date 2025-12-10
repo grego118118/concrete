@@ -168,7 +168,7 @@
 - [ ] Go to Vercel Dashboard
 - [ ] Select project
 - [ ] Go to Settings → Domains
-- [ ] Add domain: concretecoatingspecialists.com
+- [ ] Add domain: pioneerconcretecoatings.com
 - [ ] Note the DNS records provided by Vercel
 
 ### **Update DNS Records**
@@ -181,7 +181,7 @@
 ### **Verify Domain Connection**
 - [ ] Wait 24-48 hours for DNS propagation
 - [ ] Check Vercel Dashboard for domain status
-- [ ] Visit https://concretecoatingspecialists.com
+- [ ] Visit https://pioneerconcretecoatings.com
 - [ ] Verify site loads correctly
 - [ ] Verify SSL certificate is valid
 - [ ] Verify www redirect works (if configured)

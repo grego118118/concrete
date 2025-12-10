@@ -243,7 +243,7 @@ All 8 gallery images have descriptive alt text
 Search for "(413) 668-8126" and replace with new number
 
 **Update Email:**
-Search for "contact@concretecoatingspecialists.com" and replace
+Search for "contact@pioneerconcretecoatings.com" and replace
 
 **Update Address:**
 Update in LocalBusiness schema
@@ -361,5 +361,5 @@ Add to AggregateRating schema:
 
 **Contact:**
 - Phone: (413) 668-8126
-- Email: contact@concretecoatingspecialists.com
+- Email: contact@pioneerconcretecoatings.com
 

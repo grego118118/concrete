@@ -56,7 +56,7 @@ The website has a solid foundation with good semantic HTML, responsive design, a
 **Recommendation:** Add canonical tag to prevent indexing issues
 
 ```html
-<link rel="canonical" href="https://concretecoatingspecialists.com/">
+<link rel="canonical" href="https://pioneerconcretecoatings.com/">
 ```
 
 ### 3. Missing Robots Meta Tag
@@ -76,8 +76,8 @@ The website has a solid foundation with good semantic HTML, responsive design, a
 ```html
 <meta property="og:title" content="Pioneer Concrete Coatings LLC | Western Massachusetts">
 <meta property="og:description" content="Transform your garage & basement floors in just one day with premium polyaspartic coatings.">
-<meta property="og:image" content="https://concretecoatingspecialists.com/assets/images/hero-garage.jpg.jpg">
-<meta property="og:url" content="https://concretecoatingspecialists.com/">
+<meta property="og:image" content="https://pioneerconcretecoatings.com/assets/images/hero-garage.jpg.jpg">
+<meta property="og:url" content="https://pioneerconcretecoatings.com/">
 <meta property="og:type" content="business.business">
 ```
 
@@ -90,7 +90,7 @@ The website has a solid foundation with good semantic HTML, responsive design, a
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Pioneer Concrete Coatings LLC | Western Massachusetts">
 <meta name="twitter:description" content="Premium polyaspartic concrete coatings. 1-day installation. Free quote!">
-<meta name="twitter:image" content="https://concretecoatingspecialists.com/assets/images/hero-garage.jpg.jpg">
+<meta name="twitter:image" content="https://pioneerconcretecoatings.com/assets/images/hero-garage.jpg.jpg">
 ```
 
 ### 6. No LocalBusiness Schema
@@ -177,10 +177,10 @@ See HIGH PRIORITY section above for specific meta tags to add.
   "@context": "https://schema.org",
   "@type": "LocalBusiness",
   "name": "Pioneer Concrete Coatings LLC",
-  "image": "https://concretecoatingspecialists.com/assets/images/logo.svg",
+  "image": "https://pioneerconcretecoatings.com/assets/images/logo.svg",
   "description": "Premium polyaspartic concrete coatings for garage and basement floors",
   "telephone": "(413) 668-8126",
-  "email": "contact@concretecoatingspecialists.com",
+  "email": "contact@pioneerconcretecoatings.com",
   "address": {
     "@type": "PostalAddress",
     "addressRegion": "MA",
@@ -290,7 +290,7 @@ After implementing all recommendations:
 
 ## 📝 NOTES
 
-- Replace `https://concretecoatingspecialists.com/` with actual domain
+- Replace `https://pioneerconcretecoatings.com/` with actual domain
 - Update phone number and email in schemas
 - Add actual business address when available
 - Consider adding Google Business Profile integration

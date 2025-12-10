@@ -292,8 +292,8 @@ A: Not necessary with this implementation. Monitor yourself first.
 
 ### **Contact Information:**
 - **Phone:** (413) 668-8126
-- **Email:** contact@concretecoatingspecialists.com
-- **Website:** https://concretecoatingspecialists.com/
+- **Email:** contact@pioneerconcretecoatings.com
+- **Website:** https://pioneerconcretecoatings.com/
 
 ---
 

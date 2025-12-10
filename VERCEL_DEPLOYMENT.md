@@ -16,7 +16,7 @@ Before deploying, ensure you have:
 - [x] GitHub account (for repository hosting)
 - [x] Vercel account (free at https://vercel.com)
 - [x] All website files ready (index.html, assets/, etc.)
-- [x] Custom domain (concretecoatingspecialists.com) - optional but recommended
+- [x] Custom domain (pioneerconcretecoatings.com) - optional but recommended
 
 ---
 
@@ -139,7 +139,7 @@ git push -u origin main
 2. Select your project
 3. Go to "Settings" → "Domains"
 4. Click "Add Domain"
-5. Enter: `concretecoatingspecialists.com`
+5. Enter: `pioneerconcretecoatings.com`
 6. Click "Add"
 
 ### **Step 2: Update DNS Records**
@@ -163,7 +163,7 @@ Vercel will provide DNS records to add to your domain registrar:
 ### **Step 3: Verify Domain**
 1. Return to Vercel Dashboard
 2. Check domain status (should show "Valid Configuration")
-3. Visit https://concretecoatingspecialists.com
+3. Visit https://pioneerconcretecoatings.com
 4. Verify site loads correctly
 
 ### **Step 4: Enable HTTPS**
@@ -208,13 +208,13 @@ The following URLs in index.html are hardcoded for the custom domain:
 
 ```html
 <!-- Lines 12, 17-18, 26, 34 -->
-<link rel="canonical" href="https://concretecoatingspecialists.com/">
-<meta property="og:image" content="https://concretecoatingspecialists.com/assets/images/hero-garage.jpg.jpg">
-<meta property="og:url" content="https://concretecoatingspecialists.com/">
+<link rel="canonical" href="https://pioneerconcretecoatings.com/">
+<meta property="og:image" content="https://pioneerconcretecoatings.com/assets/images/hero-garage.jpg.jpg">
+<meta property="og:url" content="https://pioneerconcretecoatings.com/">
 <meta property="og:type" content="business.business">
 <meta property="og:site_name" content="Commonwealth Concrete Coating">
-<meta name="twitter:image" content="https://concretecoatingspecialists.com/assets/images/hero-garage.jpg.jpg">
-<link rel="alternate" hreflang="en-US" href="https://concretecoatingspecialists.com/">
+<meta name="twitter:image" content="https://pioneerconcretecoatings.com/assets/images/hero-garage.jpg.jpg">
+<link rel="alternate" hreflang="en-US" href="https://pioneerconcretecoatings.com/">
 ```
 
 ### **Option 1: Keep Hardcoded URLs (Recommended)**
@@ -233,7 +233,7 @@ Replace absolute URLs with relative URLs:
 ### **Option 3: Use Environment Variables (Advanced)**
 Create a script to replace URLs based on environment:
 ```javascript
-const domain = process.env.VERCEL_URL || 'concretecoatingspecialists.com';
+const domain = process.env.VERCEL_URL || 'pioneerconcretecoatings.com';
 const canonicalUrl = `https://${domain}/`;
 ```
 
@@ -275,7 +275,7 @@ const canonicalUrl = `https://${domain}/`;
 5. Verify images display correctly
 
 ### **Test Custom Domain**
-1. Visit: `https://concretecoatingspecialists.com`
+1. Visit: `https://pioneerconcretecoatings.com`
 2. Verify SSL certificate (green lock icon)
 3. Check all functionality works
 4. Verify redirects work (www to non-www)
@@ -383,7 +383,7 @@ const canonicalUrl = `https://${domain}/`;
 
 ### **Google Search Console**
 1. Go to https://search.google.com/search-console
-2. Add property: `https://concretecoatingspecialists.com`
+2. Add property: `https://pioneerconcretecoatings.com`
 3. Verify ownership (DNS or HTML file)
 4. Monitor:
    - Search impressions

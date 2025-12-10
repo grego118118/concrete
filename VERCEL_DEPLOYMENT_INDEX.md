@@ -91,7 +91,7 @@ vercel
 
 ### **Step 1: Add Domain to Vercel**
 - Vercel Dashboard → Settings → Domains
-- Add: `concretecoatingspecialists.com`
+- Add: `pioneerconcretecoatings.com`
 
 ### **Step 2: Update DNS**
 - Go to domain registrar
@@ -100,7 +100,7 @@ vercel
 
 ### **Step 3: Verify**
 - Check Vercel Dashboard
-- Visit https://concretecoatingspecialists.com
+- Visit https://pioneerconcretecoatings.com
 - Verify SSL certificate
 
 ---
@@ -274,7 +274,7 @@ vercel --prod
 ✅ All assets loading correctly  
 
 ### **After Custom Domain (24-48 hours)**
-✅ Site live at: `https://concretecoatingspecialists.com`  
+✅ Site live at: `https://pioneerconcretecoatings.com`  
 ✅ SSL certificate for custom domain  
 ✅ SEO benefits from canonical URL  
 ✅ Professional appearance  

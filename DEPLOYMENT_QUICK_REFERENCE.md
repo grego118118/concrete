@@ -119,10 +119,10 @@ git log --oneline -5
 
 ## 🌐 **CUSTOM DOMAIN (Optional)**
 
-To connect `concretecoatingspecialists.com`:
+To connect `pioneerconcretecoatings.com`:
 
 1. Vercel Dashboard → Settings → Domains
-2. Add: `concretecoatingspecialists.com`
+2. Add: `pioneerconcretecoatings.com`
 3. Update DNS at your registrar
 4. Wait 24-48 hours
 

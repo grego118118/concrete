@@ -28,7 +28,7 @@ These 5 changes will have the biggest immediate impact:
 **File:** index.html, line 5  
 **Add:**
 ```html
-<link rel="canonical" href="https://concretecoatingspecialists.com/">
+<link rel="canonical" href="https://pioneerconcretecoatings.com/">
 ```
 **Impact:** Prevents duplicate content issues
 
@@ -38,8 +38,8 @@ These 5 changes will have the biggest immediate impact:
 ```html
 <meta property="og:title" content="Pioneer Concrete Coatings LLC | Western Massachusetts">
 <meta property="og:description" content="Transform your garage & basement floors in just one day with premium polyaspartic coatings.">
-<meta property="og:image" content="https://concretecoatingspecialists.com/assets/images/hero-garage.jpg.jpg">
-<meta property="og:url" content="https://concretecoatingspecialists.com/">
+<meta property="og:image" content="https://pioneerconcretecoatings.com/assets/images/hero-garage.jpg.jpg">
+<meta property="og:url" content="https://pioneerconcretecoatings.com/">
 <meta property="og:type" content="business.business">
 ```
 **Impact:** +30% social sharing
@@ -63,7 +63,7 @@ These 5 changes will have the biggest immediate impact:
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Pioneer Concrete Coatings LLC | Western Massachusetts">
 <meta name="twitter:description" content="Premium polyaspartic concrete coatings. 1-day installation. Free quote!">
-<meta name="twitter:image" content="https://concretecoatingspecialists.com/assets/images/hero-garage.jpg.jpg">
+<meta name="twitter:image" content="https://pioneerconcretecoatings.com/assets/images/hero-garage.jpg.jpg">
 ```
 
 ### 7. Add Service Schemas
@@ -181,7 +181,7 @@ After implementation, validate your work:
 
 ## 💡 TIPS FOR SUCCESS
 
-1. **Replace Domain:** Update all instances of `https://concretecoatingspecialists.com/` with your actual domain
+1. **Replace Domain:** Update all instances of `https://pioneerconcretecoatings.com/` with your actual domain
 
 2. **Update Contact Info:** Ensure phone number and email are correct in all schemas
 
@@ -222,7 +222,7 @@ After implementation, validate your work:
 ## ❓ COMMON QUESTIONS
 
 **Q: Do I need to update the domain in all schemas?**  
-A: Yes, replace `https://concretecoatingspecialists.com/` with your actual domain.
+A: Yes, replace `https://pioneerconcretecoatings.com/` with your actual domain.
 
 **Q: Will these changes break anything?**  
 A: No, these are additive changes. They only add new meta tags and schemas.

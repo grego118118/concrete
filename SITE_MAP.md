@@ -88,7 +88,7 @@ Home (index.html)
 - **Company Name**: Commonwealth Concrete Coating
 - **Service Area**: Western Massachusetts (Hampden, Hampshire, Franklin, Berkshire counties)
 - **Phone**: (413) 668-8126
-- **Email**: contact@concretecoatingspecialists.com
+- **Email**: contact@pioneerconcretecoatings.com
 - **Main Services**: Garage & Basement floor coatings
 
 ### Images (Currently Placeholders)

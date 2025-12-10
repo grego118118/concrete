@@ -71,7 +71,7 @@ Edit these sections in `index.html`:
 
 2. **Email** (Line 420):
    ```html
-   <a href="mailto:contact@concretecoatingspecialists.com">contact@concretecoatingspecialists.com</a>
+   <a href="mailto:contact@pioneerconcretecoatings.com">contact@pioneerconcretecoatings.com</a>
    ```
 
 3. **Service Area** (Line 424):
@@ -173,5 +173,5 @@ MIT License - Feel free to use and modify as needed.
 
 ## Support
 
-For questions or issues, contact: contact@concretecoatingspecialists.com
+For questions or issues, contact: contact@pioneerconcretecoatings.com
 

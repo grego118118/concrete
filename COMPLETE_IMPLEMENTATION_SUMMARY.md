@@ -254,7 +254,7 @@ Before going live, verify:
 
 ### **Contact Information:**
 - **Phone:** (413) 668-8126
-- **Email:** contact@concretecoatingspecialists.com
+- **Email:** contact@pioneerconcretecoatings.com
 - **Service Area:** Hampden, Hampshire, Franklin counties, and Northern Connecticut
 
 ---

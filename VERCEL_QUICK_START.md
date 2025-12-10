@@ -58,10 +58,10 @@ git push -u origin main
 # 1. Go to Vercel Dashboard
 # 2. Select your project
 # 3. Settings → Domains
-# 4. Add Domain: concretecoatingspecialists.com
+# 4. Add Domain: pioneerconcretecoatings.com
 # 5. Update DNS records (Vercel will show you how)
 # 6. Wait 24-48 hours for DNS propagation
-# 7. Done! Visit https://concretecoatingspecialists.com
+# 7. Done! Visit https://pioneerconcretecoatings.com
 ```
 
 ---

@@ -18,7 +18,7 @@
 ### **Step 1: Add Property**
 1. Go to https://search.google.com/search-console
 2. Click "Add property"
-3. Enter: `https://concretecoatingspecialists.com/`
+3. Enter: `https://pioneerconcretecoatings.com/`
 4. Click "Continue"
 
 ### **Step 2: Verify Ownership**
@@ -65,7 +65,7 @@ Choose one verification method:
 ### **Step 2: Add Data Stream**
 1. Click "Data streams"
 2. Select "Web"
-3. Enter website URL: `https://concretecoatingspecialists.com/`
+3. Enter website URL: `https://pioneerconcretecoatings.com/`
 4. Enter stream name: "Main Website"
 5. Copy Measurement ID
 
@@ -110,8 +110,8 @@ Add this to your website `<head>` section:
 4. Enter business information:
    - Business name: Commonwealth Concrete Coating
    - Address: (if applicable)
-   - Phone: (413) 668-8126
-   - Website: https://concretecoatingspecialists.com/
+  - Phone: (413) 668-8126
+  - Website: https://pioneerconcretecoatings.com/
    - Service area: Hampden, Hampshire, Franklin counties, Northern Connecticut
 
 ### **Step 2: Verify Business**
@@ -239,7 +239,7 @@ Add this to your website `<head>` section:
 
 **Google Rich Results Test:**
 1. Go to https://search.google.com/test/rich-results
-2. Enter URL: https://concretecoatingspecialists.com/
+2. Enter URL: https://pioneerconcretecoatings.com/
 3. Check for:
    - ✅ LocalBusiness
    - ✅ FAQPage
@@ -326,5 +326,5 @@ Add this to your website `<head>` section:
 
 **Need help?**
 - Phone: (413) 668-8126
-- Email: contact@concretecoatingspecialists.com
+- Email: contact@pioneerconcretecoatings.com
 

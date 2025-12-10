@@ -89,7 +89,7 @@ Edit `index.html` and find these lines:
 
 **Line 420 - Email:**
 ```html
-<a href="mailto:contact@concretecoatingspecialists.com">contact@concretecoatingspecialists.com</a>
+<a href="mailto:contact@pioneerconcretecoatings.com">contact@pioneerconcretecoatings.com</a>
 ```
 
 **Line 424 - Service Area:**

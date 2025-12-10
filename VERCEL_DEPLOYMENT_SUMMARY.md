@@ -84,9 +84,9 @@ vercel
 
 ### **Hardcoded URLs (For Custom Domain)**
 The following URLs are hardcoded for your custom domain:
-- Canonical URL: `https://concretecoatingspecialists.com/`
-- Open Graph URLs: `https://concretecoatingspecialists.com/`
-- Twitter Card URLs: `https://concretecoatingspecialists.com/`
+- Canonical URL: `https://pioneerconcretecoatings.com/`
+- Open Graph URLs: `https://pioneerconcretecoatings.com/`
+- Twitter Card URLs: `https://pioneerconcretecoatings.com/`
 
 **Note:** These will work correctly once your custom domain is connected to Vercel.
 
@@ -183,7 +183,7 @@ Follow the steps in VERCEL_QUICK_START.md
 ✅ All assets loading correctly  
 
 ### **After Custom Domain**
-✅ Site live at: `https://concretecoatingspecialists.com`  
+✅ Site live at: `https://pioneerconcretecoatings.com`  
 ✅ SSL certificate for custom domain  
 ✅ SEO benefits from canonical URL  
 ✅ Professional appearance  
@@ -279,7 +279,7 @@ Follow the steps in VERCEL_QUICK_START.md
 ### **Step 1: Add Domain to Vercel**
 1. Vercel Dashboard → Select Project
 2. Settings → Domains
-3. Add: `concretecoatingspecialists.com`
+3. Add: `pioneerconcretecoatings.com`
 
 ### **Step 2: Update DNS**
 1. Go to domain registrar
@@ -288,7 +288,7 @@ Follow the steps in VERCEL_QUICK_START.md
 
 ### **Step 3: Verify**
 1. Check Vercel Dashboard for status
-2. Visit https://concretecoatingspecialists.com
+2. Visit https://pioneerconcretecoatings.com
 3. Verify SSL certificate is valid
 
 ---

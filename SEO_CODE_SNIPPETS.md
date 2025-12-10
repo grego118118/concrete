@@ -12,13 +12,13 @@ Add these tags after the existing `<meta name="viewport">` tag (around line 5):
 <meta name="description" content="Premium polyaspartic concrete coatings for garage & basement floors in Western Massachusetts. 1-day installation, UV-stable, 4x more durable than epoxy. Free quote!">
 <meta name="keywords" content="concrete coating, polyaspartic coating, garage floor coating, basement floor coating, Western Massachusetts, epoxy alternative, floor coating Springfield MA">
 <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
-<link rel="canonical" href="https://concretecoatingspecialists.com/">
+<link rel="canonical" href="https://pioneerconcretecoatings.com/">
 
 <!-- Open Graph Tags (Social Media) -->
 <meta property="og:title" content="Pioneer Concrete Coatings LLC | Western Massachusetts">
 <meta property="og:description" content="Transform your garage & basement floors in just one day with premium polyaspartic coatings. 4x more durable than epoxy. Free quote!">
-<meta property="og:image" content="https://concretecoatingspecialists.com/assets/images/hero-garage.jpg.jpg">
-<meta property="og:url" content="https://concretecoatingspecialists.com/">
+<meta property="og:image" content="https://pioneerconcretecoatings.com/assets/images/hero-garage.jpg.jpg">
+<meta property="og:url" content="https://pioneerconcretecoatings.com/">
 <meta property="og:type" content="business.business">
 <meta property="og:site_name" content="Pioneer Concrete Coatings LLC">
 
@@ -26,7 +26,7 @@ Add these tags after the existing `<meta name="viewport">` tag (around line 5):
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Pioneer Concrete Coatings LLC | Western Massachusetts">
 <meta name="twitter:description" content="Premium polyaspartic concrete coatings. 1-day installation. UV-stable. Free quote!">
-<meta name="twitter:image" content="https://concretecoatingspecialists.com/assets/images/hero-garage.jpg.jpg">
+<meta name="twitter:image" content="https://pioneerconcretecoatings.com/assets/images/hero-garage.jpg.jpg">
 ```
 
 ---
@@ -42,11 +42,11 @@ Add these `<script>` tags before the closing `</body>` tag (after existing scrip
   "@context": "https://schema.org",
   "@type": "LocalBusiness",
   "name": "Pioneer Concrete Coatings LLC",
-  "image": "https://concretecoatingspecialists.com/assets/images/logo.svg",
+  "image": "https://pioneerconcretecoatings.com/assets/images/logo.svg",
   "description": "Premium polyaspartic concrete coatings for garage and basement floors in Western Massachusetts",
   "telephone": "(413) 668-8126",
-  "email": "contact@concretecoatingspecialists.com",
-  "url": "https://concretecoatingspecialists.com/",
+  "email": "contact@pioneerconcretecoatings.com",
+  "url": "https://pioneerconcretecoatings.com/",
   "address": {
     "@type": "PostalAddress",
     "addressRegion": "MA",
@@ -98,11 +98,11 @@ Add these `<script>` tags before the closing `</body>` tag (after existing scrip
   "@context": "https://schema.org",
   "@type": "Organization",
   "name": "Pioneer Concrete Coatings LLC",
-  "url": "https://concretecoatingspecialists.com/",
-  "logo": "https://concretecoatingspecialists.com/assets/images/logo.svg",
+  "url": "https://pioneerconcretecoatings.com/",
+  "logo": "https://pioneerconcretecoatings.com/assets/images/logo.svg",
   "description": "Premium polyaspartic concrete coatings for garage and basement floors",
   "telephone": "(413) 668-8126",
-  "email": "contact@concretecoatingspecialists.com",
+  "email": "contact@pioneerconcretecoatings.com",
   "address": {
     "@type": "PostalAddress",
     "addressRegion": "MA",
@@ -280,7 +280,7 @@ After implementation, validate your markup:
 
 ## 📝 NOTES
 
-- Replace `https://concretecoatingspecialists.com/` with your actual domain
+- Replace `https://pioneerconcretecoatings.com/` with your actual domain
 - Update phone number and email as needed
 - Add actual business address when available
 - Consider adding Google Business Profile
