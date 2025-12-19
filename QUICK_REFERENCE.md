@@ -105,7 +105,7 @@
 
 **Business:**
 - Name: Commonwealth Concrete Coating
-- Phone: (413) 668-8126
+- Phone: (413) 544-4933
 - Email: contact@pioneerconcretecoatings.com
 - Website: https://pioneerconcretecoatings.com/
 
@@ -120,7 +120,7 @@
 ## 🔧 Quick Adjustments
 
 ### **To Update Phone Number:**
-Search for: `(413) 668-8126`
+Search for: `(413) 544-4933`
 Replace with: `[NEW NUMBER]`
 Files: index.html + all schemas
 

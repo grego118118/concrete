@@ -180,8 +180,8 @@ Installation by trained technicians using proper equipment and techniques. Ensur
 
 ## Questions?
 
-For more information about any of these terms or concepts, contact us:
-- **Phone:** (413) 668-8126
+For more information about any of these terms or concepts, contact us. [Call (413) 544-4933](tel:4135444933) or [email us](mailto:quotes@pioneerconcretecoatings.com) to speak with an expert about your project.
+- **Phone:** (413) 544-4933
 - **Email:** contact@pioneerconcretecoatings.com
 - **Service Area:** Hampden, Hampshire, Franklin counties, and Northern Connecticut
 

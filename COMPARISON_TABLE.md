@@ -249,8 +249,7 @@
 5. **Full warranty** coverage
 6. **Best long-term investment**
 
-**Contact us for a free quote:**
-- **Phone:** (413) 668-8126
-- **Email:** contact@pioneerconcretecoatings.com
+**Contact us for a free quote:** [Call (413) 544-4933](tel:4135444933) or [email us](mailto:quotes@pioneerconcretecoatings.com) to speak with an expert about your project.
+- **Service Area:** Hampden, Hampshire, Franklin counties, and Northern Connecticut
 - **Service Area:** Hampden, Hampshire, Franklin counties, and Northern Connecticut
 

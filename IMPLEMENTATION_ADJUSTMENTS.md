@@ -240,7 +240,7 @@ All 8 gallery images have descriptive alt text
 ### **Common Updates:**
 
 **Update Phone Number:**
-Search for "(413) 668-8126" and replace with new number
+Search for "(413) 544-4933" and replace with new number
 
 **Update Email:**
 Search for "contact@pioneerconcretecoatings.com" and replace
