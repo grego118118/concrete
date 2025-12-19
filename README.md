@@ -66,7 +66,7 @@ Edit these sections in `index.html`:
 
 1. **Phone Number** (Line 419):
    ```html
-   <a href="tel:4136688126">(413) 668-8126</a>
+   <a href="tel:4135444933">(413) 544-4933</a>
    ```
 
 2. **Email** (Line 420):

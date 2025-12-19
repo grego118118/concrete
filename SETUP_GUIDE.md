@@ -84,7 +84,7 @@ Edit `index.html` and find these lines:
 
 **Line 419 - Phone:**
 ```html
-<a href="tel:4136688126">(413) 668-8126</a>
+<a href="tel:4135444933">(413) 544-4933</a>
 ```
 
 **Line 420 - Email:**

@@ -124,7 +124,9 @@ Home (index.html)
 1. **4x More Durable** - Resists chemicals, oil, abrasions, impact
 2. **1-Day Installation** - Walk on in hours, drive in 24
 3. **UV Stable** - Never turns yellow or fades
-4. **All-Weather Application** - -30°F to 140°F
+4. **Year-Round Application** - Our coatings can be applied in a wide range of temperatures and are suitable for various weather conditions throughout the year.
+
+**CTA:** [Call (413) 544-4933](tel:4135444933) or [email us](mailto:quotes@pioneerconcretecoatings.com) to speak with an expert about your project.
 
 ### Why Us (4 Reasons)
 1. **Local Experts** - Western Mass business
