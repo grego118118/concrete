@@ -60,8 +60,9 @@ Answer Engine Optimization focuses on optimizing content for AI-powered search e
     <div class="space-y-6">
       <div>
         <h3 class="text-xl font-semibold mb-2">Polyaspartic Coating</h3>
-        <p class="text-gray-700">A type of aliphatic polyurea coating that cures quickly and is UV-stable. Unlike epoxy, polyaspartic coatings won't yellow or fade in sunlight and can be applied in a wider temperature range (-30°F to 140°F).</p>
-      </div>
+		        <p class="text-gray-700">A type of aliphatic polyurea coating that cures quickly and is UV-stable. Unlike epoxy, polyaspartic coatings won't yellow or fade in sunlight and can be applied in a wide range of temperatures, suitable for various weather conditions throughout the year.</p>
+	        <p class="text-gray-700 mt-2">Call <a href="tel:4135444933" class="text-blue-600 hover:underline">(413) 544-4933</a> or <a href="mailto:quotes@pioneerconcretecoatings.com" class="text-blue-600 hover:underline">email us</a> to speak with an expert about your project.</p>
+	      </div>
       
       <div>
         <h3 class="text-xl font-semibold mb-2">Diamond Grinding</h3>
@@ -158,9 +159,9 @@ Answer Engine Optimization focuses on optimizing content for AI-powered search e
     </tr>
     <tr>
       <td class="border border-gray-300 p-3"><strong>Application Temp</strong></td>
-      <td class="border border-gray-300 p-3">-30°F to 140°F</td>
-      <td class="border border-gray-300 p-3">50°F to 85°F</td>
-      <td class="border border-gray-300 p-3">50°F to 85°F</td>
+	    <td class="border border-gray-300 p-3">Wide temperature range; suitable for various weather conditions throughout the year</td>
+	    <td class="border border-gray-300 p-3">Typical moderate temperature range</td>
+	    <td class="border border-gray-300 p-3">Typical moderate temperature range</td>
     </tr>
     <tr>
       <td class="border border-gray-300 p-3"><strong>Installation Time</strong></td>
