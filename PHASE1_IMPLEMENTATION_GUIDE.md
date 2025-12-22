@@ -222,7 +222,7 @@ Display Google Reviews widget on website
 ```html
 <div class="sticky-cta bg-blue-600 text-white py-3 fixed bottom-0 w-full z-40">
   <div class="container mx-auto px-6 flex justify-between items-center">
-    <p class="font-bold">Ready to transform your floors?</p>
+	    <p class="font-bold">Ready to transform your surfaces?</p>
     <div class="space-x-4">
       <a href="tel:+14135551234" class="bg-white text-blue-600 px-6 py-2 rounded font-bold">
         Call Now
