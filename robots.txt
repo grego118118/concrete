@@ -1,0 +1,7 @@
+# Allow all search engines to crawl the site
+User-agent: *
+Allow: /
+
+# Sitemap for pioneerconcretecoatings.com
+Sitemap: https://pioneerconcretecoatings.com/sitemap.xml
+
