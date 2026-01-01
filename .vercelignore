@@ -2,6 +2,9 @@
 *.md
 *.txt
 
+# Ensure robots.txt is deployed for SEO / search engines
+!robots.txt
+
 # Development files
 node_modules/
 .git/
