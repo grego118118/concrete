@@ -41,6 +41,15 @@
     <link rel="icon" type="image/png" sizes="192x192" href="assets/images/android-chrome-192x192.png">
     <link rel="icon" type="image/png" sizes="512x512" href="assets/images/android-chrome-512x512.png">
 
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=AW-17854261308"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'AW-17854261308');
+    </script>
+
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
     <style>
@@ -665,6 +674,11 @@
 	                            statusEl.classList.remove('text-gray-300');
 	                            statusEl.classList.add('text-green-400');
 	                            statusEl.textContent = 'Thank you! Your request has been sent. We will contact you soon.';
+
+	                            // Google Ads conversion tracking
+	                            if (typeof gtag !== 'undefined') {
+	                                gtag('event', 'conversion', {'send_to': 'AW-17854261308/U0gMCMac6t8bELzQycFC'});
+	                            }
 	                        } else {
 	                            statusEl.classList.remove('text-gray-300');
 	                            statusEl.classList.add('text-red-400');
