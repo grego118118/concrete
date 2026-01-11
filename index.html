@@ -50,6 +50,9 @@
         gtag('config', 'AW-17854261308');
     </script>
 
+    <!-- Google Maps API for address validation -->
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAPV9GVBwLktmWPKyn90lk1zOtZ7X_n9d0&libraries=places" async defer></script>
+
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
     <style>
@@ -493,9 +496,11 @@
 	                            <label for="email" class="block mb-1 font-semibold">Email</label>
 	                            <input type="email" id="email" name="email" required class="w-full p-3 rounded-lg bg-gray-700 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
 	                        </div>
-	                         <div>
-	                            <label for="city" class="block mb-1 font-semibold">City</label>
-	                            <input type="text" id="city" name="city" class="w-full p-3 rounded-lg bg-gray-700 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
+	                        <div>
+	                            <label for="address" class="block mb-1 font-semibold">Project Address <span class="text-red-400">*</span></label>
+	                            <input type="text" id="address" name="address" required placeholder="Enter street address" class="w-full p-3 rounded-lg bg-gray-700 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
+	                            <p class="mt-1 text-xs text-gray-400">We serve Western MA (Hampden, Hampshire, Franklin counties) and Northern CT</p>
+	                            <div id="address-validation-status" class="mt-2 text-sm hidden"></div>
 	                        </div>
 	                        <div>
 	                            <label for="square-footage" class="block mb-1 font-semibold">Approximate Square Footage</label>
@@ -639,6 +644,106 @@
 	            // Dynamic Year in Footer
 	            document.getElementById('year').textContent = new Date().getFullYear();
 
+	            // Address validation with Google Maps API
+	            let addressValidated = false;
+	            let autocomplete;
+	            const addressInput = document.getElementById('address');
+	            const addressStatusEl = document.getElementById('address-validation-status');
+
+	            // Service area counties
+	            const serviceAreaCounties = {
+	                'MA': ['Hampden County', 'Hampshire County', 'Franklin County'],
+	                'CT': ['Hartford County', 'Tolland County', 'Windham County', 'Litchfield County']
+	            };
+
+	            function initAutocomplete() {
+	                if (typeof google !== 'undefined' && google.maps && google.maps.places) {
+	                    autocomplete = new google.maps.places.Autocomplete(addressInput, {
+	                        types: ['address'],
+	                        componentRestrictions: { country: 'us' }
+	                    });
+
+	                    autocomplete.addListener('place_changed', function() {
+	                        const place = autocomplete.getPlace();
+	                        if (place.geometry) {
+	                            validateAddress(place);
+	                        }
+	                    });
+	                }
+	            }
+
+	            function validateAddress(place) {
+	                addressStatusEl.classList.remove('hidden', 'text-green-400', 'text-red-400', 'text-yellow-400');
+	                addressStatusEl.classList.add('text-gray-300');
+	                addressStatusEl.textContent = 'Validating address...';
+
+	                const addressComponents = place.address_components;
+	                let county = '';
+	                let state = '';
+
+	                // Extract county and state from address components
+	                for (let component of addressComponents) {
+	                    if (component.types.includes('administrative_area_level_2')) {
+	                        county = component.long_name;
+	                    }
+	                    if (component.types.includes('administrative_area_level_1')) {
+	                        state = component.short_name;
+	                    }
+	                }
+
+	                // Check if address is in service area
+	                if (state && serviceAreaCounties[state]) {
+	                    if (serviceAreaCounties[state].includes(county)) {
+	                        addressValidated = true;
+	                        addressStatusEl.classList.remove('text-gray-300');
+	                        addressStatusEl.classList.add('text-green-400');
+	                        addressStatusEl.innerHTML = '✓ Address is within our service area';
+	                    } else {
+	                        addressValidated = false;
+	                        addressStatusEl.classList.remove('text-gray-300');
+	                        addressStatusEl.classList.add('text-red-400');
+	                        addressStatusEl.innerHTML = `✗ Sorry, ${county || 'this area'} is outside our service area. We serve Western MA (Hampden, Hampshire, Franklin counties) and Northern CT (Hartford, Tolland, Windham, Litchfield counties).`;
+	                    }
+	                } else {
+	                    addressValidated = false;
+	                    addressStatusEl.classList.remove('text-gray-300');
+	                    addressStatusEl.classList.add('text-red-400');
+	                    addressStatusEl.innerHTML = '✗ Sorry, this address is outside our service area. We serve Western Massachusetts and Northern Connecticut only.';
+	                }
+	            }
+
+	            // Manual address validation (when user types without selecting from autocomplete)
+	            if (addressInput) {
+	                addressInput.addEventListener('blur', function() {
+	                    if (addressInput.value && !addressValidated && typeof google !== 'undefined' && google.maps) {
+	                        const geocoder = new google.maps.Geocoder();
+	                        geocoder.geocode({ address: addressInput.value }, function(results, status) {
+	                            if (status === 'OK' && results[0]) {
+	                                validateAddress(results[0]);
+	                            } else {
+	                                addressStatusEl.classList.remove('hidden', 'text-green-400', 'text-red-400');
+	                                addressStatusEl.classList.add('text-yellow-400');
+	                                addressStatusEl.textContent = '⚠ Please select an address from the dropdown or verify the address is correct.';
+	                            }
+	                        });
+	                    }
+	                });
+
+	                // Reset validation when user starts typing
+	                addressInput.addEventListener('input', function() {
+	                    addressValidated = false;
+	                });
+	            }
+
+	            // Initialize autocomplete when Google Maps API is loaded
+	            if (typeof google !== 'undefined' && google.maps) {
+	                initAutocomplete();
+	            } else {
+	                window.addEventListener('load', function() {
+	                    setTimeout(initAutocomplete, 1000);
+	                });
+	            }
+
 	            // Quote form: client-side validation + Formspree submission feedback
 	            const quoteForm = document.getElementById('quote-form');
 	            const statusEl = document.getElementById('quote-form-status');
@@ -653,6 +758,18 @@
 	                    }
 
 	                    event.preventDefault();
+
+	                    // Check address validation
+	                    if (!addressValidated && addressInput.value) {
+	                        statusEl.classList.remove('hidden');
+	                        statusEl.classList.remove('text-green-400', 'text-gray-300');
+	                        statusEl.classList.add('text-red-400');
+	                        statusEl.textContent = 'Please enter a valid address within our service area before submitting.';
+	                        addressStatusEl.classList.remove('hidden');
+	                        addressInput.focus();
+	                        return;
+	                    }
+
 	                    statusEl.classList.remove('hidden');
 	                    statusEl.classList.remove('text-green-400', 'text-red-400');
 	                    statusEl.classList.add('text-gray-300');
