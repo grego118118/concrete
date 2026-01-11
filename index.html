@@ -50,6 +50,18 @@
         gtag('config', 'AW-17854261308');
     </script>
 
+    <!-- Google Maps API callback - must be defined BEFORE the API loads -->
+    <script>
+        // Define the callback function globally before Google Maps loads
+        window.initGoogleMaps = function() {
+            console.log('Google Maps API loaded successfully');
+            // The actual initialization will happen in the main script
+            if (window.googleMapsCallback) {
+                window.googleMapsCallback();
+            }
+        };
+    </script>
+
     <!-- Google Maps API for address validation -->
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAPV9GVBwLktmWPKyn90lk1zOtZ7X_n9d0&libraries=places&callback=initGoogleMaps" async defer></script>
 
@@ -657,11 +669,17 @@
 	                'CT': ['Hartford County', 'Tolland County', 'Windham County', 'Litchfield County']
 	            };
 
-	            // Global callback function for Google Maps API
-	            window.initGoogleMaps = function() {
+	            // Set up the callback for when Google Maps API loads
+	            window.googleMapsCallback = function() {
 	                googleMapsLoaded = true;
 	                initAutocomplete();
 	            };
+
+	            // If Google Maps is already loaded, initialize immediately
+	            if (typeof google !== 'undefined' && google.maps && google.maps.places) {
+	                googleMapsLoaded = true;
+	                initAutocomplete();
+	            }
 
 	            function initAutocomplete() {
 	                if (!addressInput) return;
