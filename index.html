@@ -51,7 +51,7 @@
     </script>
 
     <!-- Google Maps API for address validation -->
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAPV9GVBwLktmWPKyn90lk1zOtZ7X_n9d0&libraries=places" async defer></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAPV9GVBwLktmWPKyn90lk1zOtZ7X_n9d0&libraries=places&callback=initGoogleMaps" async defer></script>
 
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
@@ -647,6 +647,7 @@
 	            // Address validation with Google Maps API
 	            let addressValidated = false;
 	            let autocomplete;
+	            let googleMapsLoaded = false;
 	            const addressInput = document.getElementById('address');
 	            const addressStatusEl = document.getElementById('address-validation-status');
 
@@ -656,19 +657,31 @@
 	                'CT': ['Hartford County', 'Tolland County', 'Windham County', 'Litchfield County']
 	            };
 
-	            function initAutocomplete() {
-	                if (typeof google !== 'undefined' && google.maps && google.maps.places) {
-	                    autocomplete = new google.maps.places.Autocomplete(addressInput, {
-	                        types: ['address'],
-	                        componentRestrictions: { country: 'us' }
-	                    });
+	            // Global callback function for Google Maps API
+	            window.initGoogleMaps = function() {
+	                googleMapsLoaded = true;
+	                initAutocomplete();
+	            };
 
-	                    autocomplete.addListener('place_changed', function() {
-	                        const place = autocomplete.getPlace();
-	                        if (place.geometry) {
-	                            validateAddress(place);
-	                        }
-	                    });
+	            function initAutocomplete() {
+	                if (!addressInput) return;
+
+	                try {
+	                    if (typeof google !== 'undefined' && google.maps && google.maps.places) {
+	                        autocomplete = new google.maps.places.Autocomplete(addressInput, {
+	                            types: ['address'],
+	                            componentRestrictions: { country: 'us' }
+	                        });
+
+	                        autocomplete.addListener('place_changed', function() {
+	                            const place = autocomplete.getPlace();
+	                            if (place.geometry) {
+	                                validateAddress(place);
+	                            }
+	                        });
+	                    }
+	                } catch (error) {
+	                    console.error('Error initializing Google Maps Autocomplete:', error);
 	                }
 	            }
 
@@ -715,32 +728,27 @@
 	            // Manual address validation (when user types without selecting from autocomplete)
 	            if (addressInput) {
 	                addressInput.addEventListener('blur', function() {
-	                    if (addressInput.value && !addressValidated && typeof google !== 'undefined' && google.maps) {
-	                        const geocoder = new google.maps.Geocoder();
-	                        geocoder.geocode({ address: addressInput.value }, function(results, status) {
-	                            if (status === 'OK' && results[0]) {
-	                                validateAddress(results[0]);
-	                            } else {
-	                                addressStatusEl.classList.remove('hidden', 'text-green-400', 'text-red-400');
-	                                addressStatusEl.classList.add('text-yellow-400');
-	                                addressStatusEl.textContent = '⚠ Please select an address from the dropdown or verify the address is correct.';
-	                            }
-	                        });
+	                    if (addressInput.value && !addressValidated && googleMapsLoaded && typeof google !== 'undefined' && google.maps) {
+	                        try {
+	                            const geocoder = new google.maps.Geocoder();
+	                            geocoder.geocode({ address: addressInput.value }, function(results, status) {
+	                                if (status === 'OK' && results[0]) {
+	                                    validateAddress(results[0]);
+	                                } else {
+	                                    addressStatusEl.classList.remove('hidden', 'text-green-400', 'text-red-400');
+	                                    addressStatusEl.classList.add('text-yellow-400');
+	                                    addressStatusEl.textContent = '⚠ Please select an address from the dropdown or verify the address is correct.';
+	                                }
+	                            });
+	                        } catch (error) {
+	                            console.error('Error geocoding address:', error);
+	                        }
 	                    }
 	                });
 
 	                // Reset validation when user starts typing
 	                addressInput.addEventListener('input', function() {
 	                    addressValidated = false;
-	                });
-	            }
-
-	            // Initialize autocomplete when Google Maps API is loaded
-	            if (typeof google !== 'undefined' && google.maps) {
-	                initAutocomplete();
-	            } else {
-	                window.addEventListener('load', function() {
-	                    setTimeout(initAutocomplete, 1000);
 	                });
 	            }
 
