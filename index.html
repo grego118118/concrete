@@ -50,20 +50,11 @@
         gtag('config', 'AW-17854261308');
     </script>
 
-    <!-- Google Maps API callback - must be defined BEFORE the API loads -->
+    <!-- Google Maps API for address validation (New API - 2025) -->
     <script>
-        // Define the callback function globally before Google Maps loads
-        window.initGoogleMaps = function() {
-            console.log('Google Maps API loaded successfully');
-            // The actual initialization will happen in the main script
-            if (window.googleMapsCallback) {
-                window.googleMapsCallback();
-            }
-        };
+        (g=>{var h,a,k,p="The Google Maps JavaScript API",c="google",l="importLibrary",q="__ib__",m=document,b=window;b=b[c]||(b[c]={});var d=b.maps||(b.maps={}),r=new Set,e=new URLSearchParams,u=()=>h||(h=new Promise(async(f,n)=>{await (a=m.createElement("script"));e.set("libraries",[...r]+"");for(k in g)e.set(k.replace(/[A-Z]/g,t=>"_"+t[0].toLowerCase()),g[k]);e.set("callback",c+".maps."+q);a.src=`https://maps.${c}apis.com/maps/api/js?`+e;d[q]=f;a.onerror=()=>h=n(Error(p+" could not load."));a.nonce=m.querySelector("script[nonce]")?.nonce||"";m.head.append(a)}));d[l]?console.warn(p+" only loads once. Ignoring:",g):d[l]=(f,...n)=>r.add(f)&&u().then(()=>d[l](f,...n))})
+        ({key: "AIzaSyAPV9GVBwLktmWPKyn90lk1zOtZ7X_n9d0", v: "weekly", loading: "async"});
     </script>
-
-    <!-- Google Maps API for address validation -->
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAPV9GVBwLktmWPKyn90lk1zOtZ7X_n9d0&libraries=places&callback=initGoogleMaps" async defer></script>
 
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
@@ -669,34 +660,22 @@
 	                'CT': ['Hartford County', 'Tolland County', 'Windham County', 'Litchfield County']
 	            };
 
-	            // Set up the callback for when Google Maps API loads
-	            window.googleMapsCallback = function() {
-	                googleMapsLoaded = true;
-	                initAutocomplete();
-	            };
-
-	            // If Google Maps is already loaded, initialize immediately
-	            if (typeof google !== 'undefined' && google.maps && google.maps.places) {
-	                googleMapsLoaded = true;
-	                initAutocomplete();
-	            }
-
-	            function initAutocomplete() {
+	            // Initialize autocomplete with new Places API (2025)
+	            async function initAutocomplete() {
 	                if (!addressInput) return;
 
 	                try {
-	                    if (typeof google !== 'undefined' && google.maps && google.maps.places) {
-	                        console.log('Initializing Google Places Autocomplete (New API)');
+	                    console.log('Initializing Google Places Autocomplete (New API 2025)');
 
-	                        // Use the new Places Autocomplete Service (compatible with new API keys)
-	                        const autocompleteService = new google.maps.places.AutocompleteService();
-	                        const placesService = new google.maps.places.PlacesService(document.createElement('div'));
+	                    // Load the Places library using the new importLibrary method
+	                    const { AutocompleteSuggestion, AutocompleteSessionToken } = await google.maps.importLibrary('places');
 
-	                        let autocompleteResults = [];
-	                        let selectedIndex = -1;
+	                    let autocompleteResults = [];
+	                    let selectedIndex = -1;
+	                    let sessionToken = new AutocompleteSessionToken();
 
-	                        // Create dropdown for suggestions
-	                        const dropdown = document.createElement('div');
+	                    // Create dropdown for suggestions
+	                    const dropdown = document.createElement('div');
 	                        dropdown.className = 'autocomplete-dropdown';
 	                        dropdown.style.cssText = `
 	                            position: absolute;
@@ -713,7 +692,7 @@
 	                        addressInput.parentElement.appendChild(dropdown);
 
 	                        // Input event listener for autocomplete
-	                        addressInput.addEventListener('input', function() {
+	                        addressInput.addEventListener('input', async function() {
 	                            const value = this.value;
 
 	                            if (value.length < 3) {
@@ -721,28 +700,39 @@
 	                                return;
 	                            }
 
-	                            // Get autocomplete predictions
-	                            autocompleteService.getPlacePredictions({
-	                                input: value,
-	                                types: ['address'],
-	                                componentRestrictions: { country: 'us' }
-	                            }, function(predictions, status) {
-	                                if (status === google.maps.places.PlacesServiceStatus.OK && predictions) {
-	                                    autocompleteResults = predictions;
-	                                    displaySuggestions(predictions);
+	                            // Get autocomplete predictions using new API
+	                            try {
+	                                const request = {
+	                                    input: value,
+	                                    includedPrimaryTypes: ['street_address', 'premise', 'subpremise'],
+	                                    includedRegionCodes: ['us'],
+	                                    sessionToken: sessionToken
+	                                };
+
+	                                const { suggestions } = await AutocompleteSuggestion.fetchAutocompleteSuggestions(request);
+
+	                                if (suggestions && suggestions.length > 0) {
+	                                    autocompleteResults = suggestions;
+	                                    displaySuggestions(suggestions);
 	                                } else {
 	                                    dropdown.style.display = 'none';
 	                                }
-	                            });
+	                            } catch (error) {
+	                                console.error('Error fetching autocomplete suggestions:', error);
+	                                dropdown.style.display = 'none';
+	                            }
 	                        });
 
 	                        // Display suggestions in dropdown
-	                        function displaySuggestions(predictions) {
+	                        function displaySuggestions(suggestions) {
 	                            dropdown.innerHTML = '';
 	                            dropdown.style.display = 'block';
 	                            dropdown.style.width = addressInput.offsetWidth + 'px';
 
-	                            predictions.forEach((prediction, index) => {
+	                            suggestions.forEach((suggestion, index) => {
+	                                const placePrediction = suggestion.placePrediction;
+	                                if (!placePrediction) return;
+
 	                                const item = document.createElement('div');
 	                                item.className = 'autocomplete-item';
 	                                item.style.cssText = `
@@ -750,7 +740,8 @@
 	                                    cursor: pointer;
 	                                    border-bottom: 1px solid #eee;
 	                                `;
-	                                item.textContent = prediction.description;
+	                                // Use the new API structure: placePrediction.text.text
+	                                item.textContent = placePrediction.text.text;
 
 	                                item.addEventListener('mouseenter', function() {
 	                                    this.style.backgroundColor = '#f0f0f0';
@@ -761,25 +752,36 @@
 	                                });
 
 	                                item.addEventListener('click', function() {
-	                                    selectPlace(prediction.place_id);
+	                                    selectPlace(placePrediction);
 	                                });
 
 	                                dropdown.appendChild(item);
 	                            });
 	                        }
 
-	                        // Select a place and get details
-	                        function selectPlace(placeId) {
-	                            placesService.getDetails({
-	                                placeId: placeId,
-	                                fields: ['address_components', 'geometry', 'formatted_address']
-	                            }, function(place, status) {
-	                                if (status === google.maps.places.PlacesServiceStatus.OK) {
-	                                    addressInput.value = place.formatted_address;
-	                                    dropdown.style.display = 'none';
-	                                    validateAddress(place);
-	                                }
-	                            });
+	                        // Select a place and get details using new API
+	                        async function selectPlace(placePrediction) {
+	                            try {
+	                                // Convert placePrediction to Place object
+	                                const place = placePrediction.toPlace();
+
+	                                // Fetch the required fields
+	                                await place.fetchFields({
+	                                    fields: ['addressComponents', 'location', 'formattedAddress']
+	                                });
+
+	                                // Update the input with the formatted address
+	                                addressInput.value = place.formattedAddress;
+	                                dropdown.style.display = 'none';
+
+	                                // Refresh session token after selection
+	                                sessionToken = new AutocompleteSessionToken();
+
+	                                // Validate the address
+	                                validateAddress(place);
+	                            } catch (error) {
+	                                console.error('Error fetching place details:', error);
+	                            }
 	                        }
 
 	                        // Close dropdown when clicking outside
@@ -804,7 +806,10 @@
 	                            } else if (e.key === 'Enter' && selectedIndex >= 0) {
 	                                e.preventDefault();
 	                                if (autocompleteResults[selectedIndex]) {
-	                                    selectPlace(autocompleteResults[selectedIndex].place_id);
+	                                    const placePrediction = autocompleteResults[selectedIndex].placePrediction;
+	                                    if (placePrediction) {
+	                                        selectPlace(placePrediction);
+	                                    }
 	                                }
 	                            } else if (e.key === 'Escape') {
 	                                dropdown.style.display = 'none';
@@ -832,17 +837,18 @@
 	                addressStatusEl.classList.add('text-gray-300');
 	                addressStatusEl.textContent = 'Validating address...';
 
-	                const addressComponents = place.address_components;
+	                // New API uses addressComponents (camelCase) instead of address_components
+	                const addressComponents = place.addressComponents;
 	                let county = '';
 	                let state = '';
 
 	                // Extract county and state from address components
 	                for (let component of addressComponents) {
 	                    if (component.types.includes('administrative_area_level_2')) {
-	                        county = component.long_name;
+	                        county = component.longText;
 	                    }
 	                    if (component.types.includes('administrative_area_level_1')) {
-	                        state = component.short_name;
+	                        state = component.shortText;
 	                    }
 	                }
 
@@ -958,6 +964,9 @@
 	                    }
 	                });
 	            }
+
+	            // Initialize autocomplete when page loads
+	            initAutocomplete();
 	        });
 	    </script>
 
