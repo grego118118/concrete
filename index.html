@@ -686,17 +686,141 @@
 
 	                try {
 	                    if (typeof google !== 'undefined' && google.maps && google.maps.places) {
-	                        autocomplete = new google.maps.places.Autocomplete(addressInput, {
-	                            types: ['address'],
-	                            componentRestrictions: { country: 'us' }
+	                        console.log('Initializing Google Places Autocomplete (New API)');
+
+	                        // Use the new Places Autocomplete Service (compatible with new API keys)
+	                        const autocompleteService = new google.maps.places.AutocompleteService();
+	                        const placesService = new google.maps.places.PlacesService(document.createElement('div'));
+
+	                        let autocompleteResults = [];
+	                        let selectedIndex = -1;
+
+	                        // Create dropdown for suggestions
+	                        const dropdown = document.createElement('div');
+	                        dropdown.className = 'autocomplete-dropdown';
+	                        dropdown.style.cssText = `
+	                            position: absolute;
+	                            background: white;
+	                            border: 1px solid #ddd;
+	                            border-radius: 4px;
+	                            max-height: 300px;
+	                            overflow-y: auto;
+	                            z-index: 1000;
+	                            display: none;
+	                            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+	                        `;
+	                        addressInput.parentElement.style.position = 'relative';
+	                        addressInput.parentElement.appendChild(dropdown);
+
+	                        // Input event listener for autocomplete
+	                        addressInput.addEventListener('input', function() {
+	                            const value = this.value;
+
+	                            if (value.length < 3) {
+	                                dropdown.style.display = 'none';
+	                                return;
+	                            }
+
+	                            // Get autocomplete predictions
+	                            autocompleteService.getPlacePredictions({
+	                                input: value,
+	                                types: ['address'],
+	                                componentRestrictions: { country: 'us' }
+	                            }, function(predictions, status) {
+	                                if (status === google.maps.places.PlacesServiceStatus.OK && predictions) {
+	                                    autocompleteResults = predictions;
+	                                    displaySuggestions(predictions);
+	                                } else {
+	                                    dropdown.style.display = 'none';
+	                                }
+	                            });
 	                        });
 
-	                        autocomplete.addListener('place_changed', function() {
-	                            const place = autocomplete.getPlace();
-	                            if (place.geometry) {
-	                                validateAddress(place);
+	                        // Display suggestions in dropdown
+	                        function displaySuggestions(predictions) {
+	                            dropdown.innerHTML = '';
+	                            dropdown.style.display = 'block';
+	                            dropdown.style.width = addressInput.offsetWidth + 'px';
+
+	                            predictions.forEach((prediction, index) => {
+	                                const item = document.createElement('div');
+	                                item.className = 'autocomplete-item';
+	                                item.style.cssText = `
+	                                    padding: 10px;
+	                                    cursor: pointer;
+	                                    border-bottom: 1px solid #eee;
+	                                `;
+	                                item.textContent = prediction.description;
+
+	                                item.addEventListener('mouseenter', function() {
+	                                    this.style.backgroundColor = '#f0f0f0';
+	                                });
+
+	                                item.addEventListener('mouseleave', function() {
+	                                    this.style.backgroundColor = 'white';
+	                                });
+
+	                                item.addEventListener('click', function() {
+	                                    selectPlace(prediction.place_id);
+	                                });
+
+	                                dropdown.appendChild(item);
+	                            });
+	                        }
+
+	                        // Select a place and get details
+	                        function selectPlace(placeId) {
+	                            placesService.getDetails({
+	                                placeId: placeId,
+	                                fields: ['address_components', 'geometry', 'formatted_address']
+	                            }, function(place, status) {
+	                                if (status === google.maps.places.PlacesServiceStatus.OK) {
+	                                    addressInput.value = place.formatted_address;
+	                                    dropdown.style.display = 'none';
+	                                    validateAddress(place);
+	                                }
+	                            });
+	                        }
+
+	                        // Close dropdown when clicking outside
+	                        document.addEventListener('click', function(e) {
+	                            if (e.target !== addressInput && !dropdown.contains(e.target)) {
+	                                dropdown.style.display = 'none';
 	                            }
 	                        });
+
+	                        // Keyboard navigation
+	                        addressInput.addEventListener('keydown', function(e) {
+	                            const items = dropdown.querySelectorAll('.autocomplete-item');
+
+	                            if (e.key === 'ArrowDown') {
+	                                e.preventDefault();
+	                                selectedIndex = Math.min(selectedIndex + 1, items.length - 1);
+	                                updateSelection(items);
+	                            } else if (e.key === 'ArrowUp') {
+	                                e.preventDefault();
+	                                selectedIndex = Math.max(selectedIndex - 1, -1);
+	                                updateSelection(items);
+	                            } else if (e.key === 'Enter' && selectedIndex >= 0) {
+	                                e.preventDefault();
+	                                if (autocompleteResults[selectedIndex]) {
+	                                    selectPlace(autocompleteResults[selectedIndex].place_id);
+	                                }
+	                            } else if (e.key === 'Escape') {
+	                                dropdown.style.display = 'none';
+	                                selectedIndex = -1;
+	                            }
+	                        });
+
+	                        function updateSelection(items) {
+	                            items.forEach((item, index) => {
+	                                if (index === selectedIndex) {
+	                                    item.style.backgroundColor = '#e0e0e0';
+	                                } else {
+	                                    item.style.backgroundColor = 'white';
+	                                }
+	                            });
+	                        }
 	                    }
 	                } catch (error) {
 	                    console.error('Error initializing Google Maps Autocomplete:', error);
