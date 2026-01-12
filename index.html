@@ -687,18 +687,25 @@
 	                        dropdown.className = 'autocomplete-dropdown';
 	                        dropdown.style.cssText = `
 	                            position: absolute;
+	                            top: 100%;
+	                            left: 0;
+	                            right: 0;
 	                            background: white;
-	                            border: 1px solid #ddd;
+	                            color: #333;
+	                            border: 2px solid #4299e1;
 	                            border-radius: 4px;
 	                            max-height: 300px;
 	                            overflow-y: auto;
-	                            z-index: 1000;
+	                            z-index: 9999;
 	                            display: none;
-	                            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+	                            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+	                            margin-top: 4px;
 	                        `;
 	                        addressInput.parentElement.style.position = 'relative';
 	                        addressInput.parentElement.appendChild(dropdown);
 	                        console.log('Autocomplete dropdown created and attached');
+	                        console.log('Dropdown element:', dropdown);
+	                        console.log('Parent element position:', addressInput.parentElement.style.position);
 
 	                        // Input event listener for autocomplete
 	                        addressInput.addEventListener('input', async function() {
@@ -739,13 +746,18 @@
 
 	                        // Display suggestions in dropdown
 	                        function displaySuggestions(suggestions) {
+	                            console.log('displaySuggestions called with', suggestions.length, 'suggestions');
 	                            dropdown.innerHTML = '';
 	                            dropdown.style.display = 'block';
 	                            dropdown.style.width = addressInput.offsetWidth + 'px';
+	                            console.log('Dropdown display set to block, width:', dropdown.style.width);
 
 	                            suggestions.forEach((suggestion, index) => {
 	                                const placePrediction = suggestion.placePrediction;
-	                                if (!placePrediction) return;
+	                                if (!placePrediction) {
+	                                    console.log('No placePrediction for suggestion', index);
+	                                    return;
+	                                }
 
 	                                const item = document.createElement('div');
 	                                item.className = 'autocomplete-item';
@@ -756,6 +768,7 @@
 	                                `;
 	                                // Use the new API structure: placePrediction.text.text
 	                                item.textContent = placePrediction.text.text;
+	                                console.log('Added suggestion item:', placePrediction.text.text);
 
 	                                item.addEventListener('mouseenter', function() {
 	                                    this.style.backgroundColor = '#f0f0f0';
