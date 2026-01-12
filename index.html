@@ -667,8 +667,16 @@
 	                try {
 	                    console.log('Initializing Google Places Autocomplete (New API 2025)');
 
+	                    // Wait for Google Maps to be available
+	                    if (typeof google === 'undefined' || !google.maps) {
+	                        console.error('Google Maps API not loaded yet');
+	                        return;
+	                    }
+
 	                    // Load the Places library using the new importLibrary method
+	                    console.log('Loading Places library...');
 	                    const { AutocompleteSuggestion, AutocompleteSessionToken } = await google.maps.importLibrary('places');
+	                    console.log('Places library loaded successfully');
 
 	                    let autocompleteResults = [];
 	                    let selectedIndex = -1;
@@ -702,6 +710,7 @@
 
 	                            // Get autocomplete predictions using new API
 	                            try {
+	                                console.log('Fetching suggestions for:', value);
 	                                const request = {
 	                                    input: value,
 	                                    includedPrimaryTypes: ['street_address', 'premise', 'subpremise'],
@@ -710,11 +719,13 @@
 	                                };
 
 	                                const { suggestions } = await AutocompleteSuggestion.fetchAutocompleteSuggestions(request);
+	                                console.log('Received suggestions:', suggestions);
 
 	                                if (suggestions && suggestions.length > 0) {
 	                                    autocompleteResults = suggestions;
 	                                    displaySuggestions(suggestions);
 	                                } else {
+	                                    console.log('No suggestions returned');
 	                                    dropdown.style.display = 'none';
 	                                }
 	                            } catch (error) {
@@ -965,7 +976,19 @@
 	            }
 
 	            // Initialize autocomplete when page loads
-	            initAutocomplete();
+	            // Wait a bit for Google Maps API to be fully loaded
+	            if (typeof google !== 'undefined' && google.maps) {
+	                initAutocomplete();
+	            } else {
+	                // Retry after a short delay if Google Maps isn't ready yet
+	                setTimeout(() => {
+	                    if (typeof google !== 'undefined' && google.maps) {
+	                        initAutocomplete();
+	                    } else {
+	                        console.error('Google Maps API failed to load');
+	                    }
+	                }, 1000);
+	            }
 	        });
 	    </script>
 
