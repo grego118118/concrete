@@ -698,12 +698,15 @@
 	                        `;
 	                        addressInput.parentElement.style.position = 'relative';
 	                        addressInput.parentElement.appendChild(dropdown);
+	                        console.log('Autocomplete dropdown created and attached');
 
 	                        // Input event listener for autocomplete
 	                        addressInput.addEventListener('input', async function() {
 	                            const value = this.value;
+	                            console.log('Input event triggered, value:', value);
 
 	                            if (value.length < 3) {
+	                                console.log('Value too short, need at least 3 characters');
 	                                dropdown.style.display = 'none';
 	                                return;
 	                            }
