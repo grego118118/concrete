@@ -1,0 +1,82 @@
+@import "tailwindcss";
+
+@layer base {
+    body {
+        font-family: 'Inter', sans-serif;
+    }
+}
+
+@layer components {
+    .nav-link.active {
+        @apply text-blue-500 font-semibold;
+    }
+
+    .faq-item .answer {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.3s ease-out;
+    }
+
+    .faq-item.open .answer {
+        max-height: 1000px;
+        transition: max-height 0.5s ease-in;
+    }
+
+    .faq-item.open .icon {
+        transform: rotate(180deg);
+    }
+
+    .hero-bg {
+        background-image: -webkit-image-set(url('../assets/images/hero-garage.webp') 1x,
+                url('../assets/images/hero-garage.jpg') 1x);
+        background-image: image-set(url('../assets/images/hero-garage.webp') 1x,
+                url('../assets/images/hero-garage.jpg') 1x);
+        /* Fallback for older browsers */
+        background-image: url('../assets/images/hero-garage.jpg');
+
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+    }
+
+    .gallery-img {
+        aspect-ratio: 16 / 10;
+        object-fit: cover;
+        width: 100%;
+    }
+
+    /* Breadcrumb Navigation Styles */
+    .breadcrumb {
+        @apply flex flex-wrap items-center py-3 text-sm text-gray-500;
+    }
+
+    .breadcrumb-item {
+        @apply flex items-center;
+    }
+
+    .breadcrumb-item a {
+        @apply text-blue-500 no-underline transition-colors duration-200;
+    }
+
+    .breadcrumb-item a:hover {
+        @apply text-blue-600 underline;
+    }
+
+    .breadcrumb-separator {
+        @apply mx-2 text-gray-400;
+    }
+
+    .breadcrumb-current {
+        @apply text-gray-700 font-medium;
+    }
+
+    @media (max-width: 640px) {
+        .breadcrumb {
+            @apply text-xs;
+        }
+
+        .breadcrumb-separator {
+            @apply mx-1;
+        }
+    }
+}

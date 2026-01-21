@@ -1,8 +1,8 @@
 {
   "version": 2,
   "public": true,
-  "buildCommand": "",
-  "outputDirectory": ".",
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
   "env": {
     "VERCEL_ENV": "production"
   },
@@ -59,4 +59,3 @@
     }
   ]
 }
-

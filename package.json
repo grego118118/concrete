@@ -4,6 +4,9 @@
   "description": "Professional website for Pioneer Concrete Coatings LLC in Western Massachusetts",
   "main": "index.html",
   "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
     "start": "npx http-server -p 8000 -o",
     "serve": "npx http-server -p 8000"
   },
@@ -15,6 +18,13 @@
     "polyaspartic"
   ],
   "author": "Pioneer Concrete Coatings LLC",
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.1.18",
+    "autoprefixer": "^10.4.23",
+    "postcss": "^8.5.6",
+    "sharp": "^0.34.5",
+    "tailwindcss": "^4.1.18",
+    "vite": "^6.4.1"
+  }
 }
-
