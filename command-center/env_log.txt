@@ -1,0 +1,7 @@
+DATABASE_URL is defined.
+Length: 649
+Starts with 'postgres://': false
+Starts with 'postgresql://': false
+Contains 'neon.tech': false
+Contains 'localhost': true
+Prefix: prisma+postgres...

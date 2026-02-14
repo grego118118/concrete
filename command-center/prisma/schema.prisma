@@ -1,0 +1,319 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Business & Users
+model Business {
+  id                String             @id @default(cuid())
+  name              String
+  brandKit          Json // colors, fonts, voice
+  customers         Customer[]
+  jobs              Job[]
+  socialPosts       SocialPost[]
+  socialConnections SocialConnection[]
+  users             User[]
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+}
+
+
+
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  emailVerified DateTime?
+  image         String?
+  role          Role      @default(TECHNICIAN)
+  businessId    String
+  business      Business  @relation(fields: [businessId], references: [id])
+  accounts      Account[]
+  sessions      Session[]
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+
+// CRM Entities
+model Customer {
+  id         String    @id @default(cuid())
+  name       String
+  email      String
+  phone      String?
+  address    String?
+  city       String?
+  state      String?
+  zip        String?
+  leadSource String    @default("MANUAL")
+  leadScore  Int?
+  notes      String?
+  businessId String
+  business   Business  @relation(fields: [businessId], references: [id])
+  jobs       Job[]
+  quotes     Quote[]
+  invoices   Invoice[]
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  @@index([businessId])
+}
+
+model Job {
+  id          String    @id @default(cuid())
+  title       String
+  description String?
+  status      JobStatus @default(SCHEDULED)
+  scheduledAt DateTime?
+  completedAt DateTime?
+  customerId  String
+  customer    Customer  @relation(fields: [customerId], references: [id])
+  businessId  String
+  business    Business  @relation(fields: [businessId], references: [id])
+  photos      Photo[]
+  parts       Part[]
+  scopeData   Json? // Detailed calculator data
+  quoteId     String?   @unique
+  quote       Quote?    @relation(fields: [quoteId], references: [id])
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([businessId])
+  @@index([customerId])
+}
+
+model Photo {
+  id          String       @id @default(cuid())
+  url         String
+  caption     String?
+  type        PhotoType    @default(JOB_SITE)
+  jobId       String?
+  job         Job?         @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  quoteId     String?
+  quote       Quote?       @relation(fields: [quoteId], references: [id], onDelete: Cascade)
+  usedInPosts SocialPost[]
+  createdAt   DateTime     @default(now())
+}
+
+model Part {
+  id       String  @id @default(cuid())
+  name     String
+  sku      String?
+  quantity Int     @default(1)
+  cost     Decimal @db.Decimal(10, 2)
+  price    Decimal @db.Decimal(10, 2)
+  jobId    String
+  job      Job     @relation(fields: [jobId], references: [id], onDelete: Cascade)
+}
+
+model Quote {
+  id       String      @id @default(cuid())
+  number   String      @unique // e.g. Q-1001
+  pdfUrl   String?
+  status   QuoteStatus @default(DRAFT)
+  subtotal Decimal     @db.Decimal(10, 2)
+  tax      Decimal     @db.Decimal(10, 2)
+  total    Decimal     @db.Decimal(10, 2)
+  deposit  Decimal     @default(0) @db.Decimal(10, 2)
+  balance  Decimal     @default(0) @db.Decimal(10, 2) // Calculated as total - deposit
+
+  // Additional Fees & Notes
+  cleanupFee Decimal?    @db.Decimal(10, 2)
+  notes      String?
+
+  // Project Scope
+  jobLocation    String? // Specific address or "Same"
+  scopeArea      Float? // sq ft
+  scopeThickness String? // e.g. "Full Flake"
+  scopeFinish    String? // e.g. "Polyaspartic"
+  scopePsi       String? // Strength
+
+  validUntil DateTime?
+  customerId String
+  customer   Customer    @relation(fields: [customerId], references: [id])
+  items      QuoteItem[]
+  photos     Photo[]
+  job        Job?
+  invoice    Invoice?
+  scopeData  Json? // Detailed calculator data
+  scheduledDate DateTime? // Preferred start date from customer
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+}
+
+model QuoteItem {
+  id          String  @id @default(cuid())
+  description String
+  quantity    Int     @default(1)
+  unit        String? @default("ea")
+  unitPrice   Decimal @db.Decimal(10, 2)
+  total       Decimal @db.Decimal(10, 2)
+  quoteId     String
+  quote       Quote   @relation(fields: [quoteId], references: [id], onDelete: Cascade)
+}
+
+model Invoice {
+  id         String        @id @default(cuid())
+  number     String        @unique // e.g. INV-1001
+  quoteId    String        @unique
+  quote      Quote         @relation(fields: [quoteId], references: [id])
+  status     PaymentStatus @default(PENDING)
+  amount     Decimal       @db.Decimal(10, 2)
+  dueDate    DateTime?
+  paidAt     DateTime?
+  customerId String
+  customer   Customer      @relation(fields: [customerId], references: [id])
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
+}
+
+// Social Media Entities
+model SocialConnection {
+  id           String   @id @default(cuid())
+  platform     Platform
+  isEnabled    Boolean  @default(true)
+  apiKey       String?
+  accessToken  String?
+  apiSecret    String?
+  refreshToken String?
+  profileName  String?
+  profileId    String?
+  businessId   String
+  business     Business @relation(fields: [businessId], references: [id])
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@unique([businessId, platform])
+}
+
+model SocialPost {
+
+  id           String     @id @default(cuid())
+  content      Json // platform-specific variants { "facebook": "...", "instagram": "..." }
+  platforms    Platform[]
+  status       PostStatus @default(DRAFT)
+  scheduledFor DateTime?
+  postedAt     DateTime?
+  businessId   String
+  business     Business   @relation(fields: [businessId], references: [id])
+  photos       Photo[]
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  @@index([businessId])
+}
+
+model ContentLibrary {
+  id          String      @id @default(cuid())
+  type        ContentType
+  content     String
+  mediaUrls   String[]
+  performance Json? // { "views": 100, "likes": 10 }
+  isEvergreen Boolean     @default(false)
+  lastUsed    DateTime?
+  businessId  String
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+}
+
+enum Role {
+  ADMIN
+  TECHNICIAN
+  OFFICE
+}
+
+enum JobStatus {
+  SCHEDULED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+enum PhotoType {
+  JOB_SITE
+  BEFORE
+  AFTER
+  DOCUMENT
+}
+
+enum QuoteStatus {
+  DRAFT
+  SENT
+  APPROVED
+  REJECTED
+  EXPIRED
+}
+
+enum PaymentStatus {
+  PENDING
+  SENT
+  PAID
+  DEPOSIT_PAID
+  OVERDUE
+  FAILED
+}
+
+enum PostStatus {
+  DRAFT
+  SCHEDULED
+  POSTED
+  FAILED
+}
+
+enum Platform {
+  GOOGLE_BUSINESS
+  FACEBOOK
+  INSTAGRAM
+  LINKEDIN
+}
+
+enum ContentType {
+  EDUCATIONAL
+  PROMOTION
+  CUSTOMER_STORY
+  JOB_SHOWCASE
+  SEASONAL
+}

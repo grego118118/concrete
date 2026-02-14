@@ -1,0 +1,38 @@
+# TradeOps Command Center - AI Documentation
+
+## Project Overview
+A unified platform for local service businesses comprising two modules:
+1. **TradeOps CRM**: Field operations, customer management, quoting.
+2. **SocialReach**: AI-driven social media automation and review management.
+
+## Tech Stack
+- Next.js 14 (App Router)
+- TypeScript
+- Tailwind CSS / shadcn/ui
+- Prisma ORM / Neon PostgreSQL
+- OpenAI / Anthropic API
+
+## Database Schema (Prisma)
+See `prisma/schema.prisma` for full models.
+Key models: `Customer`, `Job`, `Quote`, `Invoice`, `SocialPost`, `ContentLibrary`.
+
+## API Endpoints
+
+### CRM Module
+- `POST /api/crm/quotes/generate-pdf`: Generate PDF proposal.
+- `POST /api/crm/payments/create-checkout`: Create Stripe session.
+- `POST /api/crm/payments/stripe-webhook`: Handle payment events.
+
+### Social Module
+- `POST /api/social/gbp/post`: Publish to Google Business Profile.
+- `POST /api/social/facebook/post`: Publish to Facebook Page.
+
+## Key Workflows
+- **Lead Qualification**: Uses `src/lib/ai/lead-qualifier.ts` to score chat conversations.
+- **Content Remixing**: Uses `src/lib/ai/content-remix.ts` to generate multi-platform copy.
+- **Job Completion**: Triggers review request AND social post generation (`src/lib/workflows/job-completion.ts`).
+
+## Development Guidelines
+- All UI components in `src/components/ui` (shadcn).
+- Feature components in `src/components/crm` or `src/components/social`.
+- Shared logic in `src/lib`.

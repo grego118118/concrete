@@ -79,4 +79,13 @@
             @apply mx-1;
         }
     }
+
+    /* Blog Card Styles */
+    .blog-card {
+        @apply transition-transform duration-300;
+    }
+
+    .blog-card:hover {
+        transform: translateY(-5px);
+    }
 }

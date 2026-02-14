@@ -1,0 +1,47 @@
+# Pioneer Concrete Coatings LLC - Workspace Rules
+
+## Project Context
+- **Name:** Pioneer Concrete Coatings LLC
+- **Industry:** Concrete Flooring Services (Western Massachusetts)
+- **Tech Stack:**
+  - **Build Tool:** Vite
+  - **CSS Framework:** Tailwind CSS v4 (Utility-first)
+  - **Language:** Vanilla JavaScript (No heavy frameworks like React/Vue unless specified)
+  - **Deployment:** Vercel
+
+## Key Integrations
+- **TradeOps Command Center (CRM)**
+  - **Stack:** Next.js (Frontend/API) + Neon Postgres (Database) via Vercel.
+  - **Location:** `src/form-handler.js` (Integration point)
+  - **Documentation:** `TRADEOPS_WORKFLOWS.md` (Business Logic & Workflows)
+  - **Function:** Captures lead data from the quote form.
+  - **Endpoint:** currently `http://localhost:3000/api/leads` (local) / Production endpoint to be configured.
+  - **Rule:** ALWAYS preserve the `crmData` mapping and the `fetch` call to the CRM when modifying the quote form. Ensure data fields (name, email, phone, address, etc.) are correctly mapped.
+
+## Coding Standards
+- **HTML:** Use semantic HTML5 elements (`<header>`, `<main>`, `<section>`, `<footer>`, `<article>`).
+- **CSS:** Use Tailwind CSS utility classes. Avoid custom CSS in `src/style.css` unless absolutely necessary for complex animations or pseudo-elements not covering by Tailwind.
+- **JavaScript:** Keep it modular. Use ES6+ syntax.
+- **Responsiveness:** Mobile-First approach. Ensure all designs look great on mobile devices (320px+) before scaling up.
+- **Performance:** Optimize images (WebP/AVIF), lazy load offscreen content, and minimize bundle sizes.
+
+## Design Guidelines
+- **Colors:** 
+  - Primary Blue: `#3b82f6`
+  - Dark Blue: `#1e40af`
+  - Text Gray: `#64748b`
+- **Typography:** Inter (Google Fonts)
+- **Logo:** `assets/images/logo.svg` (or `.png` if SVG unavailable). 
+  - **STRICT RULE:** Use ONLY the "Shield" logo (Red outline, Blue interior, White "Pioneer" text with trees/mountains). 
+  - **DEPRECATED:** Do not use any text-only or "Concrete Slab" logos. If the current `logo.svg` is not the Shield logo, IT MUST BE REPLACED immediately.
+
+## Workflow
+- **Development:** `npm run dev`
+- **Build:** `npm run build`
+- **Preview:** `npm run preview`
+- **Deployment:** Automatic deployments to Vercel on push to `main`.
+
+## Verification
+- Before submitting changes, always run the build locally to ensure no errors.
+- Check console for any JavaScript errors.
+- Verify CRM integration by submitting the form (check network tab for request to CRM endpoint).
