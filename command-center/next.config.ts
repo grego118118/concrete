@@ -12,7 +12,7 @@ const nextConfig: NextConfig = {
   async rewrites() {
     return [
       {
-        source: '/app/:path*',
+        source: '/command-center/:path*',
         destination: '/:path*',
       },
     ]
