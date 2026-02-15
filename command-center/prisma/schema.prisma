@@ -34,8 +34,8 @@ model User {
   emailVerified DateTime?
   image         String?
   role          Role      @default(TECHNICIAN)
-  businessId    String
-  business      Business  @relation(fields: [businessId], references: [id])
+  businessId    String?
+  business      Business? @relation(fields: [businessId], references: [id])
   accounts      Account[]
   sessions      Session[]
   createdAt     DateTime  @default(now())

@@ -15,12 +15,8 @@
   ],
   "routes": [
     {
-      "src": "/app/(.*)",
-      "dest": "/command-center/$1"
-    },
-    {
-      "src": "/app",
-      "dest": "/command-center"
+      "src": "/app(|/.*)",
+      "dest": "/command-center$1"
     },
     {
       "src": "/login",
