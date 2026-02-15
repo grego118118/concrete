@@ -4,6 +4,7 @@ import { PrismaAdapter } from "@auth/prisma-adapter"
 import { db } from "@/lib/db"
 import { authConfig } from "./auth.config"
 import Credentials from "next-auth/providers/credentials"
+import Nodemailer from "next-auth/providers/nodemailer"
 import bcrypt from "bcryptjs"
 
 const { handlers, auth, signIn, signOut } = NextAuth({
