@@ -3,22 +3,28 @@ import type { NextAuthConfig } from "next-auth"
 
 export const authConfig = {
     pages: {
-        signIn: '/login', // We'll create a simple login page later, or NextAuth default
-        // newUser: '/app/onboarding', // Optional
+        signIn: '/login',
     },
     callbacks: {
         authorized({ auth, request: { nextUrl } }) {
             const isLoggedIn = !!auth?.user;
-            const isOnDashboard = nextUrl.pathname.startsWith('/app') || nextUrl.pathname === '/';
-            const isOnLoginPage = nextUrl.pathname === '/login';
 
-            if (isOnDashboard) {
-                if (isLoggedIn) return true;
-                return false; // Redirect unauthenticated users to login page
-            } else if (isOnLoginPage && isLoggedIn) {
+            // Public paths that don't require authentication
+            const publicPaths = ['/login'];
+            const isPublicPath = publicPaths.some(path => nextUrl.pathname.startsWith(path));
+
+            // If on a public path and already logged in, redirect to dashboard
+            if (isPublicPath && isLoggedIn) {
                 return Response.redirect(new URL('/', nextUrl));
             }
-            return true;
+
+            // If on a public path, allow access
+            if (isPublicPath) {
+                return true;
+            }
+
+            // Everything else requires authentication
+            return isLoggedIn;
         },
         async jwt({ token, user }) {
             if (user) {

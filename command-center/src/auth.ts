@@ -7,7 +7,7 @@ import Nodemailer from "next-auth/providers/nodemailer"
 
 const { handlers, auth, signIn, signOut } = NextAuth({
     adapter: PrismaAdapter(db),
-    session: { strategy: "jwt" },
+    session: { strategy: "jwt", maxAge: 30 * 24 * 60 * 60 }, // 30 days
     ...authConfig,
     providers: [
         Nodemailer({
