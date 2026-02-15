@@ -23,8 +23,8 @@
       "dest": "/command-center/login"
     },
     {
-      "src": "/api/auth/(.*)",
-      "dest": "/command-center/api/auth/$1"
+      "src": "/api/(.*)",
+      "dest": "/command-center/api/$1"
     },
     {
       "src": "/_next/(.*)",
