@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { LoginForm } from "./login-form"
 
 export default function LoginPage() {
     return (
@@ -22,27 +23,7 @@ export default function LoginPage() {
                     </CardDescription>
                 </CardHeader>
                 <CardContent>
-                    <form
-                        action={async (formData) => {
-                            "use server"
-                            await signIn("nodemailer", formData)
-                        }}
-                        className="grid gap-4"
-                    >
-                        <div className="grid gap-2">
-                            <Label htmlFor="email">Email</Label>
-                            <Input
-                                id="email"
-                                name="email"
-                                type="email"
-                                placeholder="m@example.com"
-                                required
-                            />
-                        </div>
-                        <Button type="submit" className="w-full">
-                            Login with Email
-                        </Button>
-                    </form>
+                    <LoginForm />
                 </CardContent>
             </Card>
         </div>
