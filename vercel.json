@@ -2,6 +2,10 @@
   "version": 2,
   "rewrites": [
     {
+      "source": "/app",
+      "destination": "/command-center"
+    },
+    {
       "source": "/app/:path*",
       "destination": "/command-center/:path*"
     },
