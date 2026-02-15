@@ -3,15 +3,16 @@ import type { NextAuthConfig } from "next-auth"
 
 export const authConfig = {
     pages: {
-        signIn: '/login',
+        signIn: '/app/login',
     },
     callbacks: {
         authorized({ auth, request: { nextUrl } }) {
             const isLoggedIn = !!auth?.user;
 
             // Public paths that don't require authentication
-            const publicPaths = ['/login'];
-            const isPublicPath = publicPaths.some(path => nextUrl.pathname.startsWith(path));
+            // We check for both /login (internal) and /app/login (external/rewritten)
+            const publicPaths = ['/login', '/app/login'];
+            const isPublicPath = publicPaths.some(path => nextUrl.pathname === path || nextUrl.pathname.startsWith(path));
 
             // If on a public path and already logged in, redirect to dashboard
             if (isPublicPath && isLoggedIn) {

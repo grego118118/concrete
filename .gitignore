@@ -128,3 +128,5 @@ env/
 command-center/.next
 command-center/node_modules
 command-center/.env
+.vercel
+command-center/.vercel
