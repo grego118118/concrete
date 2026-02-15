@@ -1,19 +1,5 @@
 {
   "version": 2,
-  "rewrites": [
-    {
-      "source": "/app",
-      "destination": "/command-center"
-    },
-    {
-      "source": "/app/:path*",
-      "destination": "/command-center/:path*"
-    },
-    {
-      "source": "/_next/:path*",
-      "destination": "/command-center/_next/:path*"
-    }
-  ],
   "builds": [
     {
       "src": "package.json",
@@ -25,6 +11,23 @@
     {
       "src": "command-center/package.json",
       "use": "@vercel/next"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/app/(.*)",
+      "dest": "/command-center/$1"
+    },
+    {
+      "src": "/app",
+      "dest": "/command-center"
+    },
+    {
+      "src": "/_next/(.*)",
+      "dest": "/command-center/_next/$1"
+    },
+    {
+      "handle": "filesystem"
     }
   ]
 }
