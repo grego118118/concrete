@@ -9,14 +9,6 @@ const nextConfig: NextConfig = {
       bodySizeLimit: '10mb',
     },
   },
-  async rewrites() {
-    return [
-      {
-        source: '/app/:path*',
-        destination: '/:path*',
-      },
-    ]
-  },
 };
 
 export default nextConfig;

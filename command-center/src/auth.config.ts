@@ -10,24 +10,13 @@ export const authConfig = {
             const pathname = nextUrl.pathname;
             const isLoggedIn = !!auth?.user;
 
-            // Identify if the request is intended for the command-center app
-            const isAppPath = pathname.startsWith('/app');
+            // Paths that don't require authentication
             const isLoginPath = pathname === '/login' || pathname === '/app/login';
             const isAuthApi = pathname.startsWith('/api/auth');
 
-            // In production, everything outside /app, /login, or /api/auth should fall through 
-            // to the Vite marketing site at the root.
-            if (process.env.NODE_ENV === 'production' && !isAppPath && !isLoginPath && !isAuthApi) {
-                return true;
-            }
-
-            // Public paths that don't require authentication within the app context
-            const publicPaths = ['/login', '/app/login'];
-            const isPublicPath = publicPaths.some(path => pathname === path || pathname.startsWith(path + '/'));
-
-            if (isPublicPath) {
-                // If logged in and hitting login, go to the app dashboard
-                if (isLoggedIn) {
+            if (isLoginPath || isAuthApi) {
+                // If logged in and hitting login, go to the dashboard
+                if (isLoggedIn && isLoginPath) {
                     return Response.redirect(new URL('/app', nextUrl));
                 }
                 return true;
