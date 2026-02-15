@@ -19,17 +19,21 @@ export const metadata: Metadata = {
   description: "Command Center for Field Operations & Social Marketing",
 };
 
-export default function RootLayout({
+import { auth } from "@/auth";
+
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const session = await auth();
+
   return (
     <html lang="en" suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-slate-50`}
       >
-        <SessionProviderWrapper>
+        <SessionProviderWrapper session={session}>
           {children}
         </SessionProviderWrapper>
 

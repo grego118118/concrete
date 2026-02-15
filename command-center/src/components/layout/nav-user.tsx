@@ -54,7 +54,9 @@ export function NavUser({
                         >
                             <Avatar className="h-8 w-8 rounded-lg">
                                 <AvatarImage src={user.avatar} alt={user.name} />
-                                <AvatarFallback className="rounded-lg">CN</AvatarFallback>
+                                <AvatarFallback className="rounded-lg">
+                                    {user.name?.substring(0, 2).toUpperCase() || "U"}
+                                </AvatarFallback>
                             </Avatar>
                             <div className="grid flex-1 text-left text-sm leading-tight">
                                 <span className="truncate font-semibold">{user.name}</span>
@@ -73,7 +75,9 @@ export function NavUser({
                             <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                                 <Avatar className="h-8 w-8 rounded-lg">
                                     <AvatarImage src={user.avatar} alt={user.name} />
-                                    <AvatarFallback className="rounded-lg">CN</AvatarFallback>
+                                    <AvatarFallback className="rounded-lg">
+                                        {user.name?.substring(0, 2).toUpperCase() || "U"}
+                                    </AvatarFallback>
                                 </Avatar>
                                 <div className="grid flex-1 text-left text-sm leading-tight">
                                     <span className="truncate font-semibold">{user.name}</span>
@@ -84,28 +88,19 @@ export function NavUser({
                         <DropdownMenuSeparator />
                         <DropdownMenuGroup>
                             <DropdownMenuItem asChild>
-                                <Link href="/app/settings?tab=billing">
-                                    <Sparkles />
-                                    Upgrade to Pro
-                                </Link>
-                            </DropdownMenuItem>
-                        </DropdownMenuGroup>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuGroup>
-                            <DropdownMenuItem asChild>
-                                <Link href="/app/settings?tab=account">
+                                <Link href="/app/crm/customers">
                                     <BadgeCheck />
                                     Account
                                 </Link>
                             </DropdownMenuItem>
                             <DropdownMenuItem asChild>
-                                <Link href="/app/settings?tab=billing">
+                                <Link href="/app/crm/invoices">
                                     <CreditCard />
                                     Billing
                                 </Link>
                             </DropdownMenuItem>
                             <DropdownMenuItem asChild>
-                                <Link href="/app/settings?tab=notifications">
+                                <Link href="/app/crm/jobs">
                                     <Bell />
                                     Notifications
                                 </Link>

@@ -104,11 +104,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
     console.log("AppSidebar Session:", { session, status })
 
-    const user = session?.user ? {
-        name: session.user.name || "User",
-        email: session.user.email || "",
-        avatar: session.user.image || "/avatars/shadcn.jpg",
-    } : data.user
+    const user = {
+        name: session?.user?.name || session?.user?.email?.split('@')[0] || "User",
+        email: session?.user?.email || "",
+        avatar: session?.user?.image || "",
+    }
 
     return (
         <Sidebar
