@@ -35,7 +35,7 @@ export default function DashboardLayout({
                             <Breadcrumb>
                                 <BreadcrumbList>
                                     <BreadcrumbItem>
-                                        <BreadcrumbLink href="/" className="font-bold text-gray-500 hover:text-blue-600 transition-colors">
+                                        <BreadcrumbLink href="/app" className="font-bold text-gray-500 hover:text-blue-600 transition-colors">
                                             Command Center
                                         </BreadcrumbLink>
                                     </BreadcrumbItem>
