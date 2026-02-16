@@ -38,8 +38,8 @@ export async function createInvoice(formData: FormData) {
         }
     })
 
-    revalidatePath("/crm/invoices")
-    redirect("/crm/invoices")
+    revalidatePath("/app/crm/invoices")
+    redirect("/app/crm/invoices")
 }
 
 export async function getInvoices() {
@@ -74,8 +74,8 @@ export async function updateInvoice(id: string, formData: FormData) {
         }
     })
 
-    revalidatePath("/crm/invoices")
-    redirect("/crm/invoices")
+    revalidatePath("/app/crm/invoices")
+    redirect("/app/crm/invoices")
 }
 
 export async function deleteInvoice(id: string) {
@@ -134,6 +134,6 @@ export async function sendInvoice(id: string) {
         }
     })
 
-    revalidatePath("/crm/invoices")
-    revalidatePath(`/crm/invoices/${id}`)
+    revalidatePath("/app/crm/invoices")
+    revalidatePath(`/app/crm/invoices/${id}`)
 }

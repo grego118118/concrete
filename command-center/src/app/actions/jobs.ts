@@ -44,8 +44,8 @@ export async function createJob(formData: FormData) {
         }
     })
 
-    revalidatePath("/crm/jobs")
-    redirect("/crm/jobs")
+    revalidatePath("/app/crm/jobs")
+    redirect("/app/crm/jobs")
 }
 
 export async function getJobs() {
@@ -94,8 +94,8 @@ export async function updateJob(id: string, formData: FormData) {
         }
     })
 
-    revalidatePath("/crm/jobs")
-    redirect("/crm/jobs")
+    revalidatePath("/app/crm/jobs")
+    redirect("/app/crm/jobs")
 }
 
 export async function deleteJob(id: string) {
@@ -103,5 +103,5 @@ export async function deleteJob(id: string) {
         where: { id }
     })
 
-    revalidatePath("/crm/jobs")
+    revalidatePath("/app/crm/jobs")
 }

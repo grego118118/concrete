@@ -33,7 +33,7 @@ type InitialQuoteData = {
 
 export default function CreateQuoteForm({ customers, initialData }: { customers: Customer[], initialData?: InitialQuoteData }) {
     const [items, setItems] = useState<any[]>([]);
-    const [customerId, setCustomerId] = useState<string>("");
+    const [customerId, setCustomerId] = useState<string>(initialData?.customerId || "");
     const [cleanupFee, setCleanupFee] = useState<string>("");
     const [notes, setNotes] = useState<string>("");
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -64,7 +64,9 @@ export default function CreateQuoteForm({ customers, initialData }: { customers:
     };
 
     const handleSubmit = async () => {
+        console.log("Submit clicked. CustomerId:", customerId);
         if (!customerId) {
+            console.log("Validation failed: No customer selected");
             toast.error("Please select a customer");
             return;
         }
@@ -87,11 +89,22 @@ export default function CreateQuoteForm({ customers, initialData }: { customers:
             }
 
             if (initialData) {
-                await updateQuoteDetails(initialData.id, payload);
-                toast.success("Quote updated successfully");
+                const result = await updateQuoteDetails(initialData.id, payload);
+                if (result.success) {
+                    toast.success("Quote updated successfully");
+                    router.push("/app/crm/quotes");
+                    router.refresh();
+                } else {
+                    toast.error(result.error || "Failed to update quote");
+                }
             } else {
-                await createQuote(payload);
-                toast.success("Quote created successfully");
+                const result = await createQuote(payload);
+                if (result.success && result.quoteId) {
+                    toast.success("Quote created successfully");
+                    router.push(`/app/crm/quotes/${result.quoteId}`);
+                } else {
+                    toast.error(result.error || "Failed to create quote");
+                }
             }
         } catch (error: any) {
             // Check both message and property commonly used by Next.js for redirects

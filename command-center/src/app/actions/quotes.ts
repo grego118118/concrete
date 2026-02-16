@@ -4,83 +4,99 @@ import { db } from "@/lib/db"
 import { revalidatePath } from "next/cache"
 import { redirect } from "next/navigation"
 
-export type QuoteItem = {
-    description: string
-    qty: number
-    unit?: string
-    price: number
-}
+import { z } from "zod";
 
-export type CreateQuoteData = {
-    customerId: string
-    items: QuoteItem[]
-    status?: string
-    scopeArea?: number
-    baseRate?: number
-    scopeData?: any
-    cleanupFee?: number
-    notes?: string
-}
+const QuoteItemSchema = z.object({
+    description: z.string().min(1, "Description is required"),
+    qty: z.number().min(0),
+    unit: z.string().optional(),
+    price: z.number().min(0)
+});
+
+const CreateQuoteSchema = z.object({
+    customerId: z.string().min(1, "Customer ID is required"),
+    items: z.array(QuoteItemSchema),
+    status: z.string().default("DRAFT"),
+    scopeArea: z.number().optional(),
+    baseRate: z.number().optional(),
+    scopeData: z.any().optional(),
+    cleanupFee: z.number().optional(),
+    notes: z.string().optional()
+});
+
+export type CreateQuoteData = z.infer<typeof CreateQuoteSchema>;
 
 export async function createQuote(data: CreateQuoteData) {
-    const { customerId, items, status = "DRAFT", scopeArea, baseRate, scopeData, cleanupFee, notes } = data
+    try {
+        const validatedData = CreateQuoteSchema.parse(data);
+        const { customerId, items, status, scopeArea, baseRate, scopeData, cleanupFee, notes } = validatedData;
 
-    // Calculate financials from scope data if available, otherwise from items
-    let subtotal: number;
-    const taxRate = 0.0625;
+        // Calculate financials from scope data if available, otherwise from items
+        let subtotal: number;
+        const taxRate = 0.0625;
 
-    if (scopeArea && baseRate) {
-        // Calculate from scope calculator data
-        const baseCost = scopeArea * baseRate;
-        const customItems = (scopeData?.customItems || []) as Array<{ sqft: number; rate: number }>;
-        const customItemsTotal = customItems.reduce((sum: number, item: any) => sum + (item.sqft * item.rate), 0);
-        subtotal = baseCost + customItemsTotal;
-    } else {
-        // Fallback to line items calculation
-        subtotal = items.reduce((sum, item) => sum + (item.qty * item.price), 0);
-    }
-
-    // Add cleanup fee to subtotal if present
-    if (cleanupFee) {
-        subtotal += cleanupFee;
-    }
-
-    const tax = subtotal * taxRate;
-    const total = subtotal + tax;
-    const deposit = total * 0.5;
-    const balance = total - deposit;
-
-    // Generate unique quote number
-    const number = `Q-${Date.now()}`
-
-    const quote = await db.quote.create({
-        data: {
-            number,
-            customerId,
-            status: status as any,
-            subtotal,
-            tax,
-            total,
-            deposit,
-            balance,
-            scopeArea: scopeArea || null,
-            scopeData: scopeData || null,
-            cleanupFee: cleanupFee || null,
-            notes: notes || null,
-            items: {
-                create: items.map(item => ({
-                    description: item.description,
-                    quantity: item.qty,
-                    unit: item.unit || "ea",
-                    unitPrice: item.price,
-                    total: item.qty * item.price
-                }))
-            }
+        if (scopeArea && baseRate) {
+            // Calculate from scope calculator data
+            const baseCost = scopeArea * baseRate;
+            const customItems = (scopeData?.customItems || []) as Array<{ sqft: number; rate: number }>;
+            const customItemsTotal = customItems.reduce((sum: number, item: any) => sum + (item.sqft * item.rate), 0);
+            subtotal = baseCost + customItemsTotal;
+        } else {
+            // Fallback to line items calculation
+            subtotal = items.reduce((sum, item) => sum + (item.qty * item.price), 0);
         }
-    })
 
-    revalidatePath("/crm/quotes")
-    redirect(`/crm/quotes/${quote.id}`)
+        // Add cleanup fee to subtotal if present
+        if (cleanupFee) {
+            subtotal += cleanupFee;
+        }
+
+        const tax = subtotal * taxRate;
+        const total = subtotal + tax;
+        const deposit = total * 0.5;
+        const balance = total - deposit;
+
+        // Generate unique quote number
+        const number = `Q-${Date.now()}`
+
+        const quote = await db.quote.create({
+            data: {
+                number,
+                customerId,
+                status: status as any,
+                subtotal,
+                tax,
+                total,
+                deposit,
+                balance,
+                scopeArea: scopeArea || null,
+                scopeData: scopeData || null,
+                cleanupFee: cleanupFee || null,
+                notes: notes || null,
+                validUntil: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // Default 30 days valid
+                items: {
+                    create: items.map(item => ({
+                        description: item.description,
+                        quantity: item.qty,
+                        unit: item.unit || "ea",
+                        unitPrice: item.price,
+                        total: item.qty * item.price
+                    }))
+                }
+            }
+        })
+
+        revalidatePath("/app/crm/quotes")
+        return { success: true, quoteId: quote.id }
+    } catch (error) {
+        console.error("Failed to create quote:", error);
+        if (error instanceof z.ZodError) {
+            return { success: false, error: (error as any).errors.map((e: any) => e.message).join(", ") };
+        } else if (error instanceof Error) {
+            return { success: false, error: error.message };
+        }
+        return { success: false, error: "An unexpected error occurred" };
+    }
 }
 
 export async function getQuotes() {
@@ -103,54 +119,65 @@ export async function getQuote(id: string) {
 }
 
 export async function updateQuoteDetails(id: string, data: CreateQuoteData) {
-    const { customerId, items, status, cleanupFee, notes } = data
+    try {
+        const validatedData = CreateQuoteSchema.parse(data);
+        const { customerId, items, status, cleanupFee, notes } = validatedData;
 
-    // Calculate financials
-    let subtotal = items.reduce((sum, item) => sum + (item.qty * item.price), 0)
+        // Calculate financials
+        let subtotal = items.reduce((sum, item) => sum + (item.qty * item.price), 0);
 
-    // Add cleanup fee to subtotal if present
-    if (cleanupFee) {
-        subtotal += cleanupFee;
-    }
+        // Add cleanup fee to subtotal if present
+        if (cleanupFee) {
+            subtotal += cleanupFee;
+        }
 
-    const taxRate = 0.0625 // Example MA tax rate
-    const tax = subtotal * taxRate
-    const total = subtotal + tax
+        const taxRate = 0.0625 // Example MA tax rate
+        const tax = subtotal * taxRate
+        const total = subtotal + tax
 
-    // Update quote and replace items transactionally
-    await db.$transaction(async (tx) => {
-        // 1. Delete existing items
-        await tx.quoteItem.deleteMany({
-            where: { quoteId: id }
-        })
+        // Update quote and replace items transactionally
+        await db.$transaction(async (tx) => {
+            // 1. Delete existing items
+            await tx.quoteItem.deleteMany({
+                where: { quoteId: id }
+            })
 
-        // 2. Update quote details and recreate items
-        await tx.quote.update({
-            where: { id },
-            data: {
-                customerId,
-                status: status as any,
-                subtotal,
-                tax,
-                total,
-                cleanupFee: cleanupFee || null,
-                notes: notes || null,
-                items: {
-                    create: items.map(item => ({
-                        description: item.description,
-                        quantity: item.qty,
-                        unit: item.unit || "ea",
-                        unitPrice: item.price,
-                        total: item.qty * item.price
-                    }))
+            // 2. Update quote details and recreate items
+            await tx.quote.update({
+                where: { id },
+                data: {
+                    customerId,
+                    status: status as any,
+                    subtotal,
+                    tax,
+                    total,
+                    cleanupFee: cleanupFee || null,
+                    notes: notes || null,
+                    items: {
+                        create: items.map(item => ({
+                            description: item.description,
+                            quantity: item.qty,
+                            unit: item.unit || "ea",
+                            unitPrice: item.price,
+                            total: item.qty * item.price
+                        }))
+                    }
                 }
-            }
+            })
         })
-    })
 
-    revalidatePath("/crm/quotes")
-    revalidatePath(`/crm/quotes/${id}`)
-    redirect("/crm/quotes")
+        revalidatePath("/app/crm/quotes")
+        revalidatePath(`/app/crm/quotes/${id}`)
+        return { success: true }
+    } catch (error) {
+        console.error("Failed to update quote:", error);
+        if (error instanceof z.ZodError) {
+            return { success: false, error: (error as any).errors.map((e: any) => e.message).join(", ") };
+        } else if (error instanceof Error) {
+            return { success: false, error: error.message };
+        }
+        return { success: false, error: "An unexpected error occurred" };
+    }
 }
 
 export async function deleteQuote(id: string) {
@@ -279,6 +306,6 @@ export async function sendQuote(id: string) {
         }
     })
 
-    revalidatePath("/crm/quotes")
-    revalidatePath(`/crm/quotes/${id}`)
+    revalidatePath("/app/crm/quotes")
+    revalidatePath(`/app/crm/quotes/${id}`)
 }

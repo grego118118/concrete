@@ -24,6 +24,8 @@ async function getBusinessProfile() {
     };
 }
 
+export const dynamic = "force-dynamic";
+
 export default async function QuoteViewPage(props: {
     params: Promise<{ id: string }>,
     searchParams: Promise<{ success?: string, canceled?: string }>
@@ -34,7 +36,7 @@ export default async function QuoteViewPage(props: {
     const business = await getBusinessProfile();
 
     if (!quote) {
-        redirect("/crm/quotes");
+        redirect("/app/crm/quotes");
     }
 
     const { customer, items } = quote;

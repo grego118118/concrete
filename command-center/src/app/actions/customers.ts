@@ -37,8 +37,8 @@ export async function createCustomer(formData: FormData) {
         }
     })
 
-    revalidatePath("/crm/customers")
-    redirect("/crm/customers")
+    revalidatePath("/app/crm/customers")
+    redirect("/app/crm/customers")
 }
 
 export async function getCustomers() {
@@ -92,8 +92,8 @@ export async function updateCustomer(id: string, formData: FormData) {
         }
     })
 
-    revalidatePath("/crm/customers")
-    redirect("/crm/customers")
+    revalidatePath("/app/crm/customers")
+    redirect("/app/crm/customers")
 }
 
 export async function deleteCustomer(id: string) {
@@ -101,5 +101,5 @@ export async function deleteCustomer(id: string) {
         where: { id }
     })
 
-    revalidatePath("/crm/customers")
+    revalidatePath("/app/crm/customers")
 }
