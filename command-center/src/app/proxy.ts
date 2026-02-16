@@ -1,8 +1,11 @@
 
 import NextAuth from "next-auth"
-import { authConfig } from "./auth.config"
+import { authConfig } from "../auth.config"
 
-export const proxy = NextAuth(authConfig).auth
+export const proxy = (req: any) => {
+    console.log("Proxy executing for path:", req.nextUrl.pathname);
+    return NextAuth(authConfig).auth(req);
+}
 export default proxy
 
 export const config = {

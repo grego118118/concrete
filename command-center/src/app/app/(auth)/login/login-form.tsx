@@ -24,7 +24,7 @@ export function LoginForm() {
     const [magicLinkState, dispatchMagicLink] = useFormState(sendMagicLink, undefined)
 
     return (
-        <Tabs defaultValue="magic-link" className="w-full">
+        <Tabs defaultValue="password" className="w-full">
             <TabsList className="grid w-full grid-cols-2">
                 <TabsTrigger value="magic-link">Magic Link</TabsTrigger>
                 <TabsTrigger value="password">Password</TabsTrigger>
