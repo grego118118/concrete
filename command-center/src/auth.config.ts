@@ -3,8 +3,8 @@ import type { NextAuthConfig } from "next-auth"
 
 export const authConfig = {
     pages: {
-        signIn: '/login',
-        error: '/error',
+        signIn: '/app/login',
+        error: '/app/error',
     },
     callbacks: {
         authorized({ auth, request: { nextUrl } }) {
@@ -12,14 +12,14 @@ export const authConfig = {
             const isLoggedIn = !!auth?.user;
 
             // Paths that don't require authentication
-            const isLoginPath = pathname === '/login';
-            const isErrorPath = pathname === '/error';
+            const isLoginPath = pathname === '/login' || pathname === '/app/login';
+            const isErrorPath = pathname === '/error' || pathname === '/app/error';
             const isAuthApi = pathname.startsWith('/api/auth');
 
             if (isLoginPath || isAuthApi || isErrorPath) {
                 // If logged in and hitting login, go to the dashboard
                 if (isLoggedIn && isLoginPath) {
-                    return Response.redirect(new URL('/', nextUrl));
+                    return Response.redirect(new URL('/app', nextUrl));
                 }
                 return true;
             }
