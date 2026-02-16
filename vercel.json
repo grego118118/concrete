@@ -12,5 +12,30 @@
       "src": "command-center/package.json",
       "use": "@vercel/next"
     }
+  ],
+  "routes": [
+    {
+      "src": "/app/api/(.*)",
+      "dest": "/command-center/app/api/$1"
+    },
+    {
+      "src": "/app/(.*)",
+      "dest": "/command-center/app/$1"
+    },
+    {
+      "src": "/app",
+      "dest": "/command-center/app"
+    },
+    {
+      "src": "/_next/(.*)",
+      "dest": "/command-center/_next/$1"
+    },
+    {
+      "handle": "filesystem"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/$1"
+    }
   ]
 }
