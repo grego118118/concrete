@@ -7,6 +7,7 @@ import Link from "next/link";
 
 import { getQuotes, deleteQuote } from "@/app/actions/quotes";
 import { DeleteActionButton } from "@/components/crm/delete-action-button";
+export const dynamic = "force-dynamic";
 
 export default async function QuotesPage() {
     const quotes = await getQuotes();
