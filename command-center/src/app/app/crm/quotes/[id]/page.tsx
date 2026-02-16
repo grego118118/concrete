@@ -33,6 +33,7 @@ export default async function QuoteViewPage(props: {
     const params = await props.params;
     const searchParams = await props.searchParams;
     const quote = (await getQuote(params.id)) as any;
+    console.log(`[QuoteViewPage] Loading quote: ${params.id}, Found: ${!!quote}`);
     const business = await getBusinessProfile();
 
     if (!quote) {

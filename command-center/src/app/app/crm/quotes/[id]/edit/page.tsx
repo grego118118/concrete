@@ -6,9 +6,10 @@ import CreateQuoteForm from "../../create/quote-form";
 export default async function EditQuotePage(props: { params: Promise<{ id: string }> }) {
     const params = await props.params;
     const quote = await getQuote(params.id);
+    console.log(`[EditQuotePage] Loading quote: ${params.id}, Found: ${!!quote}`);
 
     if (!quote) {
-        redirect("/crm/quotes");
+        redirect("/app/crm/quotes");
     }
 
     // Fetch customers for the dropdown
