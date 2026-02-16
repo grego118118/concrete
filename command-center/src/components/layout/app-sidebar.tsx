@@ -100,7 +100,7 @@ const data = {
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     const { isMobile } = useSidebar()
-    const { data: session, status } = useSession()
+    const { data: session, status } = useSession() || { data: null, status: "unauthenticated" }
 
     console.log("AppSidebar Session:", { session, status })
 
