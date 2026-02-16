@@ -11,10 +11,13 @@ export const authConfig = {
             const pathname = nextUrl.pathname;
             const isLoggedIn = !!auth?.user;
 
+            console.log(`[Auth] Checking path: ${pathname}, LoggedIn: ${isLoggedIn}`);
+
             // Paths that don't require authentication
-            const isLoginPath = pathname === '/login' || pathname === '/app/login';
-            const isErrorPath = pathname === '/error' || pathname === '/app/error';
-            const isAuthApi = pathname.startsWith('/api/auth');
+            // Check for both direct and rewritten paths (Vercel rewrites /app to /command-center/app)
+            const isLoginPath = pathname === '/login' || pathname.endsWith('/login');
+            const isErrorPath = pathname === '/error' || pathname.endsWith('/error');
+            const isAuthApi = pathname.includes('/api/auth');
 
             if (isLoginPath || isAuthApi || isErrorPath) {
                 // If logged in and hitting login, go to the dashboard
@@ -25,6 +28,7 @@ export const authConfig = {
             }
 
             // Everything else in the app context requires authentication
+            // This will match /app, /crm, /quotes, etc.
             return isLoggedIn;
         },
         async jwt({ token, user }) {

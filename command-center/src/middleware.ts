@@ -1,12 +1,8 @@
 
 import NextAuth from "next-auth"
-import { authConfig } from "../auth.config"
+import { authConfig } from "./auth.config"
 
-export const proxy = (req: any) => {
-    console.log("Proxy executing for path:", req.nextUrl.pathname);
-    return NextAuth(authConfig).auth(req);
-}
-export default proxy
+export default NextAuth(authConfig).auth
 
 export const config = {
     // https://nextjs.org/docs/app/building-your-application/routing/middleware#matcher
