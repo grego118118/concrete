@@ -16,15 +16,18 @@
   "routes": [
     {
       "src": "/app/api/(.*)",
-      "dest": "/command-center/app/api/$1"
+      "dest": "/command-center/app/api/$1",
+      "check": true
     },
     {
       "src": "/app/(.*)",
-      "dest": "/command-center/app/$1"
+      "dest": "/command-center/app/$1",
+      "check": true
     },
     {
       "src": "/app",
-      "dest": "/command-center/app"
+      "dest": "/command-center/app",
+      "check": true
     },
     {
       "src": "/_next/(.*)",
