@@ -8,6 +8,7 @@ import Nodemailer from "next-auth/providers/nodemailer"
 import bcrypt from "bcryptjs"
 
 const { handlers, auth, signIn, signOut } = NextAuth({
+    basePath: "/app/api/auth",
     adapter: PrismaAdapter(db),
     session: { strategy: "jwt", maxAge: 30 * 24 * 60 * 60 }, // 30 days
     ...authConfig,

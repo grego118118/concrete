@@ -15,8 +15,16 @@
   ],
   "routes": [
     {
-      "src": "/app(|/.*)",
-      "dest": "/command-center/app$1"
+      "src": "/api/auth/(.*)",
+      "dest": "/command-center/app/api/auth/$1"
+    },
+    {
+      "src": "/app/(.*)",
+      "dest": "/command-center/app/$1"
+    },
+    {
+      "src": "/app",
+      "dest": "/command-center/app"
     },
     {
       "src": "/_next/(.*)",
