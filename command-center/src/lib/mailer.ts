@@ -10,7 +10,7 @@ const transporter = nodemailer.createTransport({
     },
 });
 
-console.log("[MAILER] Configured transporter with host:", process.env.SMTP_HOST || "using default");
+console.log(`[MAILER] Configured transporter with host: ${process.env.SMTP_HOST || "default"} on port: ${process.env.SMTP_PORT || "default"} (secure: ${process.env.SMTP_PORT === "465"})`);
 
 // Verify connection configuration
 transporter.verify(function (error, success) {
