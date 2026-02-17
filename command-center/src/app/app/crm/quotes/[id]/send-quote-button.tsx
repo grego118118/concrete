@@ -14,12 +14,17 @@ export function SendQuoteButton({ quoteId, currentStatus }: { quoteId: string, c
     const handleSend = async () => {
         setIsLoading(true);
         try {
-            await sendQuote(quoteId);
-            toast.success("Quote sent to customer!");
-            router.refresh();
+            const result = await sendQuote(quoteId);
+            if (result && result.success) {
+                toast.success("Quote sent to customer!");
+                router.refresh();
+            } else {
+                console.error(result?.error);
+                toast.error(result?.error || "Failed to send quote.");
+            }
         } catch (error) {
             console.error(error);
-            toast.error("Failed to send quote.");
+            toast.error("An unexpected error occurred.");
         } finally {
             setIsLoading(false);
         }

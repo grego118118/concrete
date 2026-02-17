@@ -293,19 +293,20 @@ export async function sendQuote(id: string) {
                 }
             ]
         });
-        console.log(`[sendQuote] Email sent successfully`);
+
+        await db.quote.update({
+            where: { id },
+            data: {
+                status: 'SENT'
+            }
+        })
+
+        revalidatePath("/app/crm/quotes")
+        revalidatePath(`/app/crm/quotes/${id}`)
+
+        return { success: true };
     } catch (sendError: any) {
         console.error(`[sendQuote] Email sending failed:`, sendError);
-        throw sendError;
+        return { success: false, error: sendError.message || "Failed to send email" };
     }
-
-    await db.quote.update({
-        where: { id },
-        data: {
-            status: 'SENT'
-        }
-    })
-
-    revalidatePath("/app/crm/quotes")
-    revalidatePath(`/app/crm/quotes/${id}`)
 }
