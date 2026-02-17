@@ -1,16 +1,16 @@
 import nodemailer from "nodemailer";
 
 const transporter = nodemailer.createTransport({
-    host: process.env.SMTP_HOST || "smtpout.secureserver.net",
-    port: Number(process.env.SMTP_PORT) || 465,
-    secure: process.env.SMTP_PORT === "465", // GoDaddy uses SSL on port 465
+    host: "smtpout.secureserver.net", // Hardcoded to fix EBADNAME env var issue
+    port: Number(process.env.SMTP_PORT) || 587,
+    secure: false, // TLS for 587
     auth: {
         user: process.env.SMTP_USER,
         pass: process.env.SMTP_PASS,
     },
 });
 
-console.log(`[MAILER] Configured transporter with host: ${process.env.SMTP_HOST || "default"} on port: ${process.env.SMTP_PORT || "default"} (secure: ${process.env.SMTP_PORT === "465"})`);
+console.log(`[MAILER] Configured transporter with hardcoded host: smtpout.secureserver.net on port: ${process.env.SMTP_PORT || 587}`);
 
 // Verify connection configuration
 transporter.verify(function (error, success) {
