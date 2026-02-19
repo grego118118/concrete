@@ -229,8 +229,8 @@ export async function sendQuote(id: string) {
     const pdfBuffer = await generateQuotePDF(quote);
     console.log(`[sendQuote] PDF generated, size: ${pdfBuffer.length} bytes`);
 
-    // Build the public acceptance URL
-    const origin = process.env.NEXTAUTH_URL || "http://localhost:3000";
+    // Build the public acceptance URL (quote page is outside /app/ so customers don't need to log in)
+    const origin = process.env.NEXTAUTH_URL || "https://pioneerconcretecoatings.com";
     const acceptUrl = `${origin}/quote/${quote.id}`;
 
     // Send Email via Nodemailer

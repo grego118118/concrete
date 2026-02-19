@@ -4,11 +4,11 @@ import nodemailer from "nodemailer";
 
 export async function GET() {
     try {
-        const host = process.env.SMTP_HOST;
-        const port = process.env.SMTP_PORT;
-        const user = process.env.SMTP_USER;
+        const host = (process.env.SMTP_HOST || "").trim();
+        const port = (process.env.SMTP_PORT || "").trim();
+        const user = (process.env.SMTP_USER || "").trim();
         const pass = process.env.SMTP_PASS ? "********" : undefined;
-        const secure = process.env.SMTP_PORT === "465";
+        const secure = port === "465";
 
         console.log("Diagnostic: Checking SMTP config...", { host, port, user, passObscured: pass, secure });
 
@@ -28,7 +28,7 @@ export async function GET() {
             secure,
             auth: {
                 user,
-                pass: process.env.SMTP_PASS,
+                pass: (process.env.SMTP_PASS || "").trim(),
             },
         });
 

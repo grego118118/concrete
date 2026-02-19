@@ -15,6 +15,11 @@
   ],
   "routes": [
     {
+      "src": "/quote/(.*)",
+      "dest": "/command-center/quote/$1",
+      "check": true
+    },
+    {
       "src": "/app/api/(.*)",
       "dest": "/command-center/app/api/$1",
       "check": true
