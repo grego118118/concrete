@@ -23,6 +23,20 @@ export function setupFormHandler() {
         const formData = new FormData(form);
         const data = Object.fromEntries(formData.entries());
 
+        // Honeypot check
+        if (data.fax) {
+            console.log('Spam detected via honeypot. Ignoring submission.');
+            if (statusDiv) {
+                statusDiv.innerText = "Thanks! We'll be in touch shortly.";
+                statusDiv.classList.remove('hidden');
+                statusDiv.classList.add('text-green-500');
+            }
+            form.reset();
+            submitBtn.disabled = false;
+            submitBtn.innerText = originalBtnText;
+            return;
+        }
+
         // Prepare data for CRM (mapping fields)
         const crmData = {
             name: data.name,

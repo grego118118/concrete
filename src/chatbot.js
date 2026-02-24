@@ -91,6 +91,7 @@ export class PioneerChatbot {
                 </div>
                 <div class="cb-messages" id="cb-messages"></div>
                 <form class="cb-input-area" id="cb-form">
+                    <input type="text" name="fax" class="cb-fax" id="cb-fax" style="display:none" tabindex="-1" autocomplete="off" aria-hidden="true">
                     <input type="text" class="cb-input" id="cb-input" placeholder="Type your message..." autocomplete="off">
                     <button type="submit" class="cb-send" id="cb-send">
                         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
@@ -147,6 +148,11 @@ export class PioneerChatbot {
     }
 
     handleInput() {
+        const faxField = this.elements.form.querySelector('#cb-fax');
+        if (faxField && faxField.value) {
+            this.isBot = true;
+        }
+
         const text = this.elements.input.value.trim();
         if (!text) return;
 
@@ -202,6 +208,11 @@ export class PioneerChatbot {
     }
 
     submitLead() {
+        if (this.isBot) {
+            console.log('Bot detected. Dropping lead securely.');
+            return;
+        }
+
         console.log('Lead Captured:', this.leadData);
         // Here you would typically POST to an API or Formspree
         // For now we just log it as a simulation
