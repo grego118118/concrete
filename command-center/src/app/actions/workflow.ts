@@ -2,6 +2,7 @@
 
 import { db } from "@/lib/db";
 import { revalidatePath } from "next/cache";
+import { generateQuoteItemsFromScope } from "@/lib/quote-utils";
 
 export async function updateScopeData({
     id,
@@ -28,8 +29,8 @@ export async function updateScopeData({
     } else {
         // Calculate full pricing including custom items
         const customItems = (scopeData?.customItems || []) as Array<{ sqft: number; rate: number }>;
-        const baseCost = totalArea * baseRate;
-        const customTotal = customItems.reduce((sum: number, item: any) => sum + (item.sqft * item.rate), 0);
+        const baseCost = Number(totalArea) * Number(baseRate);
+        const customTotal = customItems.reduce((sum: number, item: any) => sum + (Number(item.sqft || 0) * Number(item.rate || 0)), 0);
 
         // Add cleanup fee
         const cleanupFee = scopeData?.jobsiteCleanup ? 150 : 0;
@@ -38,23 +39,42 @@ export async function updateScopeData({
         // Handle conditional tax
         const applyTax = scopeData?.applyTax ?? true;
         const taxRate = applyTax ? 0.0625 : 0;
-        const tax = subtotal * taxRate;
+        const tax = Number(subtotal) * taxRate;
 
-        const total = subtotal + tax;
+        const total = Number(subtotal) + tax;
         const deposit = total * 0.5;
         const balance = total - deposit;
 
-        await db.quote.update({
-            where: { id },
-            data: {
-                scopeData: scopeData as any,
-                scopeArea: totalArea,
-                subtotal: subtotal,
-                tax: tax,
-                total: total,
-                deposit: deposit,
-                balance: balance,
-            }
+        const finalItems = generateQuoteItemsFromScope(totalArea, baseRate, scopeData);
+
+        await db.$transaction(async (tx) => {
+            // 1. Delete existing items
+            await tx.quoteItem.deleteMany({
+                where: { quoteId: id }
+            })
+
+            // 2. Update quote and create new items
+            await tx.quote.update({
+                where: { id },
+                data: {
+                    scopeData: scopeData as any,
+                    scopeArea: totalArea,
+                    subtotal: subtotal,
+                    tax: tax,
+                    total: total,
+                    deposit: deposit,
+                    balance: balance,
+                    items: {
+                        create: finalItems.map(item => ({
+                            description: item.description,
+                            quantity: Math.round(item.qty),
+                            unit: item.unit || "ea",
+                            unitPrice: item.price,
+                            total: item.qty * item.price
+                        }))
+                    }
+                }
+            });
         });
         revalidatePath(`/crm/quotes/${id}`);
     }

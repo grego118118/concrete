@@ -318,3 +318,22 @@ enum ContentType {
   JOB_SHOWCASE
   SEASONAL
 }
+
+
+enum SyncStatusEnum {
+  PENDING
+  RUNNING
+  COMPLETED
+  FAILED
+}
+
+model SyncLog {
+  id           String         @id @default(cuid())
+  taskName     String         // e.g., 'commercial-scraper', 'ga4-fetch'
+  status       SyncStatusEnum @default(PENDING)
+  errorMessage String?
+  startedAt    DateTime       @default(now())
+  completedAt  DateTime?
+
+  @@map("sync_logs")
+}

@@ -1,10 +1,12 @@
 import nodemailer from "nodemailer";
 
+const globalForApp = global as unknown as { transporter: nodemailer.Transporter };
+
 const smtpHost = (process.env.SMTP_HOST || "smtpout.secureserver.net").trim();
 const smtpPort = Number(process.env.SMTP_PORT) || 587;
-const smtpSecure = smtpPort === 465;
+const smtpSecure = process.env.SMTP_SECURE === 'true' || smtpPort === 465;
 
-const transporter = nodemailer.createTransport({
+export const transporter = globalForApp.transporter || nodemailer.createTransport({
     host: smtpHost,
     port: smtpPort,
     secure: smtpSecure,
@@ -14,16 +16,11 @@ const transporter = nodemailer.createTransport({
     },
 });
 
+if (process.env.NODE_ENV !== 'production') globalForApp.transporter = transporter;
+
 console.log(`[MAILER] Configured transporter with host: "${smtpHost}" on port: ${smtpPort} (secure: ${smtpSecure})`);
 
-// Verify connection configuration
-transporter.verify(function (error, success) {
-    if (error) {
-        console.error("[MAILER] SMTP Connection Error:", error);
-    } else {
-        console.log("[MAILER] SMTP Server is ready to take our messages");
-    }
-});
+console.log(`[MAILER] Configured transporter (Singleton)`);
 
 export async function sendEmail(options: {
     to: string;

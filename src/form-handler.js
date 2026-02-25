@@ -24,7 +24,7 @@ export function setupFormHandler() {
         const data = Object.fromEntries(formData.entries());
 
         // Honeypot check
-        if (data.fax) {
+        if (data._gotcha) {
             console.log('Spam detected via honeypot. Ignoring submission.');
             if (statusDiv) {
                 statusDiv.innerText = "Thanks! We'll be in touch shortly.";

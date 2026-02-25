@@ -38,7 +38,7 @@ export async function acceptQuote(id: string, scheduledDate: string) {
                 description: `Project generated from Quote #${quote.number}`,
                 status: "SCHEDULED",
                 customerId: quote.customerId,
-                businessId: "cm6d8y1a000018s9k4g3x2y1z", // Use a default or the same business ID logic as elsewhere
+                businessId: quote.customer.businessId,
                 quoteId: quote.id,
                 scheduledAt: scheduledDate ? new Date(scheduledDate) : null,
             }

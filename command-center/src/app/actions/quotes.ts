@@ -3,6 +3,7 @@
 import { db } from "@/lib/db"
 import { revalidatePath } from "next/cache"
 import { redirect } from "next/navigation"
+import { generateQuoteItemsFromScope } from "@/lib/quote-utils";
 
 import { z } from "zod";
 
@@ -31,19 +32,20 @@ export async function createQuote(data: CreateQuoteData) {
         const validatedData = CreateQuoteSchema.parse(data);
         const { customerId, items, status, scopeArea, baseRate, scopeData, cleanupFee, notes } = validatedData;
 
-        // Calculate financials from scope data if available, otherwise from items
-        let subtotal: number;
+        let subtotal = 0;
         const taxRate = 0.0625;
 
+        // If scope data is provided, use it as the source of truth for items
+        let finalItems = items;
         if (scopeArea && baseRate) {
-            // Calculate from scope calculator data
-            const baseCost = scopeArea * baseRate;
+            finalItems = generateQuoteItemsFromScope(scopeArea, baseRate, scopeData);
+
+            const bCost = Number(scopeArea) * Number(baseRate);
             const customItems = (scopeData?.customItems || []) as Array<{ sqft: number; rate: number }>;
-            const customItemsTotal = customItems.reduce((sum: number, item: any) => sum + (item.sqft * item.rate), 0);
-            subtotal = baseCost + customItemsTotal;
+            const customItemsTotal = customItems.reduce((sum: number, item: any) => sum + (Number(item.sqft || 0) * Number(item.rate || 0)), 0);
+            subtotal = bCost + customItemsTotal;
         } else {
-            // Fallback to line items calculation
-            subtotal = items.reduce((sum, item) => sum + (item.qty * item.price), 0);
+            subtotal = items.reduce((sum, item) => sum + (Number(item.qty || 0) * Number(item.price || 0)), 0);
         }
 
         // Add cleanup fee to subtotal if present
@@ -75,9 +77,9 @@ export async function createQuote(data: CreateQuoteData) {
                 notes: notes || null,
                 validUntil: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // Default 30 days valid
                 items: {
-                    create: items.map(item => ({
+                    create: finalItems.map(item => ({
                         description: item.description,
-                        quantity: item.qty,
+                        quantity: Math.round(item.qty),
                         unit: item.unit || "ea",
                         unitPrice: item.price,
                         total: item.qty * item.price
@@ -121,19 +123,32 @@ export async function getQuote(id: string) {
 export async function updateQuoteDetails(id: string, data: CreateQuoteData) {
     try {
         const validatedData = CreateQuoteSchema.parse(data);
-        const { customerId, items, status, cleanupFee, notes } = validatedData;
+        const { customerId, items, status, scopeArea, baseRate, scopeData, cleanupFee, notes } = validatedData;
 
-        // Calculate financials
-        let subtotal = items.reduce((sum, item) => sum + (item.qty * item.price), 0);
+        // Financials source of truth: Calculator (if used) or manual Items
+        let subtotal = 0;
+        let finalItems = items;
+
+        if (scopeArea && baseRate) {
+            finalItems = generateQuoteItemsFromScope(scopeArea, baseRate, scopeData);
+            const baseCost = Number(scopeArea) * Number(baseRate);
+            const customItems = (scopeData?.customItems || []) as Array<{ sqft: number; rate: number }>;
+            const customItemsTotal = customItems.reduce((sum: number, item: any) => sum + (Number(item.sqft || 0) * Number(item.rate || 0)), 0);
+            subtotal = baseCost + customItemsTotal;
+        } else {
+            subtotal = items.reduce((sum, item) => sum + (Number(item.qty || 0) * Number(item.price || 0)), 0);
+        }
 
         // Add cleanup fee to subtotal if present
         if (cleanupFee) {
-            subtotal += cleanupFee;
+            subtotal += Number(cleanupFee);
         }
 
-        const taxRate = 0.0625 // Example MA tax rate
+        const taxRate = 0.0625
         const tax = subtotal * taxRate
         const total = subtotal + tax
+        const deposit = total * 0.5;
+        const balance = total - deposit;
 
         // Update quote and replace items transactionally
         await db.$transaction(async (tx) => {
@@ -151,12 +166,16 @@ export async function updateQuoteDetails(id: string, data: CreateQuoteData) {
                     subtotal,
                     tax,
                     total,
+                    deposit,
+                    balance,
+                    scopeArea: scopeArea || null,
+                    scopeData: scopeData || null,
                     cleanupFee: cleanupFee || null,
                     notes: notes || null,
                     items: {
-                        create: items.map(item => ({
+                        create: finalItems.map(item => ({
                             description: item.description,
-                            quantity: item.qty,
+                            quantity: Math.round(item.qty),
                             unit: item.unit || "ea",
                             unitPrice: item.price,
                             total: item.qty * item.price
@@ -214,15 +233,8 @@ export async function sendQuote(id: string) {
 
     if (!quote || !quote.customer) throw new Error("Quote or customer not found");
 
-    // Calculate display total from scope data if available
-    const scopeData = quote.scopeData as any;
-    const scopeArea = Number(quote.scopeArea) || 0;
-    const baseRate = Number(scopeData?.baseRate) || (scopeArea > 0 ? Number(quote.total) / scopeArea : 0);
-    const customItems = (scopeData?.customItems || []) as Array<{ sqft: number; rate: number }>;
-    const baseCost = scopeArea * baseRate;
-    const customTotal = customItems.reduce((sum: number, item: any) => sum + (item.sqft * item.rate), 0);
-    const subtotal = baseCost + customTotal;
-    const displayTotal = subtotal > 0 ? subtotal + (subtotal * 0.0625) : Number(quote.total);
+    // Use stored total from DB as source of truth
+    const displayTotal = Number(quote.total);
 
     // Generate PDF
     console.log(`[sendQuote] Generating PDF...`);

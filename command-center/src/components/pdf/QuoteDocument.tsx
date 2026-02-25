@@ -279,29 +279,16 @@ export const QuoteDocument: React.FC<QuoteDocumentProps> = ({ quote, customer, i
     const logoSrc = getLogoBase64();
     const scopeData = quote.scopeData as any;
     const scopeArea = Number(quote.scopeArea) || 0;
-    // baseRate: try stored baseRate/total first, then calculate from scopeData
-    const baseRate = Number(quote.baseRate) || (scopeArea > 0 ? Number(quote.total) / scopeArea : 0) || Number(scopeData?.baseRate) || 12;
-    const customItems = (scopeData?.customItems || []) as Array<{ name: string; sqft: number; rate: number }>;
 
-    // Calculate totals from scope data
-    const baseCost = scopeArea * baseRate;
-    const customItemsTotal = customItems.reduce((sum: number, item: any) => sum + (item.sqft * item.rate), 0);
+    // Calculate display rate for Scope Section (informational only)
+    const baseRate = Number(quote.baseRate) || (scopeArea > 0 ? (Number(quote.subtotal) - (Number(quote.cleanupFee) || 0)) / scopeArea : 0);
 
-    // Add cleanup fee if selected
-    const cleanupFee = scopeData?.jobsiteCleanup ? 150 : 0;
-
-    const subtotal = baseCost + customItemsTotal + cleanupFee;
-    const applyTax = scopeData?.applyTax ?? true;
-    const taxRate = applyTax ? 0.0625 : 0;
-    const tax = subtotal * taxRate;
-    const total = subtotal + tax;
-    const depositRequired = total * 0.5;
-
-    // Use scope-calculated total if available, otherwise fall back to stored total
-    const quoteTotal = subtotal > 0 ? total : Number(quote.total);
-    const quoteSubtotal = subtotal > 0 ? subtotal : Number(quote.subtotal);
-    const quoteTax = subtotal > 0 ? tax : Number(quote.tax);
-    const quoteDeposit = quoteTotal * 0.5;
+    // Use DB values strictly
+    const quoteTotal = Number(quote.total);
+    const quoteSubtotal = Number(quote.subtotal);
+    const quoteTax = Number(quote.tax);
+    const quoteCleanupFee = Number(quote.cleanupFee) || 0;
+    const quoteDeposit = Number(quote.deposit) || (quoteTotal * 0.5);
 
     // Comments can be in scopeData or root quote object
     const additionalComments = scopeData?.comments || quote.comments;
@@ -399,38 +386,8 @@ export const QuoteDocument: React.FC<QuoteDocumentProps> = ({ quote, customer, i
                         <Text style={[styles.colTotal, styles.tableHeaderText]}>Total</Text>
                     </View>
 
-                    {/* Main area line item - from scope calculator */}
-                    {scopeArea > 0 && baseRate > 0 && (
-                        <View style={styles.tableRow}>
-                            <Text style={styles.colDesc}>Epoxy Floor Coating System</Text>
-                            <Text style={styles.colQty}>{scopeArea.toLocaleString()}</Text>
-                            <Text style={styles.colPrice}>${baseRate.toFixed(2)}</Text>
-                            <Text style={styles.colTotal}>${baseCost.toLocaleString(undefined, { minimumFractionDigits: 2 })}</Text>
-                        </View>
-                    )}
-
-                    {/* Custom items from scope calculator (add-ons like coving) */}
-                    {customItems.map((item: any, i: number) => (
-                        <View key={i} style={styles.tableRow}>
-                            <Text style={styles.colDesc}>{item.name || 'Add-on'}</Text>
-                            <Text style={styles.colQty}>{item.sqft}</Text>
-                            <Text style={styles.colPrice}>${Number(item.rate).toFixed(2)}</Text>
-                            <Text style={styles.colTotal}>${(item.sqft * item.rate).toLocaleString(undefined, { minimumFractionDigits: 2 })}</Text>
-                        </View>
-                    ))}
-
-                    {/* Jobsite Clean Up Fee */}
-                    {cleanupFee > 0 && (
-                        <View style={styles.tableRow}>
-                            <Text style={styles.colDesc}>Jobsite Clean Up & Waste Removal</Text>
-                            <Text style={styles.colQty}>1</Text>
-                            <Text style={styles.colPrice}>$150.00</Text>
-                            <Text style={styles.colTotal}>$150.00</Text>
-                        </View>
-                    )}
-
-                    {/* Fallback: show stored quote items if no scope data */}
-                    {scopeArea === 0 && items.map((item, i) => (
+                    {/* Always render Items from DB */}
+                    {items.map((item, i) => (
                         <View key={i} style={styles.tableRow}>
                             <Text style={styles.colDesc}>{item.description}</Text>
                             <Text style={styles.colQty}>{item.quantity}</Text>
@@ -438,6 +395,16 @@ export const QuoteDocument: React.FC<QuoteDocumentProps> = ({ quote, customer, i
                             <Text style={styles.colTotal}>${Number(item.total).toFixed(2)}</Text>
                         </View>
                     ))}
+
+                    {/* Jobsite Clean Up Fee */}
+                    {quoteCleanupFee > 0 && (
+                        <View style={styles.tableRow}>
+                            <Text style={styles.colDesc}>Jobsite Clean Up & Waste Removal</Text>
+                            <Text style={styles.colQty}>1</Text>
+                            <Text style={styles.colPrice}>${quoteCleanupFee.toFixed(2)}</Text>
+                            <Text style={styles.colTotal}>${quoteCleanupFee.toFixed(2)}</Text>
+                        </View>
+                    )}
                 </View>
 
                 {/* Additional Comments */}
