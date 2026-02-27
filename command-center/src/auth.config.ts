@@ -28,8 +28,12 @@ export const authConfig = {
             }
 
             // Everything else in the app context requires authentication
-            // This will match /app, /crm, /quotes, etc.
-            return isLoggedIn;
+            // In Next.js 16+, returning false causes a 404 instead of a redirect,
+            // so we must explicitly redirect unauthenticated users to the login page.
+            if (!isLoggedIn) {
+                return Response.redirect(new URL('/app/login', nextUrl));
+            }
+            return true;
         },
         async jwt({ token, user }) {
             if (user) {
