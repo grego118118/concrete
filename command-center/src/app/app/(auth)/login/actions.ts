@@ -9,8 +9,8 @@ export async function authenticate(
     formData: FormData,
 ) {
     try {
-        await signIn("credentials", formData)
-    } catch (error) {
+        await signIn("credentials", formData, { redirectTo: '/app' })
+    } catch (error: any) {
         if (error instanceof AuthError) {
             switch (error.type) {
                 case "CredentialsSignin":
@@ -19,9 +19,19 @@ export async function authenticate(
                     return "Something went wrong."
             }
         }
-        throw error
+        // Next.js uses specific errors for redirects (NEXT_REDIRECT)
+        // If it's a redirect, we MUST rethrow it so Next.js can handle the navigation
+        if (error?.message && error.message.includes('NEXT_REDIRECT')) {
+            throw error;
+        }
+        if (error?.name === 'RedirectError') {
+            throw error;
+        }
+
+        console.error("Login Error:", error);
+        return `Error: ${error?.message || "Something went wrong"}`;
     }
-    return undefined
+    return undefined;
 }
 
 export async function sendMagicLink(
@@ -29,7 +39,7 @@ export async function sendMagicLink(
     formData: FormData
 ) {
     try {
-        await signIn("nodemailer", formData)
+        await signIn("nodemailer", formData, { redirectTo: '/app' })
     } catch (error) {
         throw error
     }

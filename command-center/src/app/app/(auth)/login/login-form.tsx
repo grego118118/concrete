@@ -1,7 +1,8 @@
 
 "use client"
 
-import { useFormState, useFormStatus } from "react-dom"
+import { useActionState } from "react"
+import { useFormStatus } from "react-dom"
 import { authenticate, sendMagicLink } from "./actions"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -20,8 +21,8 @@ function LoginButton({ text }: { text: string }) {
 }
 
 export function LoginForm() {
-    const [errorMessage, dispatch] = useFormState(authenticate, undefined)
-    const [magicLinkState, dispatchMagicLink] = useFormState(sendMagicLink, undefined)
+    const [errorMessage, dispatch] = useActionState(authenticate, undefined)
+    const [magicLinkState, dispatchMagicLink] = useActionState(sendMagicLink, undefined)
 
     return (
         <Tabs defaultValue="password" className="w-full">
