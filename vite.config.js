@@ -26,4 +26,12 @@ export default defineConfig({
             },
         },
     },
+    server: {
+        proxy: {
+            '/app': 'http://localhost:3000',
+            '/quote': 'http://localhost:3000',
+            '/_next': 'http://localhost:3000',
+            '/login': 'http://localhost:3000',
+        }
+    }
 });
