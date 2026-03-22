@@ -5,9 +5,12 @@ import { UserPlus, Search } from "lucide-react";
 import Link from "next/link";
 
 import { getCustomers } from "@/app/actions/customers";
+import { CustomerSort } from "./customer-sort";
 
-export default async function CustomersPage() {
-    const customers = await getCustomers();
+export default async function CustomersPage({ searchParams }: { searchParams: Promise<{ sort?: string }> }) {
+    const params = await searchParams;
+    const sort = params.sort || 'name';
+    const customers = await getCustomers(sort);
     return (
         <div className="space-y-6">
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
@@ -23,7 +26,7 @@ export default async function CustomersPage() {
                 </Link>
             </div>
 
-            <div className="flex items-center gap-2">
+            <div className="flex items-center justify-between gap-2">
                 <div className="relative flex-1 max-w-sm">
                     <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                     <Input
@@ -32,6 +35,7 @@ export default async function CustomersPage() {
                         className="pl-8"
                     />
                 </div>
+                <CustomerSort currentSort={sort} />
             </div>
 
             <div className="rounded-md border bg-card">

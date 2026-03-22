@@ -41,7 +41,7 @@ export async function createCustomer(formData: FormData) {
     redirect("/app/crm/customers")
 }
 
-export async function getCustomers() {
+export async function getCustomers(sort: string = 'name') {
     // Ensure business exists
     let business = await db.business.findFirst()
     if (!business) {
@@ -57,9 +57,7 @@ export async function getCustomers() {
         where: {
             businessId: business.id
         },
-        orderBy: {
-            name: 'asc'
-        }
+        orderBy: sort === 'newest' ? { createdAt: 'desc' } : { name: 'asc' }
     })
 }
 

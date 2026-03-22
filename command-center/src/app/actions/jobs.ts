@@ -63,7 +63,7 @@ export async function getCustomersForSelect() {
     // Helper to populate the select dropdown
     return await db.customer.findMany({
         select: { id: true, name: true },
-        orderBy: { name: 'asc' }
+        orderBy: { createdAt: 'desc' }
     })
 }
 
