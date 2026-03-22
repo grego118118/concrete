@@ -10,7 +10,7 @@ interface DownloadQuoteButtonProps {
 export function DownloadQuoteButton({ quoteId }: DownloadQuoteButtonProps) {
     const handleDownload = () => {
         // Open PDF in a new browser tab so user can view and print/save it
-        window.open(`/api/crm/quotes/${quoteId}/pdf`, "_blank");
+        window.open(`/app/api/crm/quotes/${quoteId}/pdf`, "_blank");
     };
 
     return (

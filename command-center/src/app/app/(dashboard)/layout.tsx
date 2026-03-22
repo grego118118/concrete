@@ -20,7 +20,7 @@ export default function DashboardLayout({
         <SidebarProvider defaultOpen={true}>
             <AppSidebar />
             <SidebarInset>
-                <header className="flex h-14 shrink-0 items-center gap-2 border-b bg-white px-4 sticky top-0 z-30 shadow-sm md:h-16 md:px-6">
+                <header className="flex h-14 shrink-0 items-center gap-2 border-b bg-white px-4 sticky top-0 z-30 shadow-sm md:h-16 md:px-6 print:hidden">
                     <div className="flex items-center gap-4 w-full">
                         <div className="flex items-center gap-2 md:hidden">
                             <SidebarTrigger className="hover:bg-gray-100 p-2 rounded-lg transition-colors">

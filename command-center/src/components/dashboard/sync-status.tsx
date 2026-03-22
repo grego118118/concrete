@@ -13,7 +13,7 @@ export function SyncStatus() {
 
     const fetchStatus = async () => {
         try {
-            const res = await fetch("/api/tradeops/sync");
+            const res = await fetch("/app/api/tradeops/sync");
 
             const contentType = res.headers.get("content-type");
             if (!contentType || !contentType.includes("application/json")) {
@@ -51,7 +51,7 @@ export function SyncStatus() {
     const startSync = async () => {
         setLoading(true);
         try {
-            const res = await fetch("/api/tradeops/sync", { method: "POST" });
+            const res = await fetch("/app/api/tradeops/sync", { method: "POST" });
 
             const contentType = res.headers.get("content-type");
             if (!contentType || !contentType.includes("application/json")) {

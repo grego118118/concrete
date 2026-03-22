@@ -113,7 +113,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     return (
         <Sidebar
             collapsible={isMobile ? "offcanvas" : "none"}
-            className={cn("border-r", !isMobile && "h-screen sticky top-0 bg-white")}
+            className={cn("border-r print:hidden", !isMobile && "h-screen sticky top-0 bg-white")}
             {...props}
         >
             <SidebarHeader className="border-b px-6 py-4 bg-white">

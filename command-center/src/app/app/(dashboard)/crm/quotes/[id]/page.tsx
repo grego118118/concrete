@@ -117,7 +117,7 @@ export default async function QuoteViewPage(props: {
     return (
         <div className="max-w-7xl mx-auto px-4 space-y-8 pb-20">
             {/* Action Bar */}
-            <div className="flex items-center justify-between no-print print:hidden bg-slate-50 p-4 rounded-lg border">
+            <div className="flex items-center justify-between print:hidden bg-slate-50 p-4 rounded-lg border">
                 <div className="flex items-center gap-4">
                     <Link href="/crm/quotes">
                         <Button variant="outline" size="sm">
@@ -148,7 +148,7 @@ export default async function QuoteViewPage(props: {
             {/* Administrative / Planning Tools */}
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
                 {/* Formal Quote Paper */}
-                <div className="lg:col-span-8 bg-white border shadow-sm p-8 md:p-12 text-slate-900 rounded-sm font-sans no-print flex flex-col">
+                <div className="lg:col-span-8 bg-white border shadow-sm p-8 md:p-12 text-slate-900 rounded-sm font-sans flex flex-col">
                     {/* Header */}
                     <div className="flex justify-between items-start border-b-2 border-slate-800 pb-8 mb-8">
                         <div className="space-y-4">
@@ -315,7 +315,7 @@ export default async function QuoteViewPage(props: {
                 </div>
 
                 {/* Planning & Scope Tools */}
-                <div className="lg:col-span-4 space-y-8 no-print self-start sticky top-24">
+                <div className="lg:col-span-4 space-y-8 print:hidden self-start sticky top-24">
                     <section id="scope-calculator" className="space-y-4">
                         <div className="flex items-center gap-2 px-1">
                             <div className="h-2 w-2 rounded-full bg-blue-600" />
