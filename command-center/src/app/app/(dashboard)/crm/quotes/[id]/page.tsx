@@ -304,7 +304,7 @@ export default async function QuoteViewPage(props: {
                             <div>
                                 <h4 className="font-bold text-slate-700 mb-2 uppercase tracking-wider">Project Preparation</h4>
                                 <p className="leading-relaxed">
-                                    Ensure the jobsite is clear of all vehicles and items by 7:00 AM on the scheduled start date.
+                                    Ensure the surface to be prepped, is clear of all vehicles and items by 7:00 AM on the scheduled start date.  The area surrounding surface to be prepped must be easily accessable and not a hinderance to the personel, tools and equipment.
                                 </p>
                             </div>
                             <div className="pt-4 border-t border-slate-100 mt-4">
