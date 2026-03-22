@@ -174,7 +174,7 @@ export function JobAreaCalculator({ jobId, quoteId, initialData, onScopeChange }
                             <span className="text-lg font-bold">$</span>
                             <Input
                                 type="number"
-                                className="w-16 h-8 text-right font-bold bg-white border-blue-200 focus:ring-blue-500"
+                                className="w-20 h-8 text-right font-bold bg-white border-blue-200 focus:ring-blue-500"
                                 value={baseRate}
                                 onChange={(e) => setBaseRate(Number(e.target.value))}
                             />
@@ -283,7 +283,7 @@ export function JobAreaCalculator({ jobId, quoteId, initialData, onScopeChange }
                     <div className="space-y-3">
                         {customItems.map((item) => (
                             <div key={item.id} className="grid grid-cols-12 gap-3 items-end bg-slate-50/50 p-3 rounded-lg border border-slate-100">
-                                <div className="col-span-6 space-y-1">
+                                <div className="col-span-5 space-y-1">
                                     <Label className="text-[10px] uppercase font-bold text-slate-400">Item Name</Label>
                                     <Input
                                         value={item.name}
@@ -292,7 +292,7 @@ export function JobAreaCalculator({ jobId, quoteId, initialData, onScopeChange }
                                         className="h-9 text-sm bg-white"
                                     />
                                 </div>
-                                <div className="col-span-2 space-y-1">
+                                <div className="col-span-3 space-y-1">
                                     <Label className="text-[10px] uppercase font-bold text-slate-400">Sq Ft</Label>
                                     <Input
                                         type="number"
@@ -311,7 +311,7 @@ export function JobAreaCalculator({ jobId, quoteId, initialData, onScopeChange }
                                         className="h-9 text-sm bg-white"
                                     />
                                 </div>
-                                <div className="col-span-1 pb-1">
+                                <div className="col-span-1 pb-1 flex justify-end">
                                     <Button variant="ghost" size="icon" onClick={() => removeCustomItem(item.id)} className="h-8 w-8 text-slate-400 hover:text-red-500">
                                         <Trash2 className="h-4 w-4" />
                                     </Button>
