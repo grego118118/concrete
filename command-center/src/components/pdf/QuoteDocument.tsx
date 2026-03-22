@@ -289,6 +289,8 @@ export const QuoteDocument: React.FC<QuoteDocumentProps> = ({ quote, customer, i
     const quoteTax = Number(quote.tax);
     const quoteCleanupFee = Number(quote.cleanupFee) || 0;
     const quoteDeposit = Number(quote.deposit) || (quoteTotal * 0.5);
+    const quoteDiscount = Number(quote.discount) || 0;
+    const discountRate = Number(scopeData?.discountRate) || 0;
 
     // Comments can be in scopeData or root quote object
     const additionalComments = scopeData?.comments || quote.comments;
@@ -439,8 +441,14 @@ export const QuoteDocument: React.FC<QuoteDocumentProps> = ({ quote, customer, i
                         <Text style={styles.totalLabel}>Subtotal:</Text>
                         <Text style={styles.totalValue}>${quoteSubtotal.toLocaleString(undefined, { minimumFractionDigits: 2 })}</Text>
                     </View>
+                    {quoteDiscount > 0 && (
+                        <View style={styles.totalRow}>
+                            <Text style={{ ...styles.totalLabel, color: '#1d4ed8', fontWeight: 'bold' }}>Discount ({discountRate}%):</Text>
+                            <Text style={{ ...styles.totalValue, color: '#1d4ed8', fontStyle: 'italic' }}>-${quoteDiscount.toLocaleString(undefined, { minimumFractionDigits: 2 })}</Text>
+                        </View>
+                    )}
                     <View style={styles.totalRow}>
-                        <Text style={styles.totalLabel}>MA Sales Tax (6.25%):</Text>
+                        <Text style={styles.totalLabel}>Tax (6.25%):</Text>
                         <Text style={styles.totalValue}>${quoteTax.toLocaleString(undefined, { minimumFractionDigits: 2 })}</Text>
                     </View>
                     <View style={styles.grandTotal}>
@@ -471,15 +479,21 @@ export const QuoteDocument: React.FC<QuoteDocumentProps> = ({ quote, customer, i
                     <View style={styles.footerCol}>
                         <Text style={styles.footerTitle}>Payment Terms</Text>
                         <Text style={styles.footerText}>
-                            - 50% deposit required to confirm booking.{'\n'}
-                            - Full balance due immediately upon completion.{'\n'}
-                            - Quote valid for 30 days.
+                            - 50% deposit required to confirm booking and secure materials.{'\n'}
+                            - Full balance due immediately upon completion of the coating installation.
+                        </Text>
+                        <Text style={{ ...styles.footerTitle, marginTop: 10 }}>Premium Warranty</Text>
+                        <Text style={styles.footerText}>
+                            Pioneer Concrete Coatings proudly stands behind our work with a comprehensive life-time limited warranty.
                         </Text>
                     </View>
                     <View style={styles.footerCol}>
-                        <Text style={styles.footerTitle}>Pioneer Concrete Coatings</Text>
+                        <Text style={styles.footerTitle}>Project Preparation</Text>
                         <Text style={styles.footerText}>
-                            Thank you for your business. We look forward to transforming your space!
+                            Ensure the surface to be prepped, is clear of all vehicles and items by 7:00 AM on the scheduled start date. The area surrounding surface to be prepped must be easily accessable and not a hinderance to the personel, tools and equipment.
+                        </Text>
+                        <Text style={{ fontSize: 9, fontWeight: 'bold', color: '#0f172a', marginTop: 10 }}>
+                            Pioneer Concrete Coatings
                         </Text>
                     </View>
                 </View>
