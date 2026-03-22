@@ -36,12 +36,17 @@ export async function updateScopeData({
         const cleanupFee = scopeData?.jobsiteCleanup ? 150 : 0;
         const subtotal = baseCost + customTotal + cleanupFee;
 
+        // Calculate discount
+        const discountRate = Number(scopeData?.discountRate || 0);
+        const discountAmount = subtotal * (discountRate / 100);
+        const taxableAmount = subtotal - discountAmount;
+
         // Handle conditional tax
         const applyTax = scopeData?.applyTax ?? true;
         const taxRate = applyTax ? 0.0625 : 0;
-        const tax = Number(subtotal) * taxRate;
+        const tax = taxableAmount * taxRate;
 
-        const total = Number(subtotal) + tax;
+        const total = taxableAmount + tax;
         const deposit = total * 0.5;
         const balance = total - deposit;
 
@@ -60,6 +65,7 @@ export async function updateScopeData({
                     scopeData: scopeData as any,
                     scopeArea: totalArea,
                     subtotal: subtotal,
+                    discount: discountAmount,
                     tax: tax,
                     total: total,
                     deposit: deposit,

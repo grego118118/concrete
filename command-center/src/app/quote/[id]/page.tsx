@@ -79,6 +79,8 @@ export default async function PublicQuotePage(props: {
             customerName={quote.customer.name}
             items={displayItems}
             subtotal={subtotal}
+            discount={Number(quote.discount) || 0}
+            discountRate={Number((quote.scopeData as any)?.discountRate) || 0}
             tax={tax}
             total={quoteTotal}
             deposit={deposit}

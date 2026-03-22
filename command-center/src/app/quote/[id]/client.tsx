@@ -11,6 +11,8 @@ interface QuoteAcceptClientProps {
     customerName: string;
     items: { description: string; quantity: number; unitPrice: number; total: number }[];
     subtotal: number;
+    discount?: number;
+    discountRate?: number;
     tax: number;
     total: number;
     deposit: number;
@@ -27,6 +29,8 @@ export function QuoteAcceptClient({
     customerName,
     items,
     subtotal,
+    discount,
+    discountRate,
     tax,
     total,
     deposit,
@@ -176,6 +180,14 @@ export function QuoteAcceptClient({
                             <span>Subtotal</span>
                             <span>${subtotal.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
                         </div>
+
+                        {/* Discount */}
+                        {discount && discount > 0 ? (
+                            <div className="flex justify-between text-sm font-medium text-blue-600">
+                                <span>Project Discount ({discountRate}%)</span>
+                                <span>-${discount.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                            </div>
+                        ) : null}
 
                         {/* Cleanup Fee */}
                         {cleanupFee && cleanupFee > 0 && (

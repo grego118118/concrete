@@ -163,6 +163,7 @@ model Quote {
 
   // Additional Fees & Notes
   cleanupFee Decimal?    @db.Decimal(10, 2)
+  discount   Decimal?    @db.Decimal(10, 2)
   notes      String?
 
   // Project Scope

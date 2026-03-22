@@ -34,6 +34,7 @@ export async function createQuote(data: CreateQuoteData) {
 
         let subtotal = 0;
         const taxRate = 0.0625;
+        let discountRate = 0;
 
         // If scope data is provided, use it as the source of truth for items
         let finalItems = items;
@@ -44,6 +45,7 @@ export async function createQuote(data: CreateQuoteData) {
             const customItems = (scopeData?.customItems || []) as Array<{ sqft: number; rate: number }>;
             const customItemsTotal = customItems.reduce((sum: number, item: any) => sum + (Number(item.sqft || 0) * Number(item.rate || 0)), 0);
             subtotal = bCost + customItemsTotal;
+            discountRate = Number(scopeData?.discountRate || 0);
         } else {
             subtotal = items.reduce((sum, item) => sum + (Number(item.qty || 0) * Number(item.price || 0)), 0);
         }
@@ -53,8 +55,15 @@ export async function createQuote(data: CreateQuoteData) {
             subtotal += cleanupFee;
         }
 
-        const tax = subtotal * taxRate;
-        const total = subtotal + tax;
+        // Calculate discount
+        const discountAmount = subtotal * (discountRate / 100);
+        const taxableAmount = subtotal - discountAmount;
+
+        // Apply conditional tax
+        const applyTax = scopeData?.applyTax ?? true;
+        const actualTaxRate = applyTax ? taxRate : 0;
+        const tax = taxableAmount * actualTaxRate;
+        const total = taxableAmount + tax;
         const deposit = total * 0.5;
         const balance = total - deposit;
 
@@ -67,6 +76,7 @@ export async function createQuote(data: CreateQuoteData) {
                 customerId,
                 status: status as any,
                 subtotal,
+                discount: discountAmount,
                 tax,
                 total,
                 deposit,
@@ -128,6 +138,7 @@ export async function updateQuoteDetails(id: string, data: CreateQuoteData) {
         // Financials source of truth: Calculator (if used) or manual Items
         let subtotal = 0;
         let finalItems = items;
+        let discountRate = 0;
 
         if (scopeArea && baseRate) {
             finalItems = generateQuoteItemsFromScope(scopeArea, baseRate, scopeData);
@@ -135,6 +146,7 @@ export async function updateQuoteDetails(id: string, data: CreateQuoteData) {
             const customItems = (scopeData?.customItems || []) as Array<{ sqft: number; rate: number }>;
             const customItemsTotal = customItems.reduce((sum: number, item: any) => sum + (Number(item.sqft || 0) * Number(item.rate || 0)), 0);
             subtotal = baseCost + customItemsTotal;
+            discountRate = Number(scopeData?.discountRate || 0);
         } else {
             subtotal = items.reduce((sum, item) => sum + (Number(item.qty || 0) * Number(item.price || 0)), 0);
         }
@@ -144,9 +156,17 @@ export async function updateQuoteDetails(id: string, data: CreateQuoteData) {
             subtotal += Number(cleanupFee);
         }
 
-        const taxRate = 0.0625
-        const tax = subtotal * taxRate
-        const total = subtotal + tax
+        // Calculate discount
+        const discountAmount = subtotal * (discountRate / 100);
+        const taxableAmount = subtotal - discountAmount;
+
+        // Apply conditional tax
+        const taxRate = 0.0625;
+        const applyTax = scopeData?.applyTax ?? true;
+        const actualTaxRate = applyTax ? taxRate : 0;
+        
+        const tax = taxableAmount * actualTaxRate;
+        const total = taxableAmount + tax;
         const deposit = total * 0.5;
         const balance = total - deposit;
 
@@ -164,6 +184,7 @@ export async function updateQuoteDetails(id: string, data: CreateQuoteData) {
                     customerId,
                     status: status as any,
                     subtotal,
+                    discount: discountAmount,
                     tax,
                     total,
                     deposit,

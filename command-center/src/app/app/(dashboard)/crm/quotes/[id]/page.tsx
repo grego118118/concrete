@@ -239,6 +239,12 @@ export default async function QuoteViewPage(props: {
                                 <span>Subtotal:</span>
                                 <span>${Number(quote.subtotal).toFixed(2)}</span>
                             </div>
+                            {Number(quote.discount) > 0 && (
+                                <div className="flex justify-between text-blue-600 text-sm font-medium">
+                                    <span>Discount ({((quote.scopeData as any)?.discountRate || 0)}%):</span>
+                                    <span>-${Number(quote.discount).toFixed(2)}</span>
+                                </div>
+                            )}
                             <div className="flex justify-between text-slate-600 text-sm pb-3 border-b border-slate-200">
                                 <span>Tax (6.25%):</span>
                                 <span>${Number(quote.tax).toFixed(2)}</span>

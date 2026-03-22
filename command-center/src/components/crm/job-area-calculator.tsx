@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Plus, Trash2, Calculator, Save, Square, Loader2 } from "lucide-react";
+import { Plus, Trash2, Calculator, Save, Square, Loader2, Percent } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { updateScopeData } from "@/app/actions/workflow";
 import { toast } from "sonner";
@@ -34,6 +34,7 @@ export function JobAreaCalculator({ jobId, quoteId, initialData, onScopeChange }
     const [baseRate, setBaseRate] = useState<number>(initialData?.baseRate || 12);
     const [applyTax, setApplyTax] = useState<boolean>(initialData?.scopeData?.applyTax ?? true);
     const [jobsiteCleanup, setJobsiteCleanup] = useState<boolean>(initialData?.scopeData?.jobsiteCleanup ?? false);
+    const [discountRate, setDiscountRate] = useState<number>(initialData?.scopeData?.discountRate || 0);
 
     // Custom items
     const [customItems, setCustomItems] = useState<CalcItem[]>(initialData?.scopeData?.customItems || []);
@@ -80,7 +81,8 @@ export function JobAreaCalculator({ jobId, quoteId, initialData, onScopeChange }
             comments,
             baseRate,
             applyTax,
-            jobsiteCleanup
+            jobsiteCleanup,
+            discountRate
         }
     });
 
@@ -89,7 +91,7 @@ export function JobAreaCalculator({ jobId, quoteId, initialData, onScopeChange }
         if (onScopeChange) {
             onScopeChange(getCurrentScopeData());
         }
-    }, [area, baseRate, prepType, coatingType, topCoatType, flakeType, customItems, comments, applyTax, jobsiteCleanup]);
+    }, [area, baseRate, prepType, coatingType, topCoatType, flakeType, customItems, comments, applyTax, jobsiteCleanup, discountRate]);
 
     const handleSave = async () => {
         const id = jobId || quoteId;
@@ -119,7 +121,8 @@ export function JobAreaCalculator({ jobId, quoteId, initialData, onScopeChange }
                     comments,
                     baseRate,
                     applyTax,
-                    jobsiteCleanup
+                    jobsiteCleanup,
+                    discountRate
                 }
             });
             toast.success("Project scope updated successfully");
@@ -248,6 +251,24 @@ export function JobAreaCalculator({ jobId, quoteId, initialData, onScopeChange }
 
                 {/* Tax & Cleanup Toggle */}
                 <div className="space-y-4 pt-2">
+                    <div className="flex items-center justify-between p-3 bg-slate-50 rounded-lg border border-slate-100">
+                        <div className="space-y-0.5">
+                            <Label className="text-sm font-bold text-slate-700">Project Discount (%)</Label>
+                            <p className="text-[10px] text-slate-500 font-medium">Apply a percentage discount to the subtotal</p>
+                        </div>
+                        <div className="relative">
+                            <Input
+                                type="number"
+                                min="0"
+                                max="100"
+                                value={discountRate || ""}
+                                onChange={(e) => setDiscountRate(Number(e.target.value))}
+                                className="w-20 pr-6 text-right font-bold bg-white"
+                            />
+                            <Percent className="absolute right-2 top-2.5 h-4 w-4 text-slate-400" />
+                        </div>
+                    </div>
+
                     <div className="flex items-center justify-between p-3 bg-slate-50 rounded-lg border border-slate-100">
                         <div className="space-y-0.5">
                             <Label className="text-sm font-bold text-slate-700">Massachusetts Sales Tax</Label>
