@@ -1,11 +1,11 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { UserPlus, Search } from "lucide-react";
 import Link from "next/link";
 
 import { getCustomers } from "@/app/actions/customers";
 import { CustomerSort } from "./customer-sort";
+import { CustomerTable } from "./customer-table";
 
 export default async function CustomersPage({ searchParams }: { searchParams: Promise<{ sort?: string }> }) {
     const params = await searchParams;
@@ -38,44 +38,7 @@ export default async function CustomersPage({ searchParams }: { searchParams: Pr
                 <CustomerSort currentSort={sort} />
             </div>
 
-            <div className="rounded-md border bg-card">
-                <Table>
-                    <TableHeader>
-                        <TableRow>
-                            <TableHead>Name</TableHead>
-                            <TableHead>Email</TableHead>
-                            <TableHead>Phone</TableHead>
-                            <TableHead>Lead Source</TableHead>
-                            <TableHead>Status</TableHead>
-                            <TableHead className="text-right">Actions</TableHead>
-                        </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                        {customers.length === 0 ? (
-                            <TableRow>
-                                <TableCell colSpan={6} className="text-center h-24 text-muted-foreground">
-                                    No customers found. Add one to get started.
-                                </TableCell>
-                            </TableRow>
-                        ) : (
-                            customers.map((customer) => (
-                                <TableRow key={customer.id}>
-                                    <TableCell className="font-medium">{customer.name}</TableCell>
-                                    <TableCell>{customer.email}</TableCell>
-                                    <TableCell>{customer.phone}</TableCell>
-                                    <TableCell>{customer.leadSource}</TableCell>
-                                    <TableCell>Active</TableCell>
-                                    <TableCell className="text-right flex items-center justify-end gap-2">
-                                        <Link href={`/app/crm/customers/${customer.id}/edit`}>
-                                            <Button variant="ghost" size="sm">Edit</Button>
-                                        </Link>
-                                    </TableCell>
-                                </TableRow>
-                            ))
-                        )}
-                    </TableBody>
-                </Table>
-            </div>
+            <CustomerTable customers={customers} />
         </div>
     );
 }

@@ -101,3 +101,13 @@ export async function deleteCustomer(id: string) {
 
     revalidatePath("/app/crm/customers")
 }
+
+export async function deleteCustomers(ids: string[]) {
+    if (ids.length === 0) return
+
+    await db.customer.deleteMany({
+        where: { id: { in: ids } }
+    })
+
+    revalidatePath("/app/crm/customers")
+}
