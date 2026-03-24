@@ -76,6 +76,11 @@ const data = {
             url: "/app/social/composer",
             icon: Share2,
         },
+        {
+            title: "CRM Settings",
+            url: "/app/crm/settings",
+            icon: Settings2,
+        },
     ],
 
     projects: [

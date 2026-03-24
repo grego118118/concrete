@@ -7,6 +7,6 @@ export const proxy = auth
 
 export const config = {
     // https://nextjs.org/docs/app/building-your-application/routing/middleware#matcher
-    // Only protect /app/ routes — /quote/ is public for customer access
-    matcher: ['/app/:path*'],
+    // Protect both front-facing /app/ and Vercel-rewritten /command-center/app/
+    matcher: ['/app/:path*', '/command-center/app/:path*'],
 };
