@@ -8,5 +8,10 @@ export const proxy = auth
 export const config = {
     // https://nextjs.org/docs/app/building-your-application/routing/middleware#matcher
     // Protect both front-facing /app/ and Vercel-rewritten /command-center/app/
-    matcher: ['/app/:path*', '/command-center/app/:path*'],
+    matcher: [
+        '/app/:path*',
+        '/app',
+        '/command-center/app/:path*',
+        '/command-center/app'
+    ],
 };
