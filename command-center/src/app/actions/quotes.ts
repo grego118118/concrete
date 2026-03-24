@@ -337,6 +337,16 @@ export async function sendQuote(id: string) {
         revalidatePath("/app/crm/quotes")
         revalidatePath(`/app/crm/quotes/${id}`)
 
+        // Sync customer to QuickBooks in the background (non-blocking)
+        try {
+            const { syncCustomerToQB } = await import("@/lib/quickbooks/customer-sync");
+            syncCustomerToQB(quote.customer.id).catch(err =>
+                console.warn('[sendQuote] QB customer sync failed (non-critical):', err)
+            );
+        } catch {
+            // QuickBooks not configured, skip silently
+        }
+
         return { success: true };
     } catch (sendError: any) {
         console.error(`[sendQuote] Email sending failed:`, sendError);

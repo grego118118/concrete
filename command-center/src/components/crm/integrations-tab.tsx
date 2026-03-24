@@ -1,6 +1,7 @@
 'use client'
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { useSearchParams } from "next/navigation"
 import {
     Check,
     ExternalLink,
@@ -82,14 +83,66 @@ export function IntegrationsTab() {
     const [connectingIntegration, setConnectingIntegration] = useState<Integration | null>(null)
     const [isConnecting, setIsConnecting] = useState(false)
     const [configuringIntegration, setConfiguringIntegration] = useState<Integration | null>(null)
+    const searchParams = useSearchParams()
+
+    // Check QB connection status on mount and handle URL params
+    useEffect(() => {
+        // Check for QB OAuth callback results
+        const qbConnected = searchParams.get('qb_connected')
+        const qbError = searchParams.get('qb_error')
+
+        if (qbConnected === 'true') {
+            toast.success('Successfully connected to QuickBooks!')
+        } else if (qbError) {
+            const errorMessages: Record<string, string> = {
+                denied: 'QuickBooks authorization was denied.',
+                config: 'QuickBooks is not configured. Check environment variables.',
+                missing_params: 'Missing OAuth parameters from QuickBooks.',
+                token_exchange: 'Failed to exchange authorization code. Please try again.',
+            }
+            toast.error(errorMessages[qbError] || 'QuickBooks connection failed.')
+        }
+
+        // Fetch actual QB connection status
+        fetch('/app/api/quickbooks/status')
+            .then(res => res.json())
+            .then(data => {
+                if (data.connected) {
+                    setIntegrations(prev => prev.map(item =>
+                        item.id === 'quickbooks'
+                            ? { ...item, connected: true, lastSync: data.companyName || 'Connected' }
+                            : item
+                    ))
+                }
+            })
+            .catch(() => { /* QB status check failed silently */ })
+    }, [searchParams])
 
     const handleToggle = (id: string, currentStatus: boolean) => {
         if (!currentStatus) {
-            // Opening connection flow
+            // For QuickBooks, redirect to OAuth flow directly
+            if (id === 'quickbooks') {
+                window.location.href = '/app/api/quickbooks/connect'
+                return
+            }
+            // Opening connection flow for other integrations
             const integration = integrations.find(i => i.id === id)
             if (integration) setConnectingIntegration(integration)
         } else {
             // Disconnecting
+            if (id === 'quickbooks') {
+                fetch('/app/api/quickbooks/disconnect', { method: 'POST' })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.success) {
+                            setIntegrations(prev => prev.map(item =>
+                                item.id === 'quickbooks' ? { ...item, connected: false, lastSync: undefined } : item
+                            ))
+                            toast.info('Disconnected from QuickBooks')
+                        }
+                    })
+                return
+            }
             setIntegrations(prev => prev.map(item =>
                 item.id === id ? { ...item, connected: false } : item
             ))
@@ -100,10 +153,16 @@ export function IntegrationsTab() {
     const completeConnection = () => {
         if (!connectingIntegration) return
 
+        // For QuickBooks, redirect to OAuth (shouldn't normally reach here)
+        if (connectingIntegration.id === 'quickbooks') {
+            window.location.href = '/app/api/quickbooks/connect'
+            return
+        }
+
         setIsConnecting(true)
         const id = connectingIntegration.id
 
-        // Mock connection delay
+        // Mock connection delay for non-QB integrations
         setTimeout(() => {
             setIntegrations(prev => prev.map(item =>
                 item.id === id ? { ...item, connected: true, lastSync: "Just now" } : item

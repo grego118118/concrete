@@ -69,5 +69,17 @@ export async function acceptQuote(id: string, scheduledDate: string) {
 
     revalidatePath(`/quote/${id}`);
     revalidatePath(`/app/crm/jobs`); // Revalidate jobs list
+    revalidatePath(`/app/crm/invoices`);
+
+    // 4. Create invoice and sync to QuickBooks (non-blocking)
+    try {
+        const { createInvoiceFromQuote } = await import("@/lib/quickbooks/invoice-sync");
+        createInvoiceFromQuote(id).catch(err =>
+            console.warn('[acceptQuote] QB invoice sync failed (non-critical):', err)
+        );
+    } catch {
+        // QuickBooks not configured, skip silently
+    }
+
     return { success: true };
 }

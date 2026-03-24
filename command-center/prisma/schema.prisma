@@ -79,26 +79,40 @@ model VerificationToken {
 }
 
 
+// QuickBooks Online Integration
+model QuickBooksConnection {
+  id           String   @id @default(cuid())
+  realmId      String   @unique // QuickBooks Company ID
+  accessToken  String   @db.Text
+  refreshToken String   @db.Text
+  tokenExpiry  DateTime
+  companyName  String?
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
 // CRM Entities
 model Customer {
-  id         String    @id @default(cuid())
-  name       String
-  email      String
-  phone      String?
-  address    String?
-  city       String?
-  state      String?
-  zip        String?
-  leadSource String    @default("MANUAL")
-  leadScore  Int?
-  notes      String?
-  businessId String
-  business   Business  @relation(fields: [businessId], references: [id])
-  jobs       Job[]
-  quotes     Quote[]
-  invoices   Invoice[]
-  createdAt  DateTime  @default(now())
-  updatedAt  DateTime  @updatedAt
+  id           String    @id @default(cuid())
+  name         String
+  email        String
+  phone        String?
+  address      String?
+  city         String?
+  state        String?
+  zip          String?
+  leadSource   String    @default("MANUAL")
+  leadScore    Int?
+  notes        String?
+  qbCustomerId String?   // QuickBooks Customer ID
+  businessId   String
+  business     Business  @relation(fields: [businessId], references: [id])
+  jobs         Job[]
+  quotes       Quote[]
+  invoices     Invoice[]
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
 
   @@index([businessId])
 }
@@ -198,18 +212,22 @@ model QuoteItem {
 }
 
 model Invoice {
-  id         String        @id @default(cuid())
-  number     String        @unique // e.g. INV-1001
-  quoteId    String        @unique
-  quote      Quote         @relation(fields: [quoteId], references: [id])
-  status     PaymentStatus @default(PENDING)
-  amount     Decimal       @db.Decimal(10, 2)
-  dueDate    DateTime?
-  paidAt     DateTime?
-  customerId String
-  customer   Customer      @relation(fields: [customerId], references: [id])
-  createdAt  DateTime      @default(now())
-  updatedAt  DateTime      @updatedAt
+  id               String        @id @default(cuid())
+  number           String        @unique // e.g. INV-1001
+  quoteId          String        @unique
+  quote            Quote         @relation(fields: [quoteId], references: [id])
+  status           PaymentStatus @default(PENDING)
+  amount           Decimal       @db.Decimal(10, 2)
+  dueDate          DateTime?
+  paidAt           DateTime?
+  qbInvoiceId      String?       // QuickBooks Invoice ID
+  paymentMethod    String?       // credit_card, ach, check
+  paymentReference String?       // QB transaction ID
+  paymentLink      String?       // QB hosted payment URL
+  customerId       String
+  customer         Customer      @relation(fields: [customerId], references: [id])
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
 }
 
 // Social Media Entities
