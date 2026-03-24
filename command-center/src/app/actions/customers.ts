@@ -38,6 +38,8 @@ export async function createCustomer(formData: FormData) {
     })
 
     revalidatePath("/app/crm/customers")
+    revalidatePath("/app/crm/quotes", "layout")
+    revalidatePath("/app/crm/jobs", "layout")
     redirect("/app/crm/customers")
 }
 
@@ -91,6 +93,8 @@ export async function updateCustomer(id: string, formData: FormData) {
     })
 
     revalidatePath("/app/crm/customers")
+    revalidatePath("/app/crm/quotes", "layout")
+    revalidatePath("/app/crm/jobs", "layout")
     redirect("/app/crm/customers")
 }
 
@@ -100,6 +104,8 @@ export async function deleteCustomer(id: string) {
     })
 
     revalidatePath("/app/crm/customers")
+    revalidatePath("/app/crm/quotes", "layout")
+    revalidatePath("/app/crm/jobs", "layout")
 }
 
 export async function deleteCustomers(ids: string[]) {
@@ -110,4 +116,6 @@ export async function deleteCustomers(ids: string[]) {
     })
 
     revalidatePath("/app/crm/customers")
+    revalidatePath("/app/crm/quotes", "layout")
+    revalidatePath("/app/crm/jobs", "layout")
 }
