@@ -14,6 +14,7 @@ export default async function PublicQuotePage(props: {
         include: {
             customer: true,
             items: true,
+            invoice: true,
         }
     });
 
@@ -89,6 +90,7 @@ export default async function PublicQuotePage(props: {
             isCanceled={isCanceled}
             cleanupFee={quote.cleanupFee ? Number(quote.cleanupFee) : undefined}
             notes={quote.notes || undefined}
+            paymentLink={quote.invoice?.paymentLink || undefined}
         />
     );
 }

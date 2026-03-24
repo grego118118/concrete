@@ -21,6 +21,7 @@ interface QuoteAcceptClientProps {
     isAlreadyAccepted: boolean;
     isSuccess: boolean;
     isCanceled: boolean;
+    paymentLink?: string;
 }
 
 export function QuoteAcceptClient({
@@ -38,7 +39,8 @@ export function QuoteAcceptClient({
     notes,
     isAlreadyAccepted,
     isSuccess,
-    isCanceled
+    isCanceled,
+    paymentLink
 }: QuoteAcceptClientProps) {
     const [accepted, setAccepted] = useState(isAlreadyAccepted || isSuccess);
     const [isAccepting, setIsAccepting] = useState(false);
@@ -124,12 +126,34 @@ export function QuoteAcceptClient({
             <main className="max-w-3xl mx-auto px-4 py-8 space-y-6">
                 {/* Success Banner */}
                 {accepted && (
-                    <div className="bg-emerald-50 border-2 border-emerald-200 rounded-2xl p-6 flex items-center gap-4 text-emerald-800 animate-in fade-in slide-in-from-top-4 duration-500">
-                        <CheckCircle2 className="h-10 w-10 text-emerald-500 shrink-0" />
-                        <div>
-                            <h3 className="font-bold text-lg">Project Confirmed!</h3>
-                            <p className="text-emerald-700">Thank you! Your project has been confirmed for {new Date(scheduledDate || Date.now()).toLocaleDateString()} and added to our production schedule. We&apos;ll be in touch within 24 hours.</p>
+                    <div className="bg-emerald-50 border-2 border-emerald-200 rounded-2xl p-6 space-y-4 animate-in fade-in slide-in-from-top-4 duration-500">
+                        <div className="flex items-center gap-4 text-emerald-800">
+                            <CheckCircle2 className="h-10 w-10 text-emerald-500 shrink-0" />
+                            <div>
+                                <h3 className="font-bold text-lg">Project Confirmed!</h3>
+                                <p className="text-emerald-700">
+                                    Thank you! Your project has been confirmed and added to our production schedule. {scheduledDate ? `Reserved for ${new Date(scheduledDate).toLocaleDateString()}.` : ""} We&apos;ll be in touch within 24 hours.
+                                </p>
+                            </div>
                         </div>
+                        
+                        {paymentLink && (
+                            <div className="pt-2 border-t border-emerald-100 flex flex-col sm:flex-row items-center gap-4">
+                                <div className="flex-1 text-sm text-emerald-700">
+                                    <p className="font-bold">Ready to pay the deposit?</p>
+                                    <p>You can pay securely online via QuickBooks to lock in your date.</p>
+                                </div>
+                                <a 
+                                    href={paymentLink}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="inline-flex items-center gap-2 px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl shadow-md transition-all hover:scale-[1.02] active:scale-95 whitespace-nowrap"
+                                >
+                                    <CreditCard className="h-5 w-5" />
+                                    Pay Deposit Now
+                                </a>
+                            </div>
+                        )}
                     </div>
                 )}
 

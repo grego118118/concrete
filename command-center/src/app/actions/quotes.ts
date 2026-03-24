@@ -116,6 +116,7 @@ export async function getQuotes() {
         orderBy: { createdAt: 'desc' },
         include: {
             customer: true,
+            invoice: true,
         }
     })
 }
@@ -125,7 +126,8 @@ export async function getQuote(id: string) {
         where: { id },
         include: {
             customer: true,
-            items: true
+            items: true,
+            invoice: true,
         }
     })
 }

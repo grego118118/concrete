@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { getQuote } from "@/app/actions/quotes";
 import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
-import { Printer, Mail, ArrowLeft, CheckCircle2 } from "lucide-react";
+import { Printer, Mail, ArrowLeft, CheckCircle2, ExternalLink, CreditCard, Link as LinkIcon } from "lucide-react";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { DeleteQuoteButton } from "./delete-button";
@@ -170,10 +170,35 @@ export default async function QuoteViewPage(props: {
                                 <p className="font-mono text-lg font-bold">#{quote.number}</p>
                                 <p className="text-sm mt-1">{new Date(quote.createdAt).toLocaleDateString()}</p>
                             </div>
-                            <div className="pt-2">
+                            <div className="pt-2 flex flex-col items-end gap-2">
                                 <Badge variant="outline" className="text-lg px-4 py-1 border-slate-900 text-slate-900 rounded-none uppercase tracking-widest font-bold">
                                     {quote.status}
                                 </Badge>
+                                {quote.invoice && (
+                                    <div className="flex flex-col items-end gap-1">
+                                        <Badge 
+                                            variant={quote.invoice.status === 'PAID' ? 'default' : 'secondary'}
+                                            className={
+                                                quote.invoice.status === 'PAID' ? 'bg-emerald-600' : 
+                                                quote.invoice.status === 'PARTIAL' ? 'bg-amber-500' : 'bg-slate-200 text-slate-700'
+                                            }
+                                        >
+                                            {quote.invoice.status === 'PAID' ? 'PAID' : 
+                                             quote.invoice.status === 'PARTIAL' ? 'DEPOSIT PAID' : 'UNPAID'}
+                                        </Badge>
+                                        {quote.invoice.qbInvoiceId && (
+                                            <a 
+                                                href={`https://app.qbo.intuit.com/app/invoice?txnId=${quote.invoice.qbInvoiceId}`}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="text-[10px] text-blue-600 hover:underline flex items-center gap-1"
+                                            >
+                                                <ExternalLink className="h-3 w-3" />
+                                                View in QuickBooks
+                                            </a>
+                                        )}
+                                    </div>
+                                )}
                             </div>
                         </div>
                     </div>
@@ -312,6 +337,30 @@ export default async function QuoteViewPage(props: {
                             </div>
                         </div>
                     </div>
+
+                    {/* QuickBooks Integration Status */}
+                    {quote.invoice && (
+                        <div className="mt-8 pt-8 border-t border-slate-100 flex items-center justify-between text-xs text-slate-400">
+                            <div className="flex items-center gap-4">
+                                <div className="flex items-center gap-1">
+                                    <LinkIcon className="h-3 w-3" />
+                                    <span>QB Invoice ID: {quote.invoice.qbInvoiceId}</span>
+                                </div>
+                                {quote.invoice.paymentLink && (
+                                    <a 
+                                        href={quote.invoice.paymentLink}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="flex items-center gap-1 text-blue-500 hover:underline"
+                                    >
+                                        <CreditCard className="h-3 w-3" />
+                                        Customer Payment Link
+                                    </a>
+                                )}
+                            </div>
+                            <span>Last Synced: {new Date(quote.invoice.updatedAt).toLocaleString()}</span>
+                        </div>
+                    )}
                 </div>
 
                 {/* Planning & Scope Tools */}

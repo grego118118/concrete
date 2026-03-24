@@ -37,18 +37,30 @@ export default async function Home() {
         </div>
       </div>
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card>
+        <Card className="lg:col-span-1">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              Total Revenue
+              Collected Revenue
             </CardTitle>
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
+            <DollarSign className="h-4 w-4 text-emerald-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">${parseFloat(stats.revenue).toLocaleString()}</div>
-            <p className="text-xs text-muted-foreground">
-              +20.1% from last month
-            </p>
+            <div className="text-2xl font-bold text-emerald-600">${parseFloat(stats.revenue).toLocaleString()}</div>
+            <div className="mt-2 space-y-1">
+              <div className="flex justify-between text-[10px] text-muted-foreground uppercase font-bold tracking-wider">
+                <span>Invoiced Total</span>
+                <span>${parseFloat(stats.invoicedTotal).toLocaleString()}</span>
+              </div>
+              <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
+                <div 
+                  className="h-full bg-emerald-500 rounded-full" 
+                  style={{ width: `${Math.min(100, (parseFloat(stats.revenue) / (parseFloat(stats.invoicedTotal) || 1)) * 100)}%` }}
+                />
+              </div>
+              <p className="text-[10px] text-muted-foreground">
+                {Math.round((parseFloat(stats.revenue) / (parseFloat(stats.invoicedTotal) || 1)) * 100)}% of invoiced collected
+              </p>
+            </div>
           </CardContent>
         </Card>
 
