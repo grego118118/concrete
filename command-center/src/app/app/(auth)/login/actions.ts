@@ -33,15 +33,3 @@ export async function authenticate(
     }
     return undefined;
 }
-
-export async function sendMagicLink(
-    prevState: string | undefined,
-    formData: FormData
-) {
-    try {
-        await signIn("nodemailer", formData, { redirectTo: '/app' })
-    } catch (error) {
-        throw error
-    }
-    return undefined
-}
