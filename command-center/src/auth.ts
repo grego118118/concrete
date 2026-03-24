@@ -16,21 +16,38 @@ const { handlers, auth, signIn, signOut } = NextAuth({
             async authorize(credentials) {
                 const { email, password } = credentials
 
-                if (!email || !password) return null
+                if (!email || !password) {
+                    console.log("[Auth] Authorize failed: Missing email or password");
+                    return null
+                }
+
+                console.log(`[Auth] Authorize attempt for: ${email}`);
 
                 const user = await db.user.findUnique({
                     where: { email: email as string }
                 })
 
-                if (!user || !user.password) return null
+                if (!user) {
+                    console.log(`[Auth] Authorize failed: User not found for ${email}`);
+                    return null
+                }
+
+                if (!user.password) {
+                    console.log(`[Auth] Authorize failed: User ${email} has no password set`);
+                    return null
+                }
 
                 const passwordsMatch = await bcrypt.compare(
                     password as string,
                     user.password
                 )
 
-                if (passwordsMatch) return user
+                if (passwordsMatch) {
+                    console.log(`[Auth] Authorize success: ${email}`);
+                    return user
+                }
 
+                console.log(`[Auth] Authorize failed: Password mismatch for ${email}`);
                 return null
             }
         }),

@@ -23,38 +23,54 @@ export function LoginForm() {
     const [errorMessage, dispatch] = useActionState(authenticate, undefined)
 
     return (
-        <form action={dispatch} className="grid gap-4 py-4">
-            <div className="grid gap-2">
-                <Label htmlFor="email">Email</Label>
-                <Input
-                    id="email"
-                    name="email"
-                    type="email"
-                    placeholder="m@example.com"
-                    required
-                />
-            </div>
-            <div className="grid gap-2">
-                <Label htmlFor="password">Password</Label>
-                <Input
-                    id="password"
-                    name="password"
-                    type="password"
-                    required
-                />
-            </div>
-            <LoginButton text="Login with Password" />
-            <div
-                className="flex h-8 items-end space-x-1"
-                aria-live="polite"
-                aria-atomic="true"
+        <div className="mx-auto w-full max-w-md space-y-6">
+            <form 
+                action={(formData) => {
+                    console.log("[Auth UI] Login attempt started");
+                    dispatch(formData);
+                }} 
+                className="grid gap-4 py-4"
             >
-                {errorMessage && (
-                    <>
-                        <p className="text-sm text-red-500">{errorMessage}</p>
-                    </>
-                )}
-            </div>
-        </form>
+                <div className="grid gap-2">
+                    <Label htmlFor="email">Email</Label>
+                    <Input
+                        id="email"
+                        name="email"
+                        type="email"
+                        placeholder="your@email.com"
+                        required
+                        className="w-full h-10 px-4"
+                        onInput={(e) => {
+                            const val = (e.target as HTMLInputElement).value;
+                            if (val.length > 20) {
+                                console.log("[Auth UI] Typing long email:", val.length);
+                            }
+                        }}
+                    />
+                </div>
+                <div className="grid gap-2">
+                    <Label htmlFor="password">Password</Label>
+                    <Input
+                        id="password"
+                        name="password"
+                        type="password"
+                        required
+                        className="w-full h-10 px-4"
+                    />
+                </div>
+                <LoginButton text="Login with Password" />
+                <div
+                    className="flex h-8 items-end space-x-1"
+                    aria-live="polite"
+                    aria-atomic="true"
+                >
+                    {errorMessage && (
+                        <>
+                            <p className="text-sm text-red-500 font-medium">{errorMessage}</p>
+                        </>
+                    )}
+                </div>
+            </form>
+        </div>
     )
 }

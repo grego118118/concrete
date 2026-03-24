@@ -11,28 +11,28 @@ export const authConfig = {
             const pathname = nextUrl.pathname;
             const isLoggedIn = !!auth?.user;
 
-            console.log(`[Auth] Checking path: ${pathname}, LoggedIn: ${isLoggedIn}`);
-
             // Paths that don't require authentication
-            // Check for both direct and rewritten paths (Vercel rewrites /app to /command-center/app)
-            const isLoginPath = pathname === '/login' || pathname.endsWith('/login');
-            const isErrorPath = pathname === '/error' || pathname.endsWith('/error');
+            const isLoginPath = pathname === '/app/login' || pathname.endsWith('/login');
+            const isErrorPath = pathname === '/app/error' || pathname.endsWith('/error');
             const isAuthApi = pathname.includes('/api/auth');
+
+            console.log(`[Auth] Middleware - Path: ${pathname}, LoggedIn: ${isLoggedIn}`);
 
             if (isLoginPath || isAuthApi || isErrorPath) {
                 // If logged in and hitting login, go to the dashboard
                 if (isLoggedIn && isLoginPath) {
+                    console.log("[Auth] Already logged in, redirecting to /app");
                     return Response.redirect(new URL('/app', nextUrl));
                 }
                 return true;
             }
 
             // Everything else in the app context requires authentication
-            // In Next.js 16+, returning false causes a 404 instead of a redirect,
-            // so we must explicitly redirect unauthenticated users to the login page.
             if (!isLoggedIn) {
+                console.log("[Auth] Not logged in, redirecting to /app/login");
                 return Response.redirect(new URL('/app/login', nextUrl));
             }
+
             return true;
         },
         async jwt({ token, user }) {
