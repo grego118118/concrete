@@ -43,7 +43,7 @@ export async function createCustomer(formData: FormData) {
     redirect("/app/crm/customers")
 }
 
-export async function getCustomers(sort: string = 'name') {
+export async function getCustomers(sort: string = 'newest', search?: string) {
     // Ensure business exists
     let business = await db.business.findFirst()
     if (!business) {
@@ -55,12 +55,21 @@ export async function getCustomers(sort: string = 'name') {
         })
     }
 
-    return await db.customer.findMany({
+    const query: any = {
         where: {
             businessId: business.id
         },
         orderBy: sort === 'newest' ? { createdAt: 'desc' } : { name: 'asc' }
-    })
+    }
+
+    if (search) {
+        query.where.OR = [
+            { name: { contains: search, mode: 'insensitive' } },
+            { email: { contains: search, mode: 'insensitive' } },
+        ]
+    }
+
+    return await db.customer.findMany(query)
 }
 
 export async function getCustomer(id: string) {
