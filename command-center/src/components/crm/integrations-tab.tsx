@@ -96,7 +96,7 @@ export function IntegrationsTab() {
         } else if (qbError) {
             const errorMessages: Record<string, string> = {
                 denied: 'QuickBooks authorization was denied.',
-                config: 'QuickBooks is not configured. Check environment variables.',
+                config: 'QuickBooks is not configured. Check environment variables and ensure Redirect URI matches Intuit Developer Portal.',
                 missing_params: 'Missing OAuth parameters from QuickBooks.',
                 token_exchange: 'Failed to exchange authorization code. Please try again.',
             }

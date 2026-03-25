@@ -36,9 +36,9 @@ function getConfig(): QBConfig {
     const redirectUri = process.env.QUICKBOOKS_REDIRECT_URI;
     const environment = (process.env.QUICKBOOKS_ENVIRONMENT || 'sandbox') as 'sandbox' | 'production';
 
-    if (!clientId || !clientSecret || !redirectUri) {
-        throw new Error('Missing QuickBooks environment variables. Set QUICKBOOKS_CLIENT_ID, QUICKBOOKS_CLIENT_SECRET, and QUICKBOOKS_REDIRECT_URI.');
-    }
+    if (!clientId) throw new Error('Missing QUICKBOOKS_CLIENT_ID environment variable');
+    if (!clientSecret) throw new Error('Missing QUICKBOOKS_CLIENT_SECRET environment variable');
+    if (!redirectUri) throw new Error('Missing QUICKBOOKS_REDIRECT_URI environment variable');
 
     return { clientId, clientSecret, redirectUri, environment };
 }
@@ -51,10 +51,15 @@ export function getAuthorizationUrl(state?: string): string {
     const params = new URLSearchParams({
         client_id: config.clientId,
         response_type: 'code',
-        scope: 'com.intuit.quickbooks.accounting com.intuit.quickbooks.payment',
+        scope: 'com.intuit.quickbooks.accounting',
         redirect_uri: config.redirectUri,
-        state: state || 'random_state',
+        state: state || 'auth_state',
     });
+
+    console.log('[QB Auth] Generating Authorization URL');
+    console.log('[QB Auth] State:', state || 'auth_state');
+    console.log('[QB Auth] Redirect URI:', config.redirectUri);
+    console.log('[QB Auth] Environment:', config.environment);
 
     return `${QB_AUTH_URL}?${params.toString()}`;
 }
