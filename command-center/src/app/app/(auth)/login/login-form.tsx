@@ -25,10 +25,7 @@ export function LoginForm() {
     return (
         <div className="mx-auto w-full max-w-md space-y-6">
             <form 
-                action={(formData) => {
-                    console.log("[Auth UI] Login attempt started");
-                    dispatch(formData);
-                }} 
+                action={dispatch}
                 className="grid gap-4 py-4"
             >
                 <div className="grid gap-2">
@@ -40,12 +37,6 @@ export function LoginForm() {
                         placeholder="your@email.com"
                         required
                         className="w-full h-10 px-4"
-                        onInput={(e) => {
-                            const val = (e.target as HTMLInputElement).value;
-                            if (val.length > 20) {
-                                console.log("[Auth UI] Typing long email:", val.length);
-                            }
-                        }}
                     />
                 </div>
                 <div className="grid gap-2">
