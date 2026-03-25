@@ -11,28 +11,28 @@ export const authConfig = {
             const pathname = nextUrl.pathname;
             const isLoggedIn = !!auth?.user;
 
-            // Paths that don't require authentication
+            // ONLY paths starting with /app require authentication
+            const isAppPath = pathname.startsWith('/app');
             const isLoginPath = pathname === '/app/login' || pathname.endsWith('/login');
             const isErrorPath = pathname === '/app/error' || pathname.endsWith('/error');
             const isAuthApi = pathname.includes('/api/auth');
 
-            console.log(`[Auth] Middleware - Path: ${pathname}, LoggedIn: ${isLoggedIn}`);
-
-            if (isLoginPath || isAuthApi || isErrorPath) {
-                // If logged in and hitting login, go to the dashboard
-                if (isLoggedIn && isLoginPath) {
-                    console.log("[Auth] Already logged in, redirecting to /app");
-                    return Response.redirect(new URL('/app', nextUrl));
+            if (isAppPath) {
+                if (isLoginPath || isAuthApi || isErrorPath) {
+                    if (isLoggedIn && isLoginPath) {
+                        console.log("[Auth] Already logged in, redirecting to /app");
+                        return Response.redirect(new URL('/app', nextUrl));
+                    }
+                    return true;
                 }
-                return true;
+
+                if (!isLoggedIn) {
+                    console.log("[Auth] Not logged in, redirecting to /app/login");
+                    return Response.redirect(new URL('/app/login', nextUrl));
+                }
             }
 
-            // Everything else in the app context requires authentication
-            if (!isLoggedIn) {
-                console.log("[Auth] Not logged in, redirecting to /app/login");
-                return Response.redirect(new URL('/app/login', nextUrl));
-            }
-
+            // Public paths are always authorized
             return true;
         },
         async jwt({ token, user }) {
