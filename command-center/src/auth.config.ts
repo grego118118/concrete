@@ -16,9 +16,10 @@ export const authConfig = {
             const isLoginPath = pathname === '/app/login' || pathname.endsWith('/login');
             const isErrorPath = pathname === '/app/error' || pathname.endsWith('/error');
             const isAuthApi = pathname.includes('/api/auth');
+            const isQuickBooksApi = pathname.includes('/api/quickbooks');
 
             if (isAppPath) {
-                if (isLoginPath || isAuthApi || isErrorPath) {
+                if (isLoginPath || isAuthApi || isErrorPath || isQuickBooksApi) {
                     if (isLoggedIn && isLoginPath) {
                         console.log("[Auth] Already logged in, redirecting to /app");
                         return Response.redirect(new URL('/app', nextUrl));

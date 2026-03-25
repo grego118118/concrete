@@ -33,8 +33,19 @@ export interface QBConfig {
 function getConfig(): QBConfig {
     const clientId = process.env.QUICKBOOKS_CLIENT_ID;
     const clientSecret = process.env.QUICKBOOKS_CLIENT_SECRET;
-    const redirectUri = process.env.QUICKBOOKS_REDIRECT_URI;
     const environment = (process.env.QUICKBOOKS_ENVIRONMENT || 'sandbox') as 'sandbox' | 'production';
+    
+    // Dynamic Redirect URI logic
+    let redirectUri = process.env.QUICKBOOKS_REDIRECT_URI;
+    
+    // In production, force the correct domain even if env var is missing or set to localhost
+    const isProduction = process.env.NODE_ENV === 'production' || environment === 'production' || !!process.env.VERCEL;
+    
+    if (isProduction && (!redirectUri || redirectUri.includes('localhost'))) {
+        redirectUri = 'https://pioneerconcretecoatings.com/app/api/quickbooks/callback';
+    } else if (!redirectUri) {
+        redirectUri = 'http://localhost:3000/app/api/quickbooks/callback';
+    }
 
     if (!clientId) throw new Error('Missing QUICKBOOKS_CLIENT_ID environment variable');
     if (!clientSecret) throw new Error('Missing QUICKBOOKS_CLIENT_SECRET environment variable');
