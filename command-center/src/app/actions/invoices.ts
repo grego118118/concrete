@@ -102,22 +102,54 @@ export async function sendInvoice(id: string) {
 
     if (!invoice || !invoice.customer) throw new Error("Invoice or customer not found");
 
+    // Sync to QuickBooks first to ensure we have a payment link
+    try {
+        const { createQBInvoice } = await import("@/lib/quickbooks/invoice-sync");
+        await createQBInvoice(invoice.quoteId);
+    } catch (err) {
+        console.warn('[sendInvoice] QB sync failed:', err);
+    }
+
+    // Refresh invoice data to get the link
+    const updatedInvoice = await db.invoice.findUnique({
+        where: { id },
+    });
+    const paymentLink = updatedInvoice?.paymentLink;
+
     // Generate PDF
+    const { generateInvoicePDF } = await import("@/lib/pdf-generator");
     const pdfBuffer = await generateInvoicePDF(invoice);
 
     // Send Email via Nodemailer
     await sendEmail({
         to: invoice.customer.email,
-        subject: `Invoice #${invoice.number} from Pioneer Concrete`,
+        subject: `Invoice #${invoice.number} from Pioneer Concrete Coatings`,
         html: `
-            <h1>Your Invoice</h1>
-            <p>Hi ${invoice.customer.name},</p>
-            <p>Please find your invoice attached.</p>
-            <p>Amount Due: $${Number(invoice.amount).toFixed(2)}</p>
-            ${invoice.dueDate ? `<p>Due Date: ${new Date(invoice.dueDate).toLocaleDateString()}</p>` : ''}
-            <br/>
-            <p>Thank you for your business!</p>
-            <p>Pioneer Concrete Coatings</p>
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+                <h2 style="color: #0f172a;">Your Invoice is Ready</h2>
+                <p>Hi ${invoice.customer.name},</p>
+                <p>Thank you for choosing Pioneer Concrete Coatings. Please find your invoice #${invoice.number} attached as a PDF.</p>
+                
+                <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 24px; margin: 24px 0; text-align: center;">
+                    <p style="color: #64748b; margin: 0 0 5px; font-size: 12px; text-transform: uppercase;">Amount Due</p>
+                    <p style="color: #0f172a; font-size: 32px; font-weight: 800; margin: 0;">$${Number(invoice.amount).toLocaleString(undefined, { minimumFractionDigits: 2 })}</p>
+                    ${invoice.dueDate ? `<p style="color: #ef4444; margin: 8px 0 0; font-size: 14px; font-weight: 600;">Due by ${new Date(invoice.dueDate).toLocaleDateString()}</p>` : ''}
+                </div>
+
+                ${paymentLink ? `
+                <div style="text-align: center; margin: 30px 0;">
+                    <a href="${paymentLink}" 
+                       style="display: inline-block; background: #2563eb; color: white; text-decoration: none; padding: 16px 40px; border-radius: 10px; font-size: 16px; font-weight: 700; box-shadow: 0 4px 6px rgba(37, 99, 235, 0.2);">
+                        Pay Securely via QuickBooks
+                    </a>
+                    <p style="color: #94a3b8; font-size: 12px; margin-top: 12px;">Secure credit card or ACH payment</p>
+                </div>
+                ` : ''}
+
+                <p style="color: #475569; line-height: 1.6;">If you have any questions, please feel free to reply to this email or call us at (413) 544-4933.</p>
+                <br/>
+                <p>Thank you,<br/>Pioneer Concrete Coatings</p>
+            </div>
         `,
         attachments: [
             {
