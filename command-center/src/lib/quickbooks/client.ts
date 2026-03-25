@@ -47,11 +47,23 @@ function getConfig(): QBConfig {
         redirectUri = 'http://localhost:3000/app/api/quickbooks/callback';
     }
 
-    if (!clientId) throw new Error('Missing QUICKBOOKS_CLIENT_ID environment variable');
-    if (!clientSecret) throw new Error('Missing QUICKBOOKS_CLIENT_SECRET environment variable');
-    if (!redirectUri) throw new Error('Missing QUICKBOOKS_REDIRECT_URI environment variable');
+    // Hardened validation to catch "undefined" or "null" strings
+    const isValid = (val: string | undefined) => !!val && val !== 'undefined' && val !== 'null';
 
-    return { clientId, clientSecret, redirectUri, environment };
+    if (!isValid(clientId)) {
+        console.error('[QB Config] Missing or invalid QUICKBOOKS_CLIENT_ID');
+        throw new Error('QUICKBOOKS_CLIENT_ID is missing or set to "undefined"');
+    }
+    if (!isValid(clientSecret)) {
+        console.error('[QB Config] Missing or invalid QUICKBOOKS_CLIENT_SECRET');
+        throw new Error('QUICKBOOKS_CLIENT_SECRET is missing or set to "undefined"');
+    }
+    if (!isValid(redirectUri)) {
+        console.error('[QB Config] Missing or invalid QUICKBOOKS_REDIRECT_URI');
+        throw new Error('QUICKBOOKS_REDIRECT_URI is missing or set to "undefined"');
+    }
+
+    return { clientId: clientId!, clientSecret: clientSecret!, redirectUri: redirectUri!, environment };
 }
 
 /**
