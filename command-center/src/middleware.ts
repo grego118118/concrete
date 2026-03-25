@@ -6,22 +6,13 @@ const { auth } = NextAuth(authConfig)
 
 export const proxy = auth((req) => {
     const { nextUrl } = req;
-    
-    // DIRECT INTERCEPT for diagnostic verification
     if (nextUrl.pathname.includes('diagnostic/auth-check')) {
         return NextResponse.json({
             status: "INTERCEPTED",
-            message: "Authentication proxy is DIRECTLY RUNNING",
-            timestamp: new Date().toISOString(),
-            pathname: nextUrl.pathname,
-            file: "middleware.ts",
+            file: "command-center/src/middleware.ts",
             isLoggedIn: !!req.auth?.user
-        }, {
-            headers: { 'x-auth-proxy': 'confirmed-active' }
-        });
+        }, { headers: { 'x-auth-proxy': 'confirmed' } });
     }
-
-    // Default behavior
     const response = NextResponse.next();
     response.headers.set('x-auth-proxy', 'active');
     return response;
@@ -30,11 +21,5 @@ export const proxy = auth((req) => {
 export const middleware = proxy;
 
 export const config = {
-    matcher: [
-        '/app/:path*',
-        '/app',
-        '/command-center/app/:path*',
-        '/command-center/app',
-        '/api/app/:path*'
-    ],
+    matcher: ['/((?!_next/static|_next/image|favicon.ico).*)'],
 };

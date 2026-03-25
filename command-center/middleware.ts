@@ -1,18 +1,25 @@
 import NextAuth from "next-auth"
-import { authConfig } from "./auth.config"
+import { authConfig } from "./src/auth.config"
 import { NextResponse } from "next/server"
 
 const { auth } = NextAuth(authConfig)
 
 export const proxy = auth((req) => {
     const { nextUrl } = req;
+    
     if (nextUrl.pathname.includes('diagnostic/auth-check')) {
         return NextResponse.json({
             status: "INTERCEPTED",
-            file: "command-center/src/proxy.ts",
+            message: "Authentication proxy is DIRECTLY RUNNING",
+            timestamp: new Date().toISOString(),
+            pathname: nextUrl.pathname,
+            file: "command-center/middleware.ts",
             isLoggedIn: !!req.auth?.user
-        }, { headers: { 'x-auth-proxy': 'confirmed' } });
+        }, {
+            headers: { 'x-auth-proxy': 'confirmed-active' }
+        });
     }
+
     const response = NextResponse.next();
     response.headers.set('x-auth-proxy', 'active');
     return response;
@@ -21,5 +28,5 @@ export const proxy = auth((req) => {
 export const middleware = proxy;
 
 export const config = {
-    matcher: ['/((?!_next/static|_next/image|favicon.ico).*)'],
+    matcher: ['/:path*'], // Catch all for debugging
 };
