@@ -20,11 +20,6 @@
       "check": true
     },
     {
-      "src": "/app/api/(.*)",
-      "dest": "/command-center/app/api/$1",
-      "check": true
-    },
-    {
       "src": "/app/(.*)",
       "dest": "/command-center/app/$1",
       "check": true
@@ -32,6 +27,11 @@
     {
       "src": "/app",
       "dest": "/command-center/app",
+      "check": true
+    },
+    {
+      "src": "/api/app/(.*)",
+      "dest": "/command-center/app/api/$1",
       "check": true
     },
     {

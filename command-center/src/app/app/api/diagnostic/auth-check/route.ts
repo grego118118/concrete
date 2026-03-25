@@ -23,7 +23,8 @@ export async function GET() {
             cookies: allCookies,
             host: headerList.get("host"),
             url: headerList.get("x-forwarded-for"),
-            proxyRan: headerList.get("x-middleware-invoke") || "no header",
+            proxyRan: headerList.get("x-auth-proxy") || "no header",
+            proxyTimestamp: headerList.get("x-proxy-timestamp") || "N/A",
         })
     } catch (error: any) {
         return NextResponse.json({
