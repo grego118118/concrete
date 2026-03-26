@@ -184,9 +184,12 @@ export async function qbApiRequest(
         body: body ? JSON.stringify(body) : undefined,
     });
 
+    const intuitTid = response.headers.get('intuit_tid');
+
     if (!response.ok) {
         const errorText = await response.text();
-        throw new Error(`QB API Error (${response.status}): ${errorText}`);
+        console.error(`[QB API Error] tid: ${intuitTid}`, errorText);
+        throw new Error(`QB API Error (${response.status}) [tid: ${intuitTid}]: ${errorText}`);
     }
 
     return response.json();
