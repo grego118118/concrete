@@ -22,6 +22,9 @@ export async function GET(request: NextRequest) {
         finalRedirectUriUsed = 'https://pioneerconcretecoatings.com/app/api/quickbooks/callback';
     }
 
+    // Capture all QuickBooks-related env keys to see if anything is misnamed
+    const qbKeys = Object.keys(process.env).filter(k => k.startsWith('QUICKBOOKS_'));
+
     return NextResponse.json({
         config: {
             environment: cleanEnvironment,
@@ -32,6 +35,7 @@ export async function GET(request: NextRequest) {
             hasClientSecret,
             configuredRedirectUri: cleanRedirectUri || 'NOT SET',
             finalRedirectUriUsed: finalRedirectUriUsed || 'NOT SET',
+            availableEnvKeys: qbKeys
         },
         tip: "Ensure 'finalRedirectUriUsed' exactly matches one of the redirect URIs in your Intuit Developer Portal (Production tab)."
     });
