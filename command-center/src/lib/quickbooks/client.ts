@@ -30,7 +30,7 @@ export interface QBConfig {
     environment: 'sandbox' | 'production';
 }
 
-function getConfig(): QBConfig {
+export function getConfig(): QBConfig {
     const clientId = process.env.QUICKBOOKS_CLIENT_ID?.trim();
     const clientSecret = process.env.QUICKBOOKS_CLIENT_SECRET?.trim();
     const environment = (process.env.QUICKBOOKS_ENVIRONMENT?.trim() || 'sandbox') as 'sandbox' | 'production';

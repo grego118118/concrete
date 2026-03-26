@@ -273,9 +273,10 @@ interface QuoteDocumentProps {
     quote: any;
     customer: any;
     items: any[];
+    paymentLink?: string | null;
 }
 
-export const QuoteDocument: React.FC<QuoteDocumentProps> = ({ quote, customer, items }) => {
+export const QuoteDocument: React.FC<QuoteDocumentProps> = ({ quote, customer, items, paymentLink }) => {
     const logoSrc = getLogoBase64();
     const scopeData = quote.scopeData as any;
     const scopeArea = Number(quote.scopeArea) || 0;
@@ -466,12 +467,25 @@ export const QuoteDocument: React.FC<QuoteDocumentProps> = ({ quote, customer, i
                 <View style={styles.ctaSection}>
                     <Text style={styles.ctaTitle}>Ready to Accept This Quote?</Text>
                     <Text style={styles.ctaText}>
-                        Reply to this email or call us to confirm your booking.
+                        You can review and accept this quote online for faster processing:
                     </Text>
-                    <Text style={styles.ctaText}>
-                        A 50% deposit is required to secure your installation date.
+                    <Text style={{ ...styles.ctaText, color: '#2563eb', fontWeight: 'bold', textDecoration: 'underline', marginTop: 4, marginBottom: 8 }}>
+                        pioneerconcretecoatings.com/quote/{quote.id}
                     </Text>
-                    <Text style={styles.ctaContact}>(413) 544-4933 • quotes@pioneerconcretecoatings.com</Text>
+
+                    {paymentLink && (
+                        <View style={{ marginTop: 10, alignItems: 'center' }}>
+                            <Text style={{ ...styles.ctaTitle, color: '#1d4ed8' }}>Secure Online Deposit</Text>
+                            <Text style={styles.ctaText}>Pay your 50% deposit securely via QuickBooks to book your date:</Text>
+                            <Text style={{ ...styles.ctaText, color: '#1d4ed8', fontWeight: 'bold', textDecoration: 'underline', marginTop: 4 }}>
+                                {paymentLink}
+                            </Text>
+                        </View>
+                    )}
+
+                    <Text style={{ ...styles.ctaText, marginTop: 12 }}>
+                        Or reply to this email or call us at (413) 544-4933.
+                    </Text>
                 </View>
 
                 {/* Footer */}

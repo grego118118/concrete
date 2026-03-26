@@ -2,7 +2,7 @@ import React from "react";
 // import { renderToStream } from "@react-pdf/renderer";
 // import { QuoteDocument } from "@/components/pdf/QuoteDocument";
 
-export async function generateQuotePDF(quote: any) {
+export async function generateQuotePDF(quote: any, paymentLink?: string | null) {
     const { renderToStream } = await import("@react-pdf/renderer");
     const { QuoteDocument } = await import("@/components/pdf/QuoteDocument");
 
@@ -11,6 +11,7 @@ export async function generateQuotePDF(quote: any) {
             quote={quote}
             customer={quote.customer}
             items={quote.items}
+            paymentLink={paymentLink}
         />
     );
 
@@ -35,6 +36,7 @@ export async function generateInvoicePDF(invoice: any) {
             invoice={invoice}
             customer={invoice.customer}
             items={items}
+            paymentLink={invoice.paymentLink}
         />
     );
 

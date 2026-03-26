@@ -14,12 +14,23 @@ export async function processSendQuote(quoteId: string, logId: string) {
 
         if (!quote || !quote.customer) throw new Error("Quote or customer not found");
 
-        // 2. Generate PDF
-        const pdfBuffer = await generateQuotePDF(quote);
+        // 2. Fetch origin and payment link first
+        const isProduction = process.env.NODE_ENV === "production" || process.env.VERCEL_ENV === "production";
+        const productionDomain = "https://pioneerconcretecoatings.com";
+        const origin = isProduction ? productionDomain : (process.env.NEXTAUTH_URL || "http://localhost:3000");
 
-        // 3. Send Email
-        const origin = process.env.NEXTAUTH_URL || "http://localhost:3000";
         const acceptUrl = `${origin}/quote/${quote.id}`;
+
+        // Check if there's an associated invoice with a payment link
+        const invoice = await db.invoice.findUnique({
+            where: { quoteId: quote.id }
+        });
+        const paymentLink = invoice?.paymentLink || null;
+
+        // 3. Generate PDF with payment link if available
+        const pdfBuffer = await generateQuotePDF(quote, paymentLink);
+
+        // 4. Send Email
         const displayTotal = Number(quote.total);
 
         await sendEmail({

@@ -206,9 +206,10 @@ interface InvoiceDocumentProps {
     invoice: any;
     customer: any;
     items: any[];
+    paymentLink?: string | null;
 }
 
-export const InvoiceDocument: React.FC<InvoiceDocumentProps> = ({ invoice, customer, items }) => {
+export const InvoiceDocument: React.FC<InvoiceDocumentProps> = ({ invoice, customer, items, paymentLink }) => {
     const invoiceTotal = Number(invoice.amount);
 
     return (
@@ -296,6 +297,16 @@ export const InvoiceDocument: React.FC<InvoiceDocumentProps> = ({ invoice, custo
                         <Text style={styles.amountDueLabel}>Balance Due:</Text>
                         <Text style={styles.amountDueValue}>${invoiceTotal.toFixed(2)}</Text>
                     </View>
+
+                    {paymentLink && (
+                        <View style={{ marginTop: 20, padding: 15, backgroundColor: '#f0fdf4', border: 1, borderColor: '#22c55e', borderRadius: 4, width: '100%', alignItems: 'center' }}>
+                            <Text style={{ fontSize: 12, fontWeight: 'bold', color: '#15803d', marginBottom: 5 }}>Pay Securely with Intuit</Text>
+                            <Text style={{ fontSize: 9, color: '#166534', textAlign: 'center', marginBottom: 8 }}>Click the link below to pay this invoice online via QuickBooks:</Text>
+                            <Text style={{ fontSize: 10, color: '#2563eb', fontWeight: 'bold', textDecoration: 'underline' }}>
+                                {paymentLink}
+                            </Text>
+                        </View>
+                    )}
                 </View>
 
                 {/* Footer */}
