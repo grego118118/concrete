@@ -31,12 +31,12 @@ export interface QBConfig {
 }
 
 function getConfig(): QBConfig {
-    const clientId = process.env.QUICKBOOKS_CLIENT_ID;
-    const clientSecret = process.env.QUICKBOOKS_CLIENT_SECRET;
-    const environment = (process.env.QUICKBOOKS_ENVIRONMENT || 'sandbox') as 'sandbox' | 'production';
+    const clientId = process.env.QUICKBOOKS_CLIENT_ID?.trim();
+    const clientSecret = process.env.QUICKBOOKS_CLIENT_SECRET?.trim();
+    const environment = (process.env.QUICKBOOKS_ENVIRONMENT?.trim() || 'sandbox') as 'sandbox' | 'production';
     
     // Dynamic Redirect URI logic
-    let redirectUri = process.env.QUICKBOOKS_REDIRECT_URI;
+    let redirectUri = process.env.QUICKBOOKS_REDIRECT_URI?.trim();
     
     // In production, force the correct domain even if env var is missing or set to localhost
     const isProduction = process.env.NODE_ENV === 'production' || environment === 'production' || !!process.env.VERCEL;

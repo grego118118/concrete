@@ -13,23 +13,25 @@ export async function GET(request: NextRequest) {
     const isVercel = !!process.env.VERCEL;
     
     // Logic from client.ts to see what will actually be used
-    let finalRedirectUri = redirectUri;
-    const isProduction = nodeEnv === 'production' || environment === 'production' || isVercel;
+    const cleanEnvironment = environment.trim();
+    const cleanRedirectUri = (redirectUri || '').trim();
+    const isProduction = nodeEnv === 'production' || cleanEnvironment === 'production' || isVercel;
     
-    if (isProduction && (!finalRedirectUri || finalRedirectUri.includes('localhost'))) {
-        finalRedirectUri = 'https://pioneerconcretecoatings.com/app/api/quickbooks/callback';
+    let finalRedirectUriUsed = cleanRedirectUri;
+    if (isProduction && (!finalRedirectUriUsed || finalRedirectUriUsed.includes('localhost'))) {
+        finalRedirectUriUsed = 'https://pioneerconcretecoatings.com/app/api/quickbooks/callback';
     }
 
     return NextResponse.json({
         config: {
-            environment,
+            environment: cleanEnvironment,
             nodeEnv,
             isVercel,
             isProductionDetected: isProduction,
             hasClientId,
             hasClientSecret,
-            configuredRedirectUri: redirectUri || 'NOT SET',
-            finalRedirectUriUsed: finalRedirectUri || 'NOT SET',
+            configuredRedirectUri: cleanRedirectUri || 'NOT SET',
+            finalRedirectUriUsed: finalRedirectUriUsed || 'NOT SET',
         },
         tip: "Ensure 'finalRedirectUriUsed' exactly matches one of the redirect URIs in your Intuit Developer Portal (Production tab)."
     });
