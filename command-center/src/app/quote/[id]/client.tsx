@@ -137,7 +137,7 @@ export function QuoteAcceptClient({
                             </div>
                         </div>
                         
-                        {paymentLink && (
+                        {paymentLink ? (
                             <div className="pt-2 border-t border-emerald-100 flex flex-col sm:flex-row items-center gap-4">
                                 <div className="flex-1 text-sm text-emerald-700">
                                     <p className="font-bold">Ready to pay the deposit?</p>
@@ -152,6 +152,13 @@ export function QuoteAcceptClient({
                                     <CreditCard className="h-5 w-5" />
                                     Pay Deposit Now
                                 </a>
+                            </div>
+                        ) : (
+                            <div className="pt-2 border-t border-emerald-100">
+                                <p className="text-sm text-emerald-700 italic flex items-center gap-2">
+                                    <Loader2 className="h-3 w-3 animate-spin" />
+                                    Finalizing your secure payment link... A confirmation email will be sent shortly.
+                                </p>
                             </div>
                         )}
                     </div>

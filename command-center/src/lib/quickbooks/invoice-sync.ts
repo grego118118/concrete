@@ -86,6 +86,10 @@ export async function createQBInvoice(quoteId: string): Promise<string | null> {
             Line: lines,
             DueDate: quote.validUntil ? quote.validUntil.toISOString().split('T')[0] : undefined,
             DocNumber: quote.number.replace('Q-', 'INV-'),
+            BillEmail: { Address: quote.customer.email },
+            EmailStatus: 'NeedToSend',
+            AllowOnlineCreditCardPayment: true,
+            AllowOnlineACHPayment: true,
             CustomerMemo: {
                 value: `Quote #${quote.number} - Pioneer Concrete Coatings`,
             },
@@ -112,15 +116,21 @@ export async function createQBInvoice(quoteId: string): Promise<string | null> {
         // Get the payment link from QB (if available)
         let paymentLink: string | null = null;
         try {
+            // Minorversion 70+ and include=invoiceLink are required for the link to consistently appear
             const invoiceDetail = await qbApiRequest(
                 'GET',
-                `invoice/${qbInvoiceId}`,
+                `invoice/${qbInvoiceId}?minorversion=70&include=invoiceLink`,
                 connection.realmId,
                 connection.accessToken
             );
             paymentLink = invoiceDetail?.Invoice?.InvoiceLink || null;
-        } catch {
-            // Payment link retrieval is non-critical
+            if (paymentLink) {
+                console.log(`[QB Invoice Sync] Retrieved InvoiceLink: ${paymentLink}`);
+            } else {
+                console.warn(`[QB Invoice Sync] No InvoiceLink in response for invoice ${qbInvoiceId}`);
+            }
+        } catch (err) {
+            console.warn('[QB Invoice Sync] Payment link retrieval failed:', err);
         }
 
         // Update our invoice record with the QB invoice ID
