@@ -15,6 +15,16 @@
   ],
   "routes": [
     {
+      "src": "/privacy",
+      "dest": "/command-center/privacy",
+      "check": true
+    },
+    {
+      "src": "/terms",
+      "dest": "/command-center/terms",
+      "check": true
+    },
+    {
       "src": "/quote/(.*)",
       "dest": "/command-center/quote/$1",
       "check": true
