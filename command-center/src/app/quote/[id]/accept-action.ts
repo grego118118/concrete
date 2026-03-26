@@ -107,3 +107,14 @@ export async function acceptQuote(id: string, scheduledDate: string) {
 
     return { success: true };
 }
+
+export async function getQuotePaymentStatus(id: string) {
+    const quote = await db.quote.findUnique({
+        where: { id },
+        include: { invoice: true }
+    });
+    return {
+        status: quote?.status,
+        paymentLink: quote?.invoice?.paymentLink
+    };
+}

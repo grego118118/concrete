@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { CheckCircle2, AlertCircle, CreditCard, Calendar, Loader2, PartyPopper, Shield, Clock } from "lucide-react";
 import confetti from "canvas-confetti";
 import { acceptQuote } from "./accept-action";
@@ -46,6 +46,8 @@ export function QuoteAcceptClient({
     const [isAccepting, setIsAccepting] = useState(false);
     const [scheduledDate, setScheduledDate] = useState("");
     const acceptBtnRef = useRef<HTMLButtonElement>(null);
+    const [paymentLinkState, setPaymentLinkState] = useState(paymentLink);
+    const [isPolling, setIsPolling] = useState(false);
 
     const fireConfetti = () => {
         // Fire from the button position
@@ -94,6 +96,38 @@ export function QuoteAcceptClient({
         }
     };
 
+    // Poll for payment link if accepted but link is missing
+    useEffect(() => {
+        if (accepted && !paymentLinkState && !isPolling) {
+            setIsPolling(true);
+            const { getQuotePaymentStatus } = require("./accept-action");
+            
+            const poll = async () => {
+                try {
+                    const status = await getQuotePaymentStatus(quoteId);
+                    if (status.paymentLink) {
+                        setPaymentLinkState(status.paymentLink);
+                        setIsPolling(false);
+                        return true; // Stop polling
+                    }
+                } catch (err) {
+                    console.error("Polling error:", err);
+                }
+                return false;
+            };
+
+            const interval = setInterval(async () => {
+                const finished = await poll();
+                if (finished) clearInterval(interval);
+            }, 3000);
+
+            // Run initial poll
+            poll();
+
+            return () => clearInterval(interval);
+        }
+    }, [accepted, paymentLinkState, quoteId, isPolling]);
+
     const handleAcceptAndSchedule = async () => {
         if (!scheduledDate) {
             alert("Please select a preferred start date first.");
@@ -137,14 +171,14 @@ export function QuoteAcceptClient({
                             </div>
                         </div>
                         
-                        {paymentLink ? (
+                        {paymentLinkState ? (
                             <div className="pt-2 border-t border-emerald-100 flex flex-col sm:flex-row items-center gap-4">
                                 <div className="flex-1 text-sm text-emerald-700">
                                     <p className="font-bold">Ready to pay the deposit?</p>
                                     <p>You can pay securely online via QuickBooks to lock in your date.</p>
                                 </div>
                                 <a 
-                                    href={paymentLink}
+                                    href={paymentLinkState}
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     className="inline-flex items-center gap-2 px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl shadow-md transition-all hover:scale-[1.02] active:scale-95 whitespace-nowrap"
