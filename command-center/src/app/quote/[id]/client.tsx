@@ -98,17 +98,21 @@ export function QuoteAcceptClient({
 
     // Poll for payment link if accepted but link is missing
     useEffect(() => {
+        let interval: NodeJS.Timeout;
+        
         if (accepted && !paymentLinkState && !isPolling) {
             setIsPolling(true);
-            const { getQuotePaymentStatus } = require("./accept-action");
             
             const poll = async () => {
                 try {
+                    // Import inside to avoid SSR issues if necessary, but action is better
+                    const { getQuotePaymentStatus } = await import("./accept-action");
                     const status = await getQuotePaymentStatus(quoteId);
+                    
                     if (status.paymentLink) {
                         setPaymentLinkState(status.paymentLink);
                         setIsPolling(false);
-                        return true; // Stop polling
+                        return true; // Stop
                     }
                 } catch (err) {
                     console.error("Polling error:", err);
@@ -116,17 +120,22 @@ export function QuoteAcceptClient({
                 return false;
             };
 
-            const interval = setInterval(async () => {
-                const finished = await poll();
-                if (finished) clearInterval(interval);
-            }, 3000);
-
             // Run initial poll
             poll();
 
-            return () => clearInterval(interval);
+            // Set up interval
+            interval = setInterval(async () => {
+                const finished = await poll();
+                if (finished) {
+                    clearInterval(interval);
+                }
+            }, 5000); // 5 seconds is safer
         }
-    }, [accepted, paymentLinkState, quoteId, isPolling]);
+
+        return () => {
+            if (interval) clearInterval(interval);
+        };
+    }, [accepted, quoteId]); // Only restart if accepted state changes or quoteId changes
 
     const handleAcceptAndSchedule = async () => {
         if (!scheduledDate) {

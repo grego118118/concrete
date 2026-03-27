@@ -85,16 +85,21 @@ export async function createQBInvoice(quoteId: string): Promise<string | null> {
             },
             Line: lines,
             DueDate: quote.validUntil ? quote.validUntil.toISOString().split('T')[0] : undefined,
-            DocNumber: quote.number.replace('Q-', 'INV-'),
+            // Use the CRM invoice number if it exists, otherwise the quote number
+            DocNumber: quote.invoice?.number || quote.number.replace('Q-', 'INV-'),
             BillEmail: { Address: quote.customer.email },
+            BillAddr: {
+                Line1: quote.customer.address,
+                City: quote.customer.city,
+                CountrySubDivisionCode: quote.customer.state,
+                PostalCode: quote.customer.zip,
+            },
             EmailStatus: 'NeedToSend',
             AllowOnlineCreditCardPayment: true,
             AllowOnlineACHPayment: true,
             CustomerMemo: {
                 value: `Quote #${quote.number} - Pioneer Concrete Coatings`,
             },
-            // Deposit/partial payment info
-            Deposit: Number(quote.deposit || 0),
         };
 
         const result = await qbApiRequest(
@@ -107,7 +112,7 @@ export async function createQBInvoice(quoteId: string): Promise<string | null> {
 
         const qbInvoiceId = result?.Invoice?.Id;
         if (!qbInvoiceId) {
-            console.error('[QB Invoice Sync] No invoice ID returned:', result);
+            console.error('[QB Invoice Sync] No invoice ID returned. Full response:', JSON.stringify(result, null, 2));
             return null;
         }
 
@@ -116,10 +121,11 @@ export async function createQBInvoice(quoteId: string): Promise<string | null> {
         // Get the payment link from QB (if available)
         let paymentLink: string | null = null;
         try {
-            // Minorversion 70+ and include=invoiceLink are required for the link to consistently appear
+            // minorversion=70 and include=invoiceLink are required for the link to consistently appear
+            // (qbApiRequest now adds minorversion=70 automatically)
             const invoiceDetail = await qbApiRequest(
                 'GET',
-                `invoice/${qbInvoiceId}?minorversion=70&include=invoiceLink`,
+                `invoice/${qbInvoiceId}?include=invoiceLink`,
                 connection.realmId,
                 connection.accessToken
             );

@@ -74,7 +74,7 @@ export function getAuthorizationUrl(state?: string): string {
     const params = new URLSearchParams({
         client_id: config.clientId,
         response_type: 'code',
-        scope: 'com.intuit.quickbooks.accounting',
+        scope: 'com.intuit.quickbooks.accounting com.intuit.quickbooks.payment',
         redirect_uri: config.redirectUri,
         state: state || 'auth_state',
     });
@@ -170,7 +170,9 @@ export async function qbApiRequest(
 ): Promise<any> {
     const config = getConfig();
     const baseUrl = QB_API_BASE[config.environment];
-    const url = `${baseUrl}/v3/company/${realmId}/${endpoint}`;
+    const separator = endpoint.includes('?') ? '&' : '?';
+    const finalEndpoint = endpoint.includes('minorversion') ? endpoint : `${endpoint}${separator}minorversion=70`;
+    const url = `${baseUrl}/v3/company/${realmId}/${finalEndpoint}`;
 
     const headers: Record<string, string> = {
         'Authorization': `Bearer ${accessToken}`,
