@@ -48,7 +48,7 @@ export async function sendEmail(options: {
                 subject: options.subject,
                 html: options.html,
                 attachments: options.attachments,
-                replyTo: replyTo,
+                reply_to: replyTo,
             });
 
             if (error) throw error;
