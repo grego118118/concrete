@@ -64,8 +64,9 @@ export async function saveQBConnection(
         data: { isActive: false },
     });
 
-    // Fetch company name from QB
+    // Fetch company name and email from QB
     let companyName = 'QuickBooks';
+    let primaryEmail = null;
     try {
         const companyInfo = await qbApiRequest(
             'GET',
@@ -74,9 +75,13 @@ export async function saveQBConnection(
             accessToken
         );
         companyName = companyInfo?.CompanyInfo?.CompanyName || 'QuickBooks';
+        primaryEmail = companyInfo?.CompanyInfo?.PrimaryEmailAddr?.Address || null;
     } catch (e) {
-        console.warn('[QB] Could not fetch company name:', e);
+        console.warn('[QB] Could not fetch company info:', e);
     }
+
+    // Determine environment from realmId or config
+    const { environment } = await import('./client').then(m => m.getConfig());
 
     // Upsert (create or update based on businessId)
     return await db.quickBooksConnection.upsert({
@@ -87,6 +92,8 @@ export async function saveQBConnection(
             refreshToken,
             tokenExpiry: new Date(Date.now() + expiresIn * 1000),
             companyName,
+            primaryEmail,
+            environment,
             isActive: true,
             businessId,
         },
@@ -96,6 +103,8 @@ export async function saveQBConnection(
             refreshToken,
             tokenExpiry: new Date(Date.now() + expiresIn * 1000),
             companyName,
+            primaryEmail,
+            environment,
             isActive: true,
         },
     });
@@ -126,6 +135,8 @@ export async function getQBStatus(businessId: string) {
     return {
         connected: true,
         companyName: connection.companyName,
+        primaryEmail: connection.primaryEmail,
+        environment: connection.environment,
         connectedAt: connection.createdAt,
         tokenExpiry: connection.tokenExpiry,
     };

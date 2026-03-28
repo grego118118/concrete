@@ -13,6 +13,9 @@ import { ConvertQuoteButton } from "./convert-button";
 import { PrintQuoteButton } from "./print-button";
 import { DownloadQuoteButton } from "./download-button";
 import { SendQuoteButton } from "./send-quote-button";
+import { SyncButton } from "@/components/crm/sync-button";
+import { auth } from "@/auth";
+import { getQBStatus } from "@/lib/quickbooks/connection";
 
 // Helper to get business info (mocked or real)
 async function getBusinessProfile() {
@@ -35,6 +38,11 @@ export default async function QuoteViewPage(props: {
     const quote = (await getQuote(params.id)) as any;
     console.log(`[QuoteViewPage] Loading quote: ${params.id}, Found: ${!!quote}`);
     const business = await getBusinessProfile();
+    
+    // Get QB Connection status for the Sync Button
+    const session = await auth();
+    const businessId = (session?.user as any)?.businessId;
+    const qbStatus = businessId ? await getQBStatus(businessId) : { connected: false };
 
     if (!quote) {
         redirect("/app/crm/quotes");
@@ -344,7 +352,14 @@ export default async function QuoteViewPage(props: {
                             <div className="flex items-center gap-4">
                                 <div className="flex items-center gap-1">
                                     <LinkIcon className="h-3 w-3" />
-                                    <span>QB Invoice ID: {quote.invoice.qbInvoiceId}</span>
+                                    <span>QB Invoice ID: {quote.invoice.qbInvoiceId || '(Not Synced)'}</span>
+                                    <SyncButton 
+                                        invoiceId={quote.invoice.id} 
+                                        hasConnection={qbStatus.connected}
+                                        variant="ghost"
+                                        size="sm"
+                                        showText={false}
+                                    />
                                 </div>
                                 {quote.invoice.paymentLink && (
                                     <a 

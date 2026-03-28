@@ -153,12 +153,16 @@ export function QuoteAcceptClient({
 
         setIsAccepting(true);
         try {
-            await acceptQuote(quoteId, scheduledDate);
-            fireConfetti();
-            setAccepted(true);
+            const result = await acceptQuote(quoteId, scheduledDate);
+            if (result && 'error' in result) {
+                alert(`Sync Error: ${result.error}`);
+            } else {
+                fireConfetti();
+                setAccepted(true);
+            }
         } catch (error) {
             console.error("Failed to accept quote:", error);
-            alert("Something went wrong. Please try again.");
+            alert("Connection lost. Please check your internet and try again.");
         } finally {
             setIsAccepting(false);
         }

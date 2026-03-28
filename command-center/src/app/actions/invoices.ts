@@ -169,3 +169,24 @@ export async function sendInvoice(id: string) {
     revalidatePath("/app/crm/invoices")
     revalidatePath(`/app/crm/invoices/${id}`)
 }
+
+export async function syncQBInvoice(id: string) {
+    const invoice = await db.invoice.findUnique({
+        where: { id },
+        include: { quote: true }
+    });
+
+    if (!invoice) throw new Error("Invoice not found");
+
+    try {
+        const { createQBInvoice } = await import("@/lib/quickbooks/invoice-sync");
+        await createQBInvoice(invoice.quoteId);
+        
+        revalidatePath("/app/crm/invoices");
+        revalidatePath(`/app/crm/invoices/${id}`);
+        return { success: true };
+    } catch (err: any) {
+        console.error('[syncQBInvoice] Manual sync failed:', err);
+        return { success: false, error: err.message };
+    }
+}

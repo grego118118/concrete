@@ -81,6 +81,11 @@ const data = {
             url: "/app/crm/settings",
             icon: Settings2,
         },
+        {
+            title: "Sync Diagnostics",
+            url: "/app/crm/diagnostics",
+            icon: SquareTerminal,
+        },
     ],
 
     projects: [

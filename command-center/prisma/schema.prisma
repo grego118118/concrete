@@ -88,6 +88,8 @@ model QuickBooksConnection {
   refreshToken String     @db.Text
   tokenExpiry  DateTime
   companyName  String?
+  primaryEmail String?    // Who is logged in
+  environment  String?    // sandbox or production
   isActive     Boolean    @default(true)
   businessId   String     @unique
   business     Business   @relation(fields: [businessId], references: [id])
@@ -227,6 +229,8 @@ model Invoice {
   paymentMethod    String?       // credit_card, ach, check
   paymentReference String?       // QB transaction ID
   paymentLink      String?       // QB hosted payment URL
+  lastSyncError    String?       @db.Text // Exact error from QB for diagnostics
+  lastSyncAt       DateTime?     // When the last sync attempt occurred
   customerId       String
   customer         Customer      @relation(fields: [customerId], references: [id])
   createdAt        DateTime      @default(now())

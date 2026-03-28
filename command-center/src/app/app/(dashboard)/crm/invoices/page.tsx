@@ -7,8 +7,14 @@ import Link from "next/link";
 
 import { getInvoices, deleteInvoice } from "@/app/actions/invoices";
 import { DeleteActionButton } from "@/components/crm/delete-action-button";
+import { SyncButton } from "@/components/crm/sync-button";
+import { auth } from "@/auth";
+import { getQBStatus } from "@/lib/quickbooks/connection";
 
 export default async function InvoicesPage() {
+    const session = await auth();
+    const businessId = (session?.user as any)?.businessId;
+    const qbStatus = businessId ? await getQBStatus(businessId) : { connected: false };
     const invoices = await getInvoices();
     return (
         <div className="space-y-6">
@@ -73,6 +79,10 @@ export default async function InvoicesPage() {
                                         </Badge>
                                     </TableCell>
                                     <TableCell className="text-right flex justify-end gap-2">
+                                        <SyncButton 
+                                            invoiceId={invoice.id} 
+                                            hasConnection={qbStatus.connected} 
+                                        />
                                         <Link href={`/app/crm/invoices/${invoice.id}/edit`}>
                                             <Button variant="ghost" size="sm">Manage</Button>
                                         </Link>

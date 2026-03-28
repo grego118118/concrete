@@ -39,6 +39,8 @@ interface Integration {
     connected: boolean
     category: string
     lastSync?: string
+    primaryEmail?: string
+    environment?: string
     type: 'oauth' | 'apikey'
 }
 
@@ -113,7 +115,9 @@ export function IntegrationsTab() {
                             ? { 
                                 ...item, 
                                 connected: true, 
-                                lastSync: data.companyName ? `Linked to ${data.companyName}` : 'Connected'
+                                lastSync: data.companyName || 'Connected',
+                                primaryEmail: data.primaryEmail,
+                                environment: data.environment
                               }
                             : item
                     ))
@@ -217,13 +221,27 @@ export function IntegrationsTab() {
                                     <CardTitle className="text-lg">{item.name}</CardTitle>
                                     <Badge variant="outline" className="text-[10px] uppercase tracking-wider">{item.category}</Badge>
                                     {item.connected && (
-                                        <Badge variant="default" className="bg-green-500/10 text-green-600 border-green-200 gap-1 flex py-0 h-5">
-                                            <ShieldCheck className="h-3 w-3" />
-                                            Connected
-                                        </Badge>
+                                        <div className="flex items-center gap-2">
+                                            <Badge variant="default" className="bg-green-500/10 text-green-600 border-green-200 gap-1 flex py-0 h-5">
+                                                <ShieldCheck className="h-3 w-3" />
+                                                Connected
+                                            </Badge>
+                                            {item.id === 'quickbooks' && item.environment && (
+                                                <Badge variant="secondary" className="text-[10px] uppercase h-5 px-1.5 font-bold">
+                                                    {item.environment}
+                                                </Badge>
+                                            )}
+                                        </div>
                                     )}
                                 </div>
-                                <CardDescription className="line-clamp-1">{item.description}</CardDescription>
+                                <div className="flex flex-col">
+                                    <CardDescription className="line-clamp-1">{item.description}</CardDescription>
+                                    {item.connected && item.id === 'quickbooks' && item.primaryEmail && (
+                                        <p className="text-[11px] text-muted-foreground mt-0.5">
+                                            Authorized as: <span className="font-medium text-foreground">{item.primaryEmail}</span>
+                                        </p>
+                                    )}
+                                </div>
                             </div>
                             <div className="flex items-center gap-4">
                                 <Switch
