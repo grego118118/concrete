@@ -14,10 +14,7 @@
     }
   ],
   "routes": [
-    {
-      "src": "/ms84659924.txt",
-      "dest": "/command-center/ms-verify"
-    },
+
     {
       "src": "/privacy",
       "dest": "/command-center/privacy",
