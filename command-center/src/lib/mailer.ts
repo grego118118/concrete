@@ -39,6 +39,10 @@ export async function sendEmail(options: {
     const fromEmail = process.env.SMTP_FROM_EMAIL || process.env.SMTP_USER || "";
     const replyTo = options.replyTo || process.env.SMTP_USER || "";
 
+    // Initialize Resend dynamically
+    const resendApiKey = process.env.RESEND_API_KEY;
+    const resend = resendApiKey ? new Resend(resendApiKey) : null;
+
     try {
         if (resend) {
             console.log(`[MAILER] Sending via Resend to: ${options.to}`);
@@ -51,10 +55,14 @@ export async function sendEmail(options: {
                 reply_to: replyTo,
             });
 
-            if (error) throw error;
+            if (error) {
+                console.error(`[MAILER] Resend API Error:`, error);
+                throw error;
+            }
             console.log(`[MAILER] Email sent via Resend: ${data?.id}`);
             return data;
         } else {
+            console.warn(`[MAILER] RESEND_API_KEY not found. Falling back to Nodemailer for: ${options.to}`);
             console.log(`[MAILER] Sending via Nodemailer to: ${options.to}`);
             const info = await transporter.sendMail({
                 from: `${fromName} <${fromEmail}>`,
