@@ -20,6 +20,7 @@ model Business {
   socialPosts       SocialPost[]
   socialConnections SocialConnection[]
   users             User[]
+  quickBooks        QuickBooksConnection?
   createdAt         DateTime           @default(now())
   updatedAt         DateTime           @updatedAt
 }
@@ -81,15 +82,17 @@ model VerificationToken {
 
 // QuickBooks Online Integration
 model QuickBooksConnection {
-  id           String   @id @default(cuid())
-  realmId      String   @unique // QuickBooks Company ID
-  accessToken  String   @db.Text
-  refreshToken String   @db.Text
+  id           String     @id @default(cuid())
+  realmId      String     @unique // QuickBooks Company ID
+  accessToken  String     @db.Text
+  refreshToken String     @db.Text
   tokenExpiry  DateTime
   companyName  String?
-  isActive     Boolean  @default(true)
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  isActive     Boolean    @default(true)
+  businessId   String     @unique
+  business     Business   @relation(fields: [businessId], references: [id])
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
 }
 
 // CRM Entities

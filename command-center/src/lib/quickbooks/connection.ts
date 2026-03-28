@@ -13,9 +13,9 @@ import { refreshAccessToken, qbApiRequest } from './client';
 /**
  * Get the active QuickBooks connection (with auto-refresh if expired)
  */
-export async function getQBConnection() {
-    const connection = await db.quickBooksConnection.findFirst({
-        where: { isActive: true },
+export async function getQBConnection(businessId: string) {
+    const connection = await db.quickBooksConnection.findUnique({
+        where: { businessId },
     });
 
     if (!connection) return null;
@@ -55,11 +55,12 @@ export async function saveQBConnection(
     realmId: string,
     accessToken: string,
     refreshToken: string,
-    expiresIn: number
+    expiresIn: number,
+    businessId: string
 ) {
-    // Deactivate any existing connections
+    // Deactivate any existing connections for this business
     await db.quickBooksConnection.updateMany({
-        where: { isActive: true },
+        where: { businessId },
         data: { isActive: false },
     });
 
@@ -77,9 +78,9 @@ export async function saveQBConnection(
         console.warn('[QB] Could not fetch company name:', e);
     }
 
-    // Upsert (create or update based on realmId)
+    // Upsert (create or update based on businessId)
     return await db.quickBooksConnection.upsert({
-        where: { realmId },
+        where: { businessId },
         create: {
             realmId,
             accessToken,
@@ -87,8 +88,10 @@ export async function saveQBConnection(
             tokenExpiry: new Date(Date.now() + expiresIn * 1000),
             companyName,
             isActive: true,
+            businessId,
         },
         update: {
+            realmId,
             accessToken,
             refreshToken,
             tokenExpiry: new Date(Date.now() + expiresIn * 1000),
@@ -101,9 +104,9 @@ export async function saveQBConnection(
 /**
  * Disconnect QuickBooks (deactivate connection)
  */
-export async function disconnectQB() {
+export async function disconnectQB(businessId: string) {
     await db.quickBooksConnection.updateMany({
-        where: { isActive: true },
+        where: { businessId },
         data: { isActive: false },
     });
 }
@@ -111,9 +114,9 @@ export async function disconnectQB() {
 /**
  * Get QB connection status (for the settings page UI)
  */
-export async function getQBStatus() {
-    const connection = await db.quickBooksConnection.findFirst({
-        where: { isActive: true },
+export async function getQBStatus(businessId: string) {
+    const connection = await db.quickBooksConnection.findUnique({
+        where: { businessId },
     });
 
     if (!connection) {

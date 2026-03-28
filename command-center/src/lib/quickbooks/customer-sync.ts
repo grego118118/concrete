@@ -28,12 +28,6 @@ interface QBCustomerData {
  * Creates a new QB customer if none exists, or finds existing by email
  */
 export async function syncCustomerToQB(customerId: string): Promise<string | null> {
-    const connection = await getQBConnection();
-    if (!connection) {
-        console.log('[QB Customer Sync] No active QB connection, skipping sync');
-        return null;
-    }
-
     // Get the CRM customer
     const customer = await db.customer.findUnique({
         where: { id: customerId },
@@ -41,6 +35,14 @@ export async function syncCustomerToQB(customerId: string): Promise<string | nul
 
     if (!customer) {
         console.error('[QB Customer Sync] Customer not found:', customerId);
+        return null;
+    }
+
+    const businessId = customer.businessId;
+
+    const connection = await getQBConnection(businessId);
+    if (!connection) {
+        console.log(`[QB Customer Sync] No active QB connection for business ${businessId}, skipping sync`);
         return null;
     }
 
@@ -116,14 +118,17 @@ export async function syncCustomerToQB(customerId: string): Promise<string | nul
 }
 
 /**
- * Batch sync all customers that haven't been synced yet
+ * Batch sync all customers for a specific business that haven't been synced yet
  */
-export async function syncAllCustomersToQB(): Promise<{ synced: number; failed: number }> {
-    const connection = await getQBConnection();
+export async function syncAllCustomersToQB(businessId: string): Promise<{ synced: number; failed: number }> {
+    const connection = await getQBConnection(businessId);
     if (!connection) return { synced: 0, failed: 0 };
 
     const unsyncedCustomers = await db.customer.findMany({
-        where: { qbCustomerId: null },
+        where: { 
+            businessId,
+            qbCustomerId: null 
+        },
     });
 
     let synced = 0;

@@ -43,11 +43,16 @@ export function SendInvoiceButton({ invoiceId, currentStatus }: { invoiceId: str
             className="hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200 transition-colors"
         >
             {isLoading ? (
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Syncing & Sending...
+                </>
             ) : (
-                <Mail className="mr-2 h-4 w-4" />
+                <>
+                    <Mail className="mr-2 h-4 w-4" />
+                    Send to Customer
+                </>
             )}
-            Send to Customer
         </Button>
     );
 }

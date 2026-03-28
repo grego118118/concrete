@@ -10,6 +10,7 @@ export async function GET(request: NextRequest) {
     const searchParams = request.nextUrl.searchParams;
     const code = searchParams.get('code');
     const realmId = searchParams.get('realmId');
+    const state = searchParams.get('state'); // This is the businessId
     const error = searchParams.get('error');
 
     // Handle OAuth denial/error
@@ -20,8 +21,8 @@ export async function GET(request: NextRequest) {
         );
     }
 
-    if (!code || !realmId) {
-        console.error('[QB Callback] Missing code or realmId');
+    if (!code || !realmId || !state) {
+        console.error('[QB Callback] Missing code, realmId, or state');
         return NextResponse.redirect(
             new URL('/app/crm/settings?qb_error=missing_params', request.url)
         );
@@ -31,15 +32,16 @@ export async function GET(request: NextRequest) {
         // Exchange the authorization code for tokens
         const tokens = await exchangeCodeForTokens(code, realmId);
 
-        // Save the connection to the database
+        // Save the connection to the database (scoped to businessId)
         await saveQBConnection(
             tokens.realmId,
             tokens.accessToken,
             tokens.refreshToken,
-            tokens.expiresIn
+            tokens.expiresIn,
+            state
         );
 
-        console.log('[QB Callback] Successfully connected to QuickBooks');
+        console.log(`[QB Callback] Successfully connected to QuickBooks for business: ${state}`);
 
         // Redirect back to settings with success
         return NextResponse.redirect(

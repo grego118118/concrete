@@ -51,11 +51,14 @@ export async function acceptQuote(id: string, scheduledDate: string) {
         const { createInvoiceFromQuote } = await import("@/lib/quickbooks/invoice-sync");
         const invoice = await createInvoiceFromQuote(id);
         
-        // Wait up to 5 seconds for the background sync to populate paymentLink
+        // Wait up to 10 seconds for the background sync to populate paymentLink
         // (In a real production app, we might use a webhook or more robust polling,
         // but for this flow, a small delay is usually enough for the QB API response)
-        for (let i = 0; i < 5; i++) {
-            const updatedInvoice = await db.invoice.findUnique({ where: { id: (invoice as any).id } });
+        for (let i = 0; i < 10; i++) {
+            const updatedInvoice = await db.invoice.findUnique({ 
+                where: { id: (invoice as any).id },
+                select: { paymentLink: true }
+            });
             if (updatedInvoice?.paymentLink) {
                 paymentLink = updatedInvoice.paymentLink;
                 break;

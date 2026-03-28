@@ -16,13 +16,7 @@ import { qbApiRequest } from './client';
  * Create a QuickBooks invoice from an accepted quote
  */
 export async function createQBInvoice(quoteId: string): Promise<string | null> {
-    const connection = await getQBConnection();
-    if (!connection) {
-        console.log('[QB Invoice Sync] No active QB connection, skipping');
-        return null;
-    }
-
-    // Get the quote with all details
+    // Get the quote with all details (including customer to get businessId)
     const quote = await db.quote.findUnique({
         where: { id: quoteId },
         include: {
@@ -34,6 +28,14 @@ export async function createQBInvoice(quoteId: string): Promise<string | null> {
 
     if (!quote) {
         console.error('[QB Invoice Sync] Quote not found:', quoteId);
+        return null;
+    }
+
+    const businessId = quote.customer.businessId;
+
+    const connection = await getQBConnection(businessId);
+    if (!connection) {
+        console.log(`[QB Invoice Sync] No active QB connection for business ${businessId}, skipping`);
         return null;
     }
 

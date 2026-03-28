@@ -69,18 +69,18 @@ export function getConfig(): QBConfig {
 /**
  * Build the QuickBooks OAuth2 authorization URL
  */
-export function getAuthorizationUrl(state?: string): string {
+export function getAuthorizationUrl(businessId: string): string {
     const config = getConfig();
     const params = new URLSearchParams({
         client_id: config.clientId,
         response_type: 'code',
         scope: 'com.intuit.quickbooks.accounting com.intuit.quickbooks.payment',
         redirect_uri: config.redirectUri,
-        state: state || 'auth_state',
+        state: businessId,
     });
 
     console.log('[QB Auth] Generating Authorization URL');
-    console.log('[QB Auth] State:', state || 'auth_state');
+    console.log('[QB Auth] Business ID (State):', businessId);
     console.log('[QB Auth] Redirect URI:', config.redirectUri);
     console.log('[QB Auth] Environment:', config.environment);
 
