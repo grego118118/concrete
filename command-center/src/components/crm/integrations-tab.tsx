@@ -110,7 +110,11 @@ export function IntegrationsTab() {
                 if (data.connected) {
                     setIntegrations(prev => prev.map(item =>
                         item.id === 'quickbooks'
-                            ? { ...item, connected: true, lastSync: data.companyName || 'Connected' }
+                            ? { 
+                                ...item, 
+                                connected: true, 
+                                lastSync: data.companyName ? `Linked to ${data.companyName}` : 'Connected'
+                              }
                             : item
                     ))
                 }
@@ -267,10 +271,26 @@ export function IntegrationsTab() {
                                             variant="secondary"
                                             size="sm"
                                             className="h-8 gap-1.5"
-                                            onClick={() => setConfiguringIntegration(item)}
+                                            onClick={() => {
+                                                if (item.id === 'quickbooks') {
+                                                    // For QuickBooks, redirect to connect to refresh tokens
+                                                    window.location.href = '/app/api/quickbooks/connect'
+                                                } else {
+                                                    setConfiguringIntegration(item)
+                                                }
+                                            }}
                                         >
-                                            <Settings2 className="h-3.5 w-3.5" />
-                                            Configure
+                                            {item.id === 'quickbooks' ? (
+                                                <>
+                                                    <RefreshCw className="h-3.5 w-3.5" />
+                                                    Reconnect
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <Settings2 className="h-3.5 w-3.5" />
+                                                    Configure
+                                                </>
+                                            )}
                                         </Button>
                                     )}
                                     <Button variant="ghost" size="sm" className="h-8 gap-1.5 text-muted-foreground hover:text-foreground">

@@ -118,6 +118,7 @@ export async function getQuotePaymentStatus(id: string) {
     });
     return {
         status: quote?.status,
+        invoiceStatus: quote?.invoice?.status,
         paymentLink: quote?.invoice?.paymentLink
     };
 }

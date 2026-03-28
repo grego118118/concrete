@@ -153,8 +153,18 @@ export async function createQBInvoice(quoteId: string): Promise<string | null> {
         }
 
         return qbInvoiceId;
-    } catch (error) {
+    } catch (error: any) {
         console.error('[QB Invoice Sync] Failed to create QB invoice:', error);
+        
+        // If it's a 403/Forbidden, mark the invoice as failed and handle it
+        if (quote.invoice) {
+            await db.invoice.update({
+                where: { id: quote.invoice.id },
+                data: {
+                    status: 'FAILED',
+                },
+            });
+        }
         return null;
     }
 }

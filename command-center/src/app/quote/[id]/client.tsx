@@ -48,6 +48,7 @@ export function QuoteAcceptClient({
     const acceptBtnRef = useRef<HTMLButtonElement>(null);
     const [paymentLinkState, setPaymentLinkState] = useState(paymentLink);
     const [isPolling, setIsPolling] = useState(false);
+    const [syncStatus, setSyncStatus] = useState<string | null>(null);
 
     const fireConfetti = () => {
         // Fire from the button position
@@ -111,6 +112,13 @@ export function QuoteAcceptClient({
                     
                     if (status.paymentLink) {
                         setPaymentLinkState(status.paymentLink);
+                        setSyncStatus('COMPLETED');
+                        setIsPolling(false);
+                        return true; // Stop
+                    }
+
+                    if (status.invoiceStatus === 'FAILED') {
+                        setSyncStatus('FAILED');
                         setIsPolling(false);
                         return true; // Stop
                     }
@@ -195,6 +203,13 @@ export function QuoteAcceptClient({
                                     <CreditCard className="h-5 w-5" />
                                     Pay Deposit Now
                                 </a>
+                            </div>
+                        ) : syncStatus === 'FAILED' ? (
+                            <div className="pt-2 border-t border-red-100">
+                                <p className="text-sm text-red-700 font-medium flex items-center gap-2">
+                                    <AlertCircle className="h-4 w-4" />
+                                    We&apos;re currently finalizing your secure payment portal. A separate email with your invoice and payment link will be sent within 24 hours.
+                                </p>
                             </div>
                         ) : (
                             <div className="pt-2 border-t border-emerald-100">
