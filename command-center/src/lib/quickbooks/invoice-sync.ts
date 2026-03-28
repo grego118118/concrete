@@ -13,10 +13,9 @@ import { syncCustomerToQB } from './customer-sync';
 import { qbApiRequest } from './client';
 
 /**
- * Create a QuickBooks invoice from an accepted quote
+ * Create a QuickBooks invoice from an accepted quote with multi-tier fallback
  */
 export async function createQBInvoice(quoteId: string): Promise<string | null> {
-    // Get the quote with all details (including customer to get businessId)
     const quote = await db.quote.findUnique({
         where: { id: quoteId },
         include: {
@@ -39,13 +38,11 @@ export async function createQBInvoice(quoteId: string): Promise<string | null> {
         return null;
     }
 
-    // If invoice already has a QB ID, skip
     if (quote.invoice?.qbInvoiceId) {
         console.log(`[QB Invoice Sync] Invoice already synced (QB ID: ${quote.invoice.qbInvoiceId})`);
         return quote.invoice.qbInvoiceId;
     }
 
-    // Ensure customer is synced to QB
     let qbCustomerId = quote.customer.qbCustomerId;
     if (!qbCustomerId) {
         qbCustomerId = await syncCustomerToQB(quote.customer.id);
@@ -58,7 +55,6 @@ export async function createQBInvoice(quoteId: string): Promise<string | null> {
     try {
         console.log(`[QB Invoice Sync] Preparing line items for Quote ${quote.number}`);
         
-        // Build QB Invoice line items from quote items
         const lines = quote.items.map((item, index) => {
             const amount = Number(item.total);
             const qty = Number(item.quantity) || 1;
@@ -71,7 +67,6 @@ export async function createQBInvoice(quoteId: string): Promise<string | null> {
                 SalesItemLineDetail: {
                     Qty: qty,
                     UnitPrice: unitPrice,
-                    // Note: If sync failures persist, check if a specific ItemRef is required by QB settings
                 },
                 LineNum: index + 1,
             };
@@ -82,7 +77,6 @@ export async function createQBInvoice(quoteId: string): Promise<string | null> {
             return null;
         }
 
-        // Add discount as a separate line if present
         const discountAmount = Number(quote.discount || 0);
         if (discountAmount > 0) {
             lines.push({
@@ -94,14 +88,11 @@ export async function createQBInvoice(quoteId: string): Promise<string | null> {
             });
         }
 
-        // Build the QB invoice
-        const qbInvoice = {
-            CustomerRef: {
-                value: qbCustomerId,
-            },
+        // TIER 1: Standard Invoice Payload
+        const standardPayload = {
+            CustomerRef: { value: qbCustomerId },
             Line: lines,
             DueDate: quote.validUntil ? quote.validUntil.toISOString().split('T')[0] : undefined,
-            // Use the CRM invoice number if it exists, otherwise the quote number
             DocNumber: quote.invoice?.number || quote.number.replace('Q-', 'INV-'),
             BillEmail: { Address: quote.customer.email },
             BillAddr: {
@@ -118,71 +109,73 @@ export async function createQBInvoice(quoteId: string): Promise<string | null> {
             },
         };
 
-        console.log(`[QB Invoice Sync] Posting invoice to QuickBooks for Company: ${connection.realmId}`);
         let result;
+        let syncStatusNote = null;
+
         try {
-            result = await qbApiRequest(
-                'POST',
-                'invoice',
-                connection.realmId,
-                connection.accessToken,
-                qbInvoice
-            );
-        } catch (postError: any) {
-            // Check for 403 ApplicationAuthorizationFailed (003100)
-            const isAuthError = postError.message?.includes('403') || postError.message?.includes('3100');
+            // ATTEMPT 1: Standard
+            console.log(`[QB Sync] Attempting STANDARD sync for Quote ${quote.number}`);
+            result = await qbApiRequest('POST', 'invoice', connection.realmId, connection.accessToken, standardPayload);
+        } catch (firstError: any) {
+            const isAuthError = firstError.message?.includes('403') || firstError.message?.includes('3100');
             
             if (isAuthError) {
-                console.warn('[QB Invoice Sync] 403 Detected. Attempting "Safe Mode" retry without payment flags...');
+                // ATTEMPT 2: Safe Mode (No Payment Flags)
+                console.warn('[QB Sync] 403 Detected. Attempting Tier 2: Safe Mode (no payments)...');
+                syncStatusNote = 'Sync successful in Safe Mode (Payment links were restricted)';
                 
-                // Remove the flags that usually trigger the 403 if Payments isn't fully enabled in the app portal
-                const safeInvoice = { ...qbInvoice };
-                delete (safeInvoice as any).AllowOnlineCreditCardPayment;
-                delete (safeInvoice as any).AllowOnlineACHPayment;
+                const safePayload = { ...standardPayload };
+                delete (safePayload as any).AllowOnlineCreditCardPayment;
+                delete (safePayload as any).AllowOnlineACHPayment;
                 
-                result = await qbApiRequest(
-                    'POST',
-                    'invoice',
-                    connection.realmId,
-                    connection.accessToken,
-                    safeInvoice
-                );
-                console.log('[QB Invoice Sync] "Safe Mode" retry successful. Invoice created without payment links.');
+                try {
+                    result = await qbApiRequest('POST', 'invoice', connection.realmId, connection.accessToken, safePayload);
+                } catch (secondError: any) {
+                    if (secondError.message?.includes('403') || secondError.message?.includes('3100')) {
+                        // ATTEMPT 3: Minimalist (Minimal Metadata)
+                        console.warn('[QB Sync] 403 Still persists. Attempting Tier 3: Minimalist...');
+                        syncStatusNote = 'Sync successful in Minimalist Mode (Detailed metadata was restricted)';
+                        
+                        const minPayload = {
+                            CustomerRef: { value: qbCustomerId },
+                            Line: lines,
+                            DocNumber: standardPayload.DocNumber,
+                            DueDate: standardPayload.DueDate,
+                        };
+                        
+                        result = await qbApiRequest('POST', 'invoice', connection.realmId, connection.accessToken, minPayload);
+                    } else {
+                        throw secondError;
+                    }
+                }
             } else {
-                throw postError; // Re-throw if it's not a 403
+                throw firstError;
             }
         }
 
         const qbInvoiceId = result?.Invoice?.Id;
         if (!qbInvoiceId) {
-            console.error('[QB Invoice Sync] QuickBooks did not return an invoice ID. Response:', JSON.stringify(result, null, 2));
-            return null;
+            throw new Error('QuickBooks did not return an invoice ID');
         }
 
-        console.log(`[QB Invoice Sync] Created QB invoice: ${qbInvoiceId}. Syncing Payment Link...`);
+        console.log(`[QB Sync] Created QB invoice: ${qbInvoiceId}. Syncing Payment Link...`);
 
-        // Get the payment link from QB (if available)
+        // Only try to fetch payment link if we aren't in a stripped-down mode that likely blocks it
         let paymentLink: string | null = null;
-        try {
-            const invoiceDetail = await qbApiRequest(
-                'GET',
-                `invoice/${qbInvoiceId}?include=invoiceLink`,
-                connection.realmId,
-                connection.accessToken
-            );
-            
-            paymentLink = invoiceDetail?.Invoice?.InvoiceLink || null;
-            
-            if (paymentLink) {
-                console.log(`[QB Invoice Sync] Successfully retrieved PaymentLink: ${paymentLink}`);
-            } else {
-                console.warn(`[QB Invoice Sync] No InvoiceLink in QB response for ${qbInvoiceId}. Ensure QB Payments is enabled.`);
+        if (!syncStatusNote) {
+            try {
+                const invoiceDetail = await qbApiRequest(
+                    'GET',
+                    `invoice/${qbInvoiceId}?include=invoiceLink`,
+                    connection.realmId,
+                    connection.accessToken
+                );
+                paymentLink = invoiceDetail?.Invoice?.InvoiceLink || null;
+            } catch (err) {
+                console.warn(`[QB Sync] Skipping payment link retrieval for ${qbInvoiceId} due to restriction.`);
             }
-        } catch (err) {
-            console.error(`[QB Invoice Sync] Error retrieving payment link for invoice ${qbInvoiceId}:`, err);
         }
 
-        // Update our invoice record with the QB invoice ID
         if (quote.invoice) {
             await db.invoice.update({
                 where: { id: quote.invoice.id },
@@ -191,16 +184,15 @@ export async function createQBInvoice(quoteId: string): Promise<string | null> {
                     paymentLink,
                     status: 'PENDING',
                     lastSyncAt: new Date(),
-                    lastSyncError: null, // Clear any previous errors
+                    lastSyncError: syncStatusNote || null, 
                 },
             });
         }
 
         return qbInvoiceId;
     } catch (error: any) {
-        console.error('[QB Invoice Sync] CRITICAL ERROR:', error.message);
+        console.error('[QB Invoice Sync] PROCESSED ERROR:', error.message);
         
-        // Persist the error for diagnostics
         if (quote.invoice) {
             await db.invoice.update({
                 where: { id: quote.invoice.id },
@@ -217,7 +209,6 @@ export async function createQBInvoice(quoteId: string): Promise<string | null> {
 
 /**
  * Create an invoice in the CRM and sync to QuickBooks
- * Called when a quote is accepted/approved
  */
 export async function createInvoiceFromQuote(quoteId: string) {
     const quote = await db.quote.findUnique({
@@ -226,12 +217,8 @@ export async function createInvoiceFromQuote(quoteId: string) {
     });
 
     if (!quote) throw new Error('Quote not found');
-    if (quote.invoice) {
-        console.log('[QB Invoice] Invoice already exists for this quote');
-        return quote.invoice;
-    }
+    if (quote.invoice) return quote.invoice;
 
-    // Create the CRM invoice
     const invoice = await db.invoice.create({
         data: {
             number: `INV-${Date.now()}`,
@@ -243,7 +230,6 @@ export async function createInvoiceFromQuote(quoteId: string) {
         },
     });
 
-    // Sync to QuickBooks in the background (non-blocking)
     createQBInvoice(quoteId).catch(err =>
         console.warn('[QB Invoice] QB sync failed (non-critical):', err)
     );
@@ -252,7 +238,7 @@ export async function createInvoiceFromQuote(quoteId: string) {
 }
 
 /**
- * Manually retry synchronization for a failed invoice
+ * Manually retry synchronization
  */
 export async function retryInvoiceSync(invoiceId: string) {
     const invoice = await db.invoice.findUnique({
@@ -262,22 +248,17 @@ export async function retryInvoiceSync(invoiceId: string) {
 
     if (!invoice) throw new Error('Invoice not found');
 
-    console.log(`[QB Diagnostics] Retrying sync for Invoice ${invoice.number}`);
-
-    // Increment sync attempt or just clear error
     await db.invoice.update({
         where: { id: invoiceId },
         data: { 
             status: 'PENDING',
-            lastSyncError: 'Retrying...',
+            lastSyncError: 'Retrying with enhanced fallbacks...',
             lastSyncAt: new Date()
         }
     });
 
-    // Run sync
     const result = await createQBInvoice(invoice.quoteId);
 
-    // Revalidate paths
     const { revalidatePath } = await import('next/cache');
     revalidatePath('/app/crm/invoices');
     revalidatePath('/app/crm/diagnostics');
