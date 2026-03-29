@@ -50,18 +50,20 @@ export async function acceptQuote(id: string, scheduledDate: string) {
             });
         });
 
-        // 3. Start sync in the background
+        // 3. Create CRM invoice then sync to QuickBooks (awaited)
         console.log(`[acceptQuote] Starting QuickBooks sync for Quote ${id}`);
         let paymentLink: string | undefined;
         let invoiceId: string | undefined;
 
         try {
-            const { createInvoiceFromQuote } = await import("@/lib/quickbooks/invoice-sync");
+            const { createInvoiceFromQuote, createQBInvoice } = await import("@/lib/quickbooks/invoice-sync");
             const invoice = await createInvoiceFromQuote(id);
             invoiceId = invoice.id;
-            
-            // Poll for ONLY 1 second max to see if we get lucky
-            const updatedInvoice = await db.invoice.findUnique({ 
+
+            // Await QB sync so we have the payment link before sending the email
+            await createQBInvoice(id);
+
+            const updatedInvoice = await db.invoice.findUnique({
                 where: { id: invoiceId },
                 select: { paymentLink: true }
             });

@@ -97,30 +97,30 @@ export function QuoteAcceptClient({
         }
     };
 
-    // Poll for payment link if accepted but link is missing
+    // Poll for payment link if accepted but link is missing (30 second timeout)
     useEffect(() => {
         let interval: NodeJS.Timeout;
-        
+        let timeout: NodeJS.Timeout;
+
         if (accepted && !paymentLinkState && !isPolling) {
             setIsPolling(true);
-            
+
             const poll = async () => {
                 try {
-                    // Import inside to avoid SSR issues if necessary, but action is better
                     const { getQuotePaymentStatus } = await import("./accept-action");
                     const status = await getQuotePaymentStatus(quoteId);
-                    
+
                     if (status.paymentLink) {
                         setPaymentLinkState(status.paymentLink);
                         setSyncStatus('COMPLETED');
                         setIsPolling(false);
-                        return true; // Stop
+                        return true;
                     }
 
                     if (status.invoiceStatus === 'FAILED') {
                         setSyncStatus('FAILED');
                         setIsPolling(false);
-                        return true; // Stop
+                        return true;
                     }
                 } catch (err) {
                     console.error("Polling error:", err);
@@ -128,22 +128,26 @@ export function QuoteAcceptClient({
                 return false;
             };
 
-            // Run initial poll
             poll();
 
-            // Set up interval
             interval = setInterval(async () => {
                 const finished = await poll();
-                if (finished) {
-                    clearInterval(interval);
-                }
-            }, 5000); // 5 seconds is safer
+                if (finished) clearInterval(interval);
+            }, 5000);
+
+            // Stop polling after 30 seconds and show fallback
+            timeout = setTimeout(() => {
+                clearInterval(interval);
+                setIsPolling(false);
+                setSyncStatus('FAILED');
+            }, 30000);
         }
 
         return () => {
             if (interval) clearInterval(interval);
+            if (timeout) clearTimeout(timeout);
         };
-    }, [accepted, quoteId]); // Only restart if accepted state changes or quoteId changes
+    }, [accepted, quoteId]);
 
     const handleAcceptAndSchedule = async () => {
         if (!scheduledDate) {

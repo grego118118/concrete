@@ -230,10 +230,6 @@ export async function createInvoiceFromQuote(quoteId: string) {
         },
     });
 
-    createQBInvoice(quoteId).catch(err =>
-        console.warn('[QB Invoice] QB sync failed (non-critical):', err)
-    );
-
     return invoice;
 }
 
