@@ -50,29 +50,38 @@ export async function acceptQuote(id: string, scheduledDate: string) {
             });
         });
 
-        // 3. Create CRM invoice then sync to QuickBooks (awaited)
-        console.log(`[acceptQuote] Starting QuickBooks sync for Quote ${id}`);
+        // 3. Create CRM invoice, Stripe payment link, then QB invoice for bookkeeping
+        console.log(`[acceptQuote] Creating invoice and payment link for Quote ${id}`);
         let paymentLink: string | undefined;
-        let invoiceId: string | undefined;
 
         try {
-            const { createInvoiceFromQuote, createQBInvoice } = await import("@/lib/quickbooks/invoice-sync");
+            const { createInvoiceFromQuote } = await import("@/lib/quickbooks/invoice-sync");
             const invoice = await createInvoiceFromQuote(id);
-            invoiceId = invoice.id;
 
-            // Await QB sync so we have the payment link before sending the email
-            await createQBInvoice(id);
-
-            const updatedInvoice = await db.invoice.findUnique({
-                where: { id: invoiceId },
-                select: { paymentLink: true }
+            // Create Stripe payment link for the deposit amount
+            const { createDepositPaymentLink } = await import("@/lib/stripe/payment-link");
+            const stripeLink = await createDepositPaymentLink({
+                quoteNumber: quote.number,
+                depositAmount: Number(quote.deposit),
+                quoteId: id,
+                invoiceId: invoice.id,
             });
 
-            if (updatedInvoice?.paymentLink) {
-                paymentLink = updatedInvoice.paymentLink;
+            if (stripeLink) {
+                paymentLink = stripeLink;
+                await db.invoice.update({
+                    where: { id: invoice.id },
+                    data: { paymentLink: stripeLink },
+                });
             }
+
+            // Sync to QB in the background for bookkeeping (non-blocking)
+            import("@/lib/quickbooks/invoice-sync")
+                .then(({ createQBInvoice }) => createQBInvoice(id))
+                .catch(err => console.warn('[acceptQuote] QB sync failed (non-critical):', err));
+
         } catch (err) {
-            console.error('[acceptQuote] QB invoice initialization failed:', err);
+            console.error('[acceptQuote] Invoice/payment link creation failed:', err);
         }
 
         // 4. Send Confirmation Email IMMEDIATELY

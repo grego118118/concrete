@@ -262,3 +262,35 @@ export async function retryInvoiceSync(invoiceId: string) {
 
     return { success: !!result, qbInvoiceId: result };
 }
+
+/**
+ * Record a Stripe payment against the matching QuickBooks invoice
+ */
+export async function recordStripePaymentInQB(quoteId: string, amountPaid: number, stripeSessionId: string) {
+    const quote = await db.quote.findUnique({
+        where: { id: quoteId },
+        include: { customer: true, invoice: true },
+    });
+
+    if (!quote?.invoice?.qbInvoiceId) return;
+
+    const businessId = quote.customer.businessId;
+    const connection = await getQBConnection(businessId);
+    if (!connection) return;
+
+    try {
+        await qbApiRequest('POST', 'payment', connection.realmId, connection.accessToken, {
+            CustomerRef: { value: quote.customer.qbCustomerId },
+            TotalAmt: amountPaid,
+            Line: [{
+                Amount: amountPaid,
+                LinkedTxn: [{ TxnId: quote.invoice.qbInvoiceId, TxnType: 'Invoice' }],
+            }],
+            PaymentMethodRef: { value: '1' },
+            PrivateNote: `Stripe payment — Session ${stripeSessionId}`,
+        });
+        console.log(`[QB] Recorded Stripe payment of $${amountPaid} against QB invoice ${quote.invoice.qbInvoiceId}`);
+    } catch (err: any) {
+        console.warn('[QB] Could not record Stripe payment in QB:', err.message);
+    }
+}

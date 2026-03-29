@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react"
 import { useSearchParams } from "next/navigation"
 import {
-    Check,
     ExternalLink,
     RefreshCw,
     XCircle,
@@ -54,6 +53,16 @@ const INITIAL_INTEGRATIONS: Integration[] = [
         connected: false,
         category: "Accounting",
         type: 'oauth'
+    },
+    {
+        id: "stripe",
+        name: "Stripe",
+        description: "Collect deposit payments from customers via secure payment links sent with every accepted quote.",
+        icon: "S",
+        iconColor: "bg-indigo-600",
+        connected: false,
+        category: "Payments",
+        type: 'apikey'
     },
     {
         id: "google-calendar",
@@ -112,9 +121,9 @@ export function IntegrationsTab() {
                 if (data.connected) {
                     setIntegrations(prev => prev.map(item =>
                         item.id === 'quickbooks'
-                            ? { 
-                                ...item, 
-                                connected: true, 
+                            ? {
+                                ...item,
+                                connected: true,
                                 lastSync: data.companyName || 'Connected',
                                 primaryEmail: data.primaryEmail,
                                 environment: data.environment
@@ -124,20 +133,37 @@ export function IntegrationsTab() {
                 }
             })
             .catch(() => { /* QB status check failed silently */ })
+
+        // Fetch Stripe connection status
+        fetch('/app/api/stripe/status')
+            .then(res => res.json())
+            .then(data => {
+                if (data.connected) {
+                    setIntegrations(prev => prev.map(item =>
+                        item.id === 'stripe'
+                            ? {
+                                ...item,
+                                connected: true,
+                                lastSync: 'Active',
+                                environment: data.mode
+                              }
+                            : item
+                    ))
+                }
+            })
+            .catch(() => { /* Stripe status check failed silently */ })
     }, [searchParams])
 
     const handleToggle = (id: string, currentStatus: boolean) => {
         if (!currentStatus) {
-            // For QuickBooks, redirect to OAuth flow directly
             if (id === 'quickbooks') {
                 window.location.href = '/app/api/quickbooks/connect'
                 return
             }
-            // Opening connection flow for other integrations
+            // Stripe and others open a config dialog
             const integration = integrations.find(i => i.id === id)
             if (integration) setConnectingIntegration(integration)
         } else {
-            // Disconnecting
             if (id === 'quickbooks') {
                 fetch('/app/api/quickbooks/disconnect', { method: 'POST' })
                     .then(res => res.json())
@@ -149,6 +175,11 @@ export function IntegrationsTab() {
                             toast.info('Disconnected from QuickBooks')
                         }
                     })
+                return
+            }
+            // Stripe is configured via env vars — just inform the user
+            if (id === 'stripe') {
+                toast.info('To disable Stripe, remove STRIPE_SECRET_KEY from your environment variables.')
                 return
             }
             setIntegrations(prev => prev.map(item =>
@@ -291,8 +322,9 @@ export function IntegrationsTab() {
                                             className="h-8 gap-1.5"
                                             onClick={() => {
                                                 if (item.id === 'quickbooks') {
-                                                    // For QuickBooks, redirect to connect to refresh tokens
                                                     window.location.href = '/app/api/quickbooks/connect'
+                                                } else if (item.id === 'stripe') {
+                                                    window.open('https://dashboard.stripe.com', '_blank')
                                                 } else {
                                                     setConfiguringIntegration(item)
                                                 }
@@ -302,6 +334,11 @@ export function IntegrationsTab() {
                                                 <>
                                                     <RefreshCw className="h-3.5 w-3.5" />
                                                     Reconnect
+                                                </>
+                                            ) : item.id === 'stripe' ? (
+                                                <>
+                                                    <ExternalLink className="h-3.5 w-3.5" />
+                                                    Dashboard
                                                 </>
                                             ) : (
                                                 <>

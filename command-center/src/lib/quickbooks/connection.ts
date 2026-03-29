@@ -14,11 +14,14 @@ import { refreshAccessToken, qbApiRequest } from './client';
  * Get the active QuickBooks connection (with auto-refresh if expired)
  */
 export async function getQBConnection(businessId: string) {
-    const connection = await db.quickBooksConnection.findUnique({
-        where: { businessId },
+    const connection = await db.quickBooksConnection.findFirst({
+        where: { businessId, isActive: true },
     });
 
-    if (!connection) return null;
+    if (!connection) {
+        console.log(`[QB Connection] No active connection found for business ${businessId}`);
+        return null;
+    }
 
     // Auto-refresh if token is expired (or expires within 5 minutes)
     const fiveMinutesFromNow = new Date(Date.now() + 5 * 60 * 1000);
