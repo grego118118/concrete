@@ -181,9 +181,10 @@ model Quote {
   balance  Decimal     @default(0) @db.Decimal(10, 2) // Calculated as total - deposit
 
   // Additional Fees & Notes
-  cleanupFee Decimal?    @db.Decimal(10, 2)
-  discount   Decimal?    @db.Decimal(10, 2)
-  notes      String?
+  cleanupFee    Decimal? @db.Decimal(10, 2)
+  discount      Decimal? @db.Decimal(10, 2)
+  notes         String?
+  allowOverages Boolean  @default(false) // Allow overage line items to be added at job completion
 
   // Project Scope
   jobLocation    String? // Specific address or "Same"
@@ -228,13 +229,27 @@ model Invoice {
   qbInvoiceId      String?       // QuickBooks Invoice ID
   paymentMethod    String?       // credit_card, ach, check
   paymentReference String?       // QB transaction ID
-  paymentLink      String?       // QB hosted payment URL
-  lastSyncError    String?       @db.Text // Exact error from QB for diagnostics
-  lastSyncAt       DateTime?     // When the last sync attempt occurred
+  paymentLink      String?       // Stripe or QB hosted payment URL
+  lastSyncError    String?       @db.Text
+  lastSyncAt       DateTime?
+  // Completion invoice fields
+  completionPaymentLink String?  // Stripe link for final balance + overages
+  completionSentAt      DateTime?
+  overageItems          OverageItem[]
   customerId       String
   customer         Customer      @relation(fields: [customerId], references: [id])
   createdAt        DateTime      @default(now())
   updatedAt        DateTime      @updatedAt
+}
+
+model OverageItem {
+  id          String  @id @default(cuid())
+  description String
+  quantity    Int     @default(1)
+  unitPrice   Decimal @db.Decimal(10, 2)
+  total       Decimal @db.Decimal(10, 2)
+  invoiceId   String
+  invoice     Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
 }
 
 // Social Media Entities

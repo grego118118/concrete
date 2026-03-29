@@ -211,6 +211,9 @@ interface InvoiceDocumentProps {
 
 export const InvoiceDocument: React.FC<InvoiceDocumentProps> = ({ invoice, customer, items, paymentLink }) => {
     const invoiceTotal = Number(invoice.amount);
+    const overageItems: any[] = invoice.overageItems ?? [];
+    const overageTotal = overageItems.reduce((sum: number, item: any) => sum + Number(item.total), 0);
+    const baseBalance = invoiceTotal - overageTotal;
 
     return (
         <Document>
@@ -286,8 +289,41 @@ export const InvoiceDocument: React.FC<InvoiceDocumentProps> = ({ invoice, custo
                     )}
                 </View>
 
+                {/* Overage Items (if any) */}
+                {overageItems.length > 0 && (
+                    <View style={{ marginTop: 10, marginBottom: 20 }}>
+                        <Text style={[styles.sectionTitle, { marginBottom: 6 }]}>Additional Charges</Text>
+                        <View style={styles.tableHeader}>
+                            <Text style={[styles.colDesc, styles.tableHeaderText]}>Description</Text>
+                            <Text style={[styles.colQty, styles.tableHeaderText]}>Qty</Text>
+                            <Text style={[styles.colPrice, styles.tableHeaderText]}>Price</Text>
+                            <Text style={[styles.colTotal, styles.tableHeaderText]}>Total</Text>
+                        </View>
+                        {overageItems.map((item: any, i: number) => (
+                            <View key={i} style={styles.tableRow}>
+                                <Text style={styles.colDesc}>{item.description}</Text>
+                                <Text style={styles.colQty}>{item.quantity}</Text>
+                                <Text style={styles.colPrice}>${Number(item.unitPrice).toFixed(2)}</Text>
+                                <Text style={styles.colTotal}>${Number(item.total).toFixed(2)}</Text>
+                            </View>
+                        ))}
+                    </View>
+                )}
+
                 {/* Totals */}
                 <View style={styles.totals}>
+                    {overageItems.length > 0 && (
+                        <>
+                            <View style={styles.totalRow}>
+                                <Text style={styles.totalLabel}>Remaining Balance:</Text>
+                                <Text style={styles.totalValue}>${baseBalance.toFixed(2)}</Text>
+                            </View>
+                            <View style={styles.totalRow}>
+                                <Text style={styles.totalLabel}>Additional Charges:</Text>
+                                <Text style={styles.totalValue}>${overageTotal.toFixed(2)}</Text>
+                            </View>
+                        </>
+                    )}
                     <View style={styles.grandTotal}>
                         <Text style={styles.grandTotalText}>Amount Due:</Text>
                         <Text style={styles.grandTotalText}>${invoiceTotal.toFixed(2)}</Text>

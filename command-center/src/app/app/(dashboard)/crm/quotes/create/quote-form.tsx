@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/componen
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Send, Save } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
 import { createQuote, updateQuoteDetails } from "@/app/actions/quotes";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
@@ -31,6 +32,7 @@ type InitialQuoteData = {
     scopeArea?: number;
     baseRate?: number;
     scopeData?: any;
+    allowOverages?: boolean;
 }
 
 export default function CreateQuoteForm({ customers, initialData }: { customers: Customer[], initialData?: InitialQuoteData }) {
@@ -38,6 +40,7 @@ export default function CreateQuoteForm({ customers, initialData }: { customers:
     const [customerId, setCustomerId] = useState<string>(initialData?.customerId || "");
     const [cleanupFee, setCleanupFee] = useState<string>("");
     const [notes, setNotes] = useState<string>("");
+    const [allowOverages, setAllowOverages] = useState<boolean>(initialData?.allowOverages ?? false);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const router = useRouter();
 
@@ -80,7 +83,8 @@ export default function CreateQuoteForm({ customers, initialData }: { customers:
                 items: items.map(({ id, ...rest }) => rest),
                 status: initialData ? initialData.status : "DRAFT",
                 cleanupFee: cleanupFee ? parseFloat(cleanupFee) : undefined,
-                notes: notes || undefined
+                notes: notes || undefined,
+                allowOverages,
             };
 
             // Include scope data from the calculator
@@ -211,6 +215,17 @@ export default function CreateQuoteForm({ customers, initialData }: { customers:
                                         placeholder="Add any notes visible to the customer..."
                                         value={notes}
                                         onChange={(e) => setNotes(e.target.value)}
+                                    />
+                                </div>
+
+                                <div className="flex items-center justify-between pt-2 border-t">
+                                    <div>
+                                        <Label className="text-sm font-medium text-slate-700">Allow Overages</Label>
+                                        <p className="text-xs text-slate-400 mt-0.5">Enable extra line items at job completion</p>
+                                    </div>
+                                    <Switch
+                                        checked={allowOverages}
+                                        onCheckedChange={setAllowOverages}
                                     />
                                 </div>
                             </div>

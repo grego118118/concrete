@@ -18,7 +18,8 @@ async function main() {
         await createQuote({
             customerId: "", // Invalid
             items: [],
-            status: "DRAFT"
+            status: "DRAFT",
+            allowOverages: false,
         });
         console.error("❌ Test 1 Failed: Should have thrown validation error");
     } catch (e: any) {
@@ -40,7 +41,8 @@ async function main() {
             ],
             status: "DRAFT",
             scopeArea: 100,
-            baseRate: 5
+            baseRate: 5,
+            allowOverages: false,
         });
         console.log("✅ Test 2 Passed: No error (or redirect)");
     } catch (e: any) {

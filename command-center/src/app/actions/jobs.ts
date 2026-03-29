@@ -73,7 +73,13 @@ export async function getJob(id: string) {
         include: {
             customer: true,
             photos: true,
-            parts: true
+            parts: true,
+            quote: {
+                include: {
+                    items: true,
+                    invoice: true,
+                }
+            }
         }
     })
 }
@@ -82,7 +88,13 @@ export async function updateJob(id: string, formData: FormData) {
     const title = formData.get("title") as string
     const status = formData.get("status") as string
     const description = formData.get("description") as string
-    const scheduledDate = formData.get("scheduledDate") as string // "YYYY-MM-DD"
+    const scheduledDate = formData.get("scheduledDate") as string
+    const overageItemsRaw = formData.get("overageItems") as string | null
+
+    const previousJob = await db.job.findUnique({
+        where: { id },
+        select: { status: true }
+    })
 
     await db.job.update({
         where: { id },
@@ -90,9 +102,18 @@ export async function updateJob(id: string, formData: FormData) {
             title,
             description,
             status: status as any,
-            scheduledAt: scheduledDate ? new Date(scheduledDate) : null
+            scheduledAt: scheduledDate ? new Date(scheduledDate) : null,
+            completedAt: status === 'COMPLETED' && previousJob?.status !== 'COMPLETED' ? new Date() : undefined,
         }
     })
+
+    // Trigger completion invoice when status changes to COMPLETED
+    if (status === 'COMPLETED' && previousJob?.status !== 'COMPLETED') {
+        const overageItems = overageItemsRaw ? JSON.parse(overageItemsRaw) : []
+        import('@/lib/invoices/completion-invoice')
+            .then(({ sendCompletionInvoice }) => sendCompletionInvoice(id, overageItems))
+            .catch(err => console.error('[updateJob] Completion invoice failed:', err))
+    }
 
     revalidatePath("/app/crm/jobs")
     redirect("/app/crm/jobs")

@@ -22,7 +22,8 @@ const CreateQuoteSchema = z.object({
     baseRate: z.number().optional(),
     scopeData: z.any().optional(),
     cleanupFee: z.number().optional(),
-    notes: z.string().optional()
+    notes: z.string().optional(),
+    allowOverages: z.boolean().default(false),
 });
 
 export type CreateQuoteData = z.infer<typeof CreateQuoteSchema>;
@@ -30,7 +31,7 @@ export type CreateQuoteData = z.infer<typeof CreateQuoteSchema>;
 export async function createQuote(data: CreateQuoteData) {
     try {
         const validatedData = CreateQuoteSchema.parse(data);
-        const { customerId, items, status, scopeArea, baseRate, scopeData, cleanupFee, notes } = validatedData;
+        const { customerId, items, status, scopeArea, baseRate, scopeData, cleanupFee, notes, allowOverages } = validatedData;
 
         let subtotal = 0;
         const taxRate = 0.0625;
@@ -85,6 +86,7 @@ export async function createQuote(data: CreateQuoteData) {
                 scopeData: scopeData || null,
                 cleanupFee: cleanupFee || null,
                 notes: notes || null,
+                allowOverages: allowOverages ?? false,
                 validUntil: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // Default 30 days valid
                 items: {
                     create: finalItems.map(item => ({
@@ -135,7 +137,7 @@ export async function getQuote(id: string) {
 export async function updateQuoteDetails(id: string, data: CreateQuoteData) {
     try {
         const validatedData = CreateQuoteSchema.parse(data);
-        const { customerId, items, status, scopeArea, baseRate, scopeData, cleanupFee, notes } = validatedData;
+        const { customerId, items, status, scopeArea, baseRate, scopeData, cleanupFee, notes, allowOverages } = validatedData;
 
         // Financials source of truth: Calculator (if used) or manual Items
         let subtotal = 0;
@@ -195,6 +197,7 @@ export async function updateQuoteDetails(id: string, data: CreateQuoteData) {
                     scopeData: scopeData || null,
                     cleanupFee: cleanupFee || null,
                     notes: notes || null,
+                    allowOverages: allowOverages ?? false,
                     items: {
                         create: finalItems.map(item => ({
                             description: item.description,
