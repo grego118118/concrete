@@ -24,7 +24,6 @@ export async function createDepositPaymentLink(params: {
             unit_amount: Math.round(params.depositAmount * 100), // convert to cents
             product_data: {
                 name: `50% Deposit — Quote #${params.quoteNumber}`,
-                description: 'Pioneer Concrete Coatings — Project Deposit',
             },
         });
 
