@@ -158,17 +158,13 @@ export async function sendCompletionInvoice(jobId: string, overageItems: Overage
 
                 ${overageSection}
 
-                ${completionPaymentLink ? `
                 <div style="background: #f0fdf4; border: 2px solid #bbf7d0; border-radius: 12px; padding: 24px; margin: 24px 0; text-align: center;">
-                    <p style="color: #166534; font-weight: 700; font-size: 16px; margin: 0 0 12px;">Pay Your Final Balance</p>
-                    <a href="${completionPaymentLink}"
+                    <p style="color: #166534; font-weight: 700; font-size: 16px; margin: 0 0 12px;">Review &amp; Pay Your Final Balance</p>
+                    <a href="${(process.env.NEXT_PUBLIC_APP_URL || 'https://pioneerconcretecoatings.com')}/invoice/${invoice.id}"
                        style="display: inline-block; background: #22c55e; color: white; text-decoration: none; padding: 14px 32px; border-radius: 10px; font-size: 16px; font-weight: 700;">
-                        Pay $${finalAmount.toFixed(2)} Securely
+                        View Invoice &amp; Pay $${finalAmount.toFixed(2)}
                     </a>
                 </div>
-                ` : `
-                <p style="color: #475569;">Your invoice is attached to this email. Please contact us to arrange payment.</p>
-                `}
 
                 <p>Thank you for choosing Pioneer Concrete Coatings. We appreciate your business!</p>
                 <p>— Pioneer Concrete Coatings Team</p>

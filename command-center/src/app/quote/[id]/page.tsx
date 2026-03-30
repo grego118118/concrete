@@ -15,6 +15,7 @@ export default async function PublicQuotePage(props: {
             customer: true,
             items: true,
             invoice: true,
+            photos: true,
         }
     });
 
@@ -67,7 +68,7 @@ export default async function PublicQuotePage(props: {
     const quoteTotal = Number(quote.total);
     const subtotal = Number(quote.subtotal);
     const tax = Number(quote.tax);
-    const deposit = quoteTotal * 0.5;
+    const deposit = Number(quote.deposit) || quoteTotal * 0.5;
 
     const isAlreadyAccepted = quote.status === "APPROVED";
     const isSuccess = searchParams.success === "true";
@@ -77,11 +78,19 @@ export default async function PublicQuotePage(props: {
         <QuoteAcceptClient
             quoteId={quote.id}
             quoteNumber={quote.number}
-            customerName={quote.customer.name}
+            customer={{
+                name: quote.customer.name,
+                email: quote.customer.email,
+                phone: quote.customer.phone,
+                address: quote.customer.address,
+                city: quote.customer.city,
+                state: quote.customer.state,
+                zip: quote.customer.zip,
+            }}
             items={displayItems}
             subtotal={subtotal}
             discount={Number(quote.discount) || 0}
-            discountRate={Number((quote.scopeData as any)?.discountRate) || 0}
+            discountRate={Number(scopeData?.discountRate) || 0}
             tax={tax}
             total={quoteTotal}
             deposit={deposit}
@@ -91,6 +100,11 @@ export default async function PublicQuotePage(props: {
             cleanupFee={quote.cleanupFee ? Number(quote.cleanupFee) : undefined}
             notes={quote.notes || undefined}
             paymentLink={quote.invoice?.paymentLink || undefined}
+            scopeData={scopeData}
+            scopeArea={scopeArea}
+            jobLocation={quote.jobLocation}
+            createdAt={quote.createdAt.toISOString()}
+            photos={(quote.photos || []).map((p: any) => ({ id: p.id, url: p.url, caption: p.caption }))}
         />
     );
 }
