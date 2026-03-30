@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { LeadScraperCard } from "@/components/dashboard/lead-scraper-card";
+import { WebTrafficCard } from "@/components/dashboard/web-traffic-card";
 
 
 function DeltaBadge({ delta }: { delta: number | null }) {
@@ -174,8 +175,9 @@ export default async function Home() {
           </CardContent>
         </Card>
 
-        {/* Right column: Lead Scraper + Tickets */}
+        {/* Right column: Web Traffic + Lead Scraper + Tickets */}
         <div className="col-span-3 space-y-4">
+          <WebTrafficCard />
           <LeadScraperCard />
           <TroubleTicketCard initialTickets={tickets as any} />
         </div>

@@ -11,8 +11,10 @@ import {
     Loader2,
     Lock,
     Key,
-    Globe
+    Globe,
+    BarChart3
 } from "lucide-react"
+import { saveAnalyticsSettings, getAnalyticsSettings } from "@/app/actions/analytics"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Switch } from "@/components/ui/switch"
@@ -70,10 +72,19 @@ const INITIAL_INTEGRATIONS: Integration[] = [
         description: "Sync your coating schedule with personal or team calendars.",
         icon: "G",
         iconColor: "bg-red-500",
-        connected: true,
+        connected: false,
         category: "Scheduling",
-        lastSync: "1 hour ago",
         type: 'oauth'
+    },
+    {
+        id: "google-analytics",
+        name: "Google Analytics",
+        description: "View website sessions, users, and page views for pioneerconcretecoatings.com directly on the dashboard.",
+        icon: "GA",
+        iconColor: "bg-orange-500",
+        connected: false,
+        category: "Analytics",
+        type: 'apikey'
     },
     {
         id: "twilio",
@@ -94,6 +105,7 @@ export function IntegrationsTab() {
     const [connectingIntegration, setConnectingIntegration] = useState<Integration | null>(null)
     const [isConnecting, setIsConnecting] = useState(false)
     const [configuringIntegration, setConfiguringIntegration] = useState<Integration | null>(null)
+    const [gaFields, setGaFields] = useState({ propertyId: "", clientEmail: "", privateKey: "" })
     const searchParams = useSearchParams()
 
     // Check QB connection status on mount and handle URL params
@@ -152,6 +164,22 @@ export function IntegrationsTab() {
                 }
             })
             .catch(() => { /* Stripe status check failed silently */ })
+
+        // Check Google Analytics connection status
+        getAnalyticsSettings().then(result => {
+            if (result.success && result.data?.propertyId) {
+                setGaFields({
+                    propertyId: result.data.propertyId,
+                    clientEmail: result.data.clientEmail ?? "",
+                    privateKey: result.data.privateKey ?? "",
+                })
+                setIntegrations(prev => prev.map(item =>
+                    item.id === 'google-analytics'
+                        ? { ...item, connected: true, lastSync: `Property ${result.data.propertyId}` }
+                        : item
+                ))
+            }
+        })
     }, [searchParams])
 
     const handleToggle = (id: string, currentStatus: boolean) => {
@@ -189,12 +217,35 @@ export function IntegrationsTab() {
         }
     }
 
-    const completeConnection = () => {
+    const completeConnection = async () => {
         if (!connectingIntegration) return
 
         // For QuickBooks, redirect to OAuth (shouldn't normally reach here)
         if (connectingIntegration.id === 'quickbooks') {
             window.location.href = '/app/api/quickbooks/connect'
+            return
+        }
+
+        // Google Analytics — save credentials via server action
+        if (connectingIntegration.id === 'google-analytics') {
+            if (!gaFields.propertyId || !gaFields.clientEmail || !gaFields.privateKey) {
+                toast.error("Please fill in all three fields.")
+                return
+            }
+            setIsConnecting(true)
+            const result = await saveAnalyticsSettings(gaFields)
+            setIsConnecting(false)
+            if (result.success) {
+                setIntegrations(prev => prev.map(item =>
+                    item.id === 'google-analytics'
+                        ? { ...item, connected: true, lastSync: `Property ${gaFields.propertyId}` }
+                        : item
+                ))
+                setConnectingIntegration(null)
+                toast.success("Google Analytics connected!")
+            } else {
+                toast.error(result.error ?? "Failed to save credentials.")
+            }
             return
         }
 
@@ -373,7 +424,53 @@ export function IntegrationsTab() {
                     </DialogHeader>
 
                     <div className="grid gap-4 py-4">
-                        {connectingIntegration?.type === 'apikey' ? (
+                        {connectingIntegration?.id === 'google-analytics' ? (
+                            <div className="space-y-4">
+                                <p className="text-xs text-muted-foreground">
+                                    Create a <strong>Google Cloud Service Account</strong> with the Analytics Data API enabled, add it to your GA4 property, then paste the credentials below.
+                                </p>
+                                <div className="grid gap-2">
+                                    <Label htmlFor="ga_property_id" className="flex items-center gap-2">
+                                        <BarChart3 className="h-4 w-4 text-muted-foreground" />
+                                        GA4 Property ID
+                                    </Label>
+                                    <Input
+                                        id="ga_property_id"
+                                        placeholder="123456789"
+                                        className="font-mono"
+                                        value={gaFields.propertyId}
+                                        onChange={e => setGaFields(f => ({ ...f, propertyId: e.target.value }))}
+                                    />
+                                </div>
+                                <div className="grid gap-2">
+                                    <Label htmlFor="ga_client_email" className="flex items-center gap-2">
+                                        <Key className="h-4 w-4 text-muted-foreground" />
+                                        Service Account Email
+                                    </Label>
+                                    <Input
+                                        id="ga_client_email"
+                                        placeholder="my-sa@project.iam.gserviceaccount.com"
+                                        className="font-mono text-xs"
+                                        value={gaFields.clientEmail}
+                                        onChange={e => setGaFields(f => ({ ...f, clientEmail: e.target.value }))}
+                                    />
+                                </div>
+                                <div className="grid gap-2">
+                                    <Label htmlFor="ga_private_key" className="flex items-center gap-2">
+                                        <Lock className="h-4 w-4 text-muted-foreground" />
+                                        Private Key
+                                    </Label>
+                                    <Input
+                                        id="ga_private_key"
+                                        type="password"
+                                        placeholder="-----BEGIN PRIVATE KEY-----..."
+                                        className="font-mono text-xs"
+                                        value={gaFields.privateKey}
+                                        onChange={e => setGaFields(f => ({ ...f, privateKey: e.target.value }))}
+                                    />
+                                </div>
+                            </div>
+                        ) : connectingIntegration?.type === 'apikey' ? (
                             <div className="space-y-4">
                                 <div className="grid gap-2">
                                     <Label htmlFor="api_key" className="flex items-center gap-2">

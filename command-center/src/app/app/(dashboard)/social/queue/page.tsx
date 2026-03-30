@@ -1,8 +1,8 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { CalendarDays, Repeat, Trash2, Edit } from "lucide-react";
+import { CalendarX, BookOpen } from "lucide-react";
+import Link from "next/link";
 
 export default function QueuePage() {
     return (
@@ -14,7 +14,9 @@ export default function QueuePage() {
                 </div>
                 <div className="flex gap-2">
                     <Button variant="outline">Queue Settings</Button>
-                    <Button>Add to Queue</Button>
+                    <Button asChild>
+                        <Link href="/app/social/composer">Add to Queue</Link>
+                    </Button>
                 </div>
             </div>
 
@@ -24,64 +26,32 @@ export default function QueuePage() {
                     <TabsTrigger value="evergreen">Evergreen Library</TabsTrigger>
                 </TabsList>
 
-                <TabsContent value="scheduled" className="mt-4 space-y-4">
-                    {/* Scheduled Items List */}
+                <TabsContent value="scheduled" className="mt-4">
                     <Card>
-                        <CardContent className="p-4 flex items-center justify-between">
-                            <div className="flex items-center gap-4">
-                                <div className="h-12 w-12 bg-blue-100 text-blue-600 rounded flex items-center justify-center font-bold text-xs">
-                                    FACEBOOK
-                                </div>
-                                <div>
-                                    <h4 className="font-semibold line-clamp-1">Did you know regular cleaning extends concrete life?</h4>
-                                    <p className="text-sm text-muted-foreground">Tomorrow at 10:00 AM</p>
-                                </div>
-                            </div>
-                            <div className="flex gap-2">
-                                <Button size="icon" variant="ghost"><Edit className="h-4 w-4" /></Button>
-                                <Button size="icon" variant="ghost" className="text-destructive"><Trash2 className="h-4 w-4" /></Button>
-                            </div>
-                        </CardContent>
-                    </Card>
-
-                    <Card>
-                        <CardContent className="p-4 flex items-center justify-between">
-                            <div className="flex items-center gap-4">
-                                <div className="h-12 w-12 bg-pink-100 text-pink-600 rounded flex items-center justify-center font-bold text-xs">
-                                    INSTAGRAM
-                                </div>
-                                <div>
-                                    <h4 className="font-semibold line-clamp-1">Before & After: Hartford Basement Transformation</h4>
-                                    <p className="text-sm text-muted-foreground">Wed, Oct 28 at 9:00 AM</p>
-                                </div>
-                            </div>
-                            <div className="flex gap-2">
-                                <Button size="icon" variant="ghost"><Edit className="h-4 w-4" /></Button>
-                                <Button size="icon" variant="ghost" className="text-destructive"><Trash2 className="h-4 w-4" /></Button>
-                            </div>
+                        <CardContent className="flex flex-col items-center justify-center py-16 gap-3 text-center">
+                            <CalendarX className="h-10 w-10 text-muted-foreground/40" />
+                            <p className="text-sm font-medium text-muted-foreground">No posts scheduled</p>
+                            <p className="text-xs text-muted-foreground max-w-xs">
+                                Use the Composer to generate and schedule posts to your connected platforms.
+                            </p>
+                            <Button asChild size="sm" variant="outline" className="mt-2">
+                                <Link href="/app/social/composer">Open Composer</Link>
+                            </Button>
                         </CardContent>
                     </Card>
                 </TabsContent>
 
-                <TabsContent value="evergreen" className="mt-4 space-y-4">
-                    <Card className="border-l-4 border-green-500">
-                        <CardHeader className="pb-2">
-                            <div className="flex justify-between">
-                                <Badge variant="outline" className="text-green-600 bg-green-50 flex gap-1">
-                                    <Repeat className="h-3 w-3" />
-                                    Recycling Active
-                                </Badge>
-                                <Button size="sm" variant="ghost">Edit</Button>
-                            </div>
-                            <CardTitle className="text-lg">Educational: Concrete Maintenance</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <p className="text-sm text-muted-foreground line-clamp-2">
-                                Posts about how to clean and maintain decorative concrete coatings. Includes 5 variations.
+                <TabsContent value="evergreen" className="mt-4">
+                    <Card>
+                        <CardContent className="flex flex-col items-center justify-center py-16 gap-3 text-center">
+                            <BookOpen className="h-10 w-10 text-muted-foreground/40" />
+                            <p className="text-sm font-medium text-muted-foreground">No evergreen content yet</p>
+                            <p className="text-xs text-muted-foreground max-w-xs">
+                                Evergreen posts recycle automatically. Create content in the Composer and mark it evergreen.
                             </p>
-                            <div className="mt-4 text-xs font-mono text-muted-foreground">
-                                Last used: 2 weeks ago
-                            </div>
+                            <Button asChild size="sm" variant="outline" className="mt-2">
+                                <Link href="/app/social/composer">Create Content</Link>
+                            </Button>
                         </CardContent>
                     </Card>
                 </TabsContent>
