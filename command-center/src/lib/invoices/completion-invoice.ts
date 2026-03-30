@@ -2,7 +2,7 @@
 
 import { db } from '@/lib/db';
 import { sendEmail } from '@/lib/mailer';
-import { createDepositPaymentLink } from '@/lib/stripe/payment-link';
+import { createCompletionPaymentLink } from '@/lib/stripe/payment-link';
 import { generateInvoicePDF } from '@/lib/pdf-generator';
 
 type OverageItem = {
@@ -71,9 +71,9 @@ export async function sendCompletionInvoice(jobId: string, overageItems: Overage
     // Create Stripe payment link for the final amount
     let completionPaymentLink: string | null = null;
     try {
-        completionPaymentLink = await createDepositPaymentLink({
+        completionPaymentLink = await createCompletionPaymentLink({
             quoteNumber: quote.number,
-            depositAmount: finalAmount,
+            finalAmount,
             quoteId: quote.id,
             invoiceId: invoice.id,
         });
