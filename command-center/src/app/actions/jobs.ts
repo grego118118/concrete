@@ -51,12 +51,28 @@ export async function createJob(formData: FormData) {
 export async function getJobs() {
     return await db.job.findMany({
         include: {
-            customer: true
+            customer: true,
+            quote: {
+                include: {
+                    invoice: true,
+                }
+            }
         },
         orderBy: {
             createdAt: 'desc'
         }
     })
+}
+
+export async function advanceJobStatus(id: string, newStatus: string) {
+    await db.job.update({
+        where: { id },
+        data: {
+            status: newStatus as any,
+        }
+    })
+    revalidatePath(`/app/crm/jobs/${id}`)
+    revalidatePath('/app/crm/jobs')
 }
 
 export async function getCustomersForSelect() {

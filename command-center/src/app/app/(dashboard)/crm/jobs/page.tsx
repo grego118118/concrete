@@ -1,8 +1,8 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
 import { Plus, Search, Calendar as CalendarIcon, List } from "lucide-react";
+import { JobStagePill } from "@/components/crm/job-stage-pill";
 import Link from 'next/link';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import JobCalendar from "@/components/crm/job-calendar";
@@ -11,16 +11,6 @@ import { getJobs } from "@/app/actions/jobs";
 
 export default async function JobsPage() {
     const jobs = await getJobs();
-
-    const getStatusColor = (status: string) => {
-        switch (status) {
-            case 'SCHEDULED': return 'bg-blue-600 hover:bg-blue-700'; // Default shadcn blue
-            case 'IN_PROGRESS': return 'bg-amber-600 hover:bg-amber-700';
-            case 'COMPLETED': return 'bg-green-600 hover:bg-green-700';
-            case 'CANCELLED': return 'bg-slate-600 hover:bg-slate-700';
-            default: return 'bg-slate-600';
-        }
-    };
 
     return (
         <div className="space-y-6">
@@ -69,7 +59,7 @@ export default async function JobsPage() {
                                     <TableHead>Title</TableHead>
                                     <TableHead>Customer</TableHead>
                                     <TableHead>Date</TableHead>
-                                    <TableHead>Status</TableHead>
+                                    <TableHead>Stage</TableHead>
                                     <TableHead className="text-right">Actions</TableHead>
                                 </TableRow>
                             </TableHeader>
@@ -95,11 +85,11 @@ export default async function JobsPage() {
                                                 {job.scheduledAt ? new Date(job.scheduledAt).toLocaleDateString() : 'Unscheduled'}
                                             </TableCell>
                                             <TableCell>
-                                                <Badge className={getStatusColor(job.status)}>{job.status}</Badge>
+                                                <JobStagePill job={job} />
                                             </TableCell>
                                             <TableCell className="text-right">
-                                                <Link href={`/app/crm/jobs/${job.id}/edit`}>
-                                                    <Button variant="ghost" size="sm">Manage</Button>
+                                                <Link href={`/app/crm/jobs/${job.id}`}>
+                                                    <Button variant="ghost" size="sm">View</Button>
                                                 </Link>
                                             </TableCell>
                                         </TableRow>

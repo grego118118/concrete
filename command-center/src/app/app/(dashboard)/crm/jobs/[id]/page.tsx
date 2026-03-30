@@ -8,6 +8,7 @@ import { getJob } from "@/app/actions/jobs";
 import { notFound } from "next/navigation";
 import { PhotoUploader } from "@/components/crm/photo-uploader";
 import { JobAreaCalculator } from "@/components/crm/job-area-calculator";
+import { JobStepper } from "@/components/crm/job-stepper";
 
 export default async function JobDetailPage(props: { params: Promise<{ id: string }> }) {
     const params = await props.params;
@@ -23,11 +24,10 @@ export default async function JobDetailPage(props: { params: Promise<{ id: strin
                 <ArrowLeft className="mr-2 h-4 w-4" /> Back to Jobs
             </Link>
 
-            <div className="flex flex-col md:flex-row items-start justify-between gap-6 pb-6 border-b">
+            <div className="flex flex-col md:flex-row items-start justify-between gap-6 pb-4 border-b">
                 <div className="space-y-2">
                     <div className="flex items-center gap-3">
                         <h1 className="text-3xl font-bold tracking-tight text-slate-900">{job.title}</h1>
-                        <Badge className="bg-blue-600">{job.status}</Badge>
                     </div>
                     <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-muted-foreground">
                         <Link href={`/app/crm/customers/${job.customer.id}`} className="font-semibold text-blue-600 hover:underline flex items-center gap-1">
@@ -53,6 +53,9 @@ export default async function JobDetailPage(props: { params: Promise<{ id: strin
                     </Link>
                 </div>
             </div>
+
+            {/* Workflow Stepper */}
+            <JobStepper job={{ ...job, scheduledAt: job.scheduledAt }} />
 
             <div className="grid gap-6 md:grid-cols-3">
                 <div className="md:col-span-2 space-y-6">
