@@ -16,7 +16,7 @@ export function ConvertQuoteButton({ quoteId, isConverted }: { quoteId: string, 
         try {
             const job = await convertQuoteToJob(quoteId);
             toast.success("Quote converted to Job!");
-            router.push(`/crm/jobs/${job.id}`);
+            router.push(`/app/crm/jobs/${job.id}`);
         } catch (error) {
             console.error(error);
             toast.error("Handover failed. Please check your data.");

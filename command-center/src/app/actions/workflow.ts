@@ -118,8 +118,8 @@ export async function convertQuoteToJob(quoteId: string) {
         data: { status: 'APPROVED' }
     });
 
-    revalidatePath(`/crm/quotes/${quoteId}`);
-    revalidatePath(`/crm/jobs`);
+    revalidatePath(`/app/crm/quotes/${quoteId}`);
+    revalidatePath(`/app/crm/jobs`);
 
     return job;
 }

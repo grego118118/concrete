@@ -34,8 +34,7 @@ export function EditJobForm({ job }: { job: Job }) {
     const [overageItems, setOverageItems] = useState<OverageItem[]>([]);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
-    const allowOverages = job.quote?.allowOverages ?? false;
-    const showOverages = status === "COMPLETED" && allowOverages;
+    const showOverages = status === "COMPLETED";
 
     const addOverageItem = () => {
         setOverageItems(prev => [...prev, { description: "", quantity: 1, unitPrice: 0 }]);
@@ -60,7 +59,7 @@ export function EditJobForm({ job }: { job: Job }) {
         setIsSubmitting(true);
         const formData = new FormData(e.currentTarget);
         formData.set("status", status);
-        if (showOverages && overageItems.length > 0) {
+        if (status === "COMPLETED" && overageItems.length > 0) {
             formData.set("overageItems", JSON.stringify(overageItems));
         }
         try {
@@ -113,9 +112,9 @@ export function EditJobForm({ job }: { job: Job }) {
                 {showOverages && (
                     <Card className="border-amber-200 bg-amber-50/50">
                         <CardHeader className="pb-3">
-                            <CardTitle className="text-base text-amber-900">Overage Line Items</CardTitle>
+                            <CardTitle className="text-base text-amber-900">Invoice Amendment (Overages)</CardTitle>
                             <p className="text-xs text-amber-700">
-                                These will be added to the final balance invoice sent to the customer.
+                                Does this job have any overages? Add them here and they&apos;ll be included in the final balance invoice sent to the customer. Leave empty to send the standard remaining balance only.
                             </p>
                         </CardHeader>
                         <CardContent className="space-y-3">
