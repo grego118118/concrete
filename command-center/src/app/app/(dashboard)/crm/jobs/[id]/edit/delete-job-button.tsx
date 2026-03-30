@@ -28,9 +28,10 @@ export function DeleteJobButton({ jobId }: { jobId: string }) {
         try {
             await deleteJob(jobId);
             toast.success("Job deleted successfully");
-            router.push("/crm/jobs");
+            router.push("/app/crm/jobs");
             router.refresh();
-        } catch (error) {
+        } catch (error: any) {
+            if (error?.message?.includes('NEXT_REDIRECT') || error?.digest?.includes('NEXT_REDIRECT')) return;
             toast.error("Failed to delete job");
             setIsDeleting(false);
         }

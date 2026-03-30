@@ -18,9 +18,9 @@ export function DeleteQuoteButton({ id }: { id: string }) {
         setIsDeleting(true);
         try {
             await deleteQuote(id);
-            // Router refresh or redirect is handled by the server action's redirect, 
-            // but we can ensure client state is consistent or handle error
-        } catch (error) {
+        } catch (error: any) {
+            // Next.js redirect() throws internally — treat NEXT_REDIRECT as success
+            if (error?.message?.includes('NEXT_REDIRECT') || error?.digest?.includes('NEXT_REDIRECT')) return;
             console.error("Failed to delete quote:", error);
             alert("Failed to delete quote");
             setIsDeleting(false);
