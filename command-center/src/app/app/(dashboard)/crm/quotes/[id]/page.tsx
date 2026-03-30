@@ -123,9 +123,9 @@ export default async function QuoteViewPage(props: {
     }));
 
     return (
-        <div className="max-w-7xl mx-auto px-4 space-y-8 pb-20">
+        <div className="max-w-7xl mx-auto space-y-8 pb-20">
             {/* Action Bar */}
-            <div className="flex items-center justify-between print:hidden bg-slate-50 p-4 rounded-lg border">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 print:hidden bg-slate-50 p-4 rounded-lg border">
                 <div className="flex items-center gap-4">
                     <Link href="/app/crm/quotes">
                         <Button variant="outline" size="sm">
@@ -135,7 +135,7 @@ export default async function QuoteViewPage(props: {
                     </Link>
                     <h1 className="text-xl font-bold text-slate-700">Quote #{quote.number}</h1>
                 </div>
-                <div className="flex gap-2">
+                <div className="flex flex-wrap gap-2">
                     <ConvertQuoteButton
                         quoteId={quote.id}
                         isConverted={!!quote.job}
@@ -158,7 +158,7 @@ export default async function QuoteViewPage(props: {
                 {/* Formal Quote Paper */}
                 <div className="lg:col-span-8 bg-white border shadow-sm p-8 md:p-12 text-slate-900 rounded-sm font-sans flex flex-col">
                     {/* Header */}
-                    <div className="flex justify-between items-start border-b-2 border-slate-800 pb-8 mb-8">
+                    <div className="flex flex-col sm:flex-row justify-between items-start gap-6 border-b-2 border-slate-800 pb-8 mb-8">
                         <div className="space-y-4">
                             {/* Logo */}
                             <div className="h-20 flex items-center">
@@ -212,7 +212,7 @@ export default async function QuoteViewPage(props: {
                     </div>
 
                     {/* Client & Jobsite Info */}
-                    <div className="grid grid-cols-2 gap-12 mb-8 text-sm">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-12 mb-8 text-sm">
                         <div>
                             <h3 className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-2">Customer</h3>
                             <div className="text-slate-900 space-y-1 border-l-4 border-slate-200 pl-4">
@@ -234,8 +234,8 @@ export default async function QuoteViewPage(props: {
                     </div>
 
                     {/* Line Items Table */}
-                    <div className="mb-8">
-                        <table className="w-full text-left">
+                    <div className="mb-8 overflow-x-auto">
+                        <table className="w-full text-left min-w-[400px]">
                             <thead>
                                 <tr className="border-b-2 border-slate-900">
                                     <th className="py-3 text-sm font-bold uppercase tracking-wider text-slate-900">Description</th>
@@ -379,7 +379,7 @@ export default async function QuoteViewPage(props: {
                 </div>
 
                 {/* Planning & Scope Tools */}
-                <div className="lg:col-span-4 space-y-8 print:hidden self-start sticky top-24">
+                <div className="lg:col-span-4 space-y-8 print:hidden self-start lg:sticky lg:top-24">
                     <section id="scope-calculator" className="space-y-4">
                         <div className="flex items-center gap-2 px-1">
                             <div className="h-2 w-2 rounded-full bg-blue-600" />

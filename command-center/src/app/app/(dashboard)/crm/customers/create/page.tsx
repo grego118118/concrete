@@ -26,7 +26,7 @@ export default function CreateCustomerPage() {
                             <Label htmlFor="name">Full Name</Label>
                             <Input id="name" name="name" placeholder="John Doe" required />
                         </div>
-                        <div className="grid grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div className="grid gap-2">
                                 <Label htmlFor="email">Email</Label>
                                 <Input id="email" name="email" type="email" placeholder="john@example.com" required />

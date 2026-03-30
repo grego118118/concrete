@@ -25,7 +25,7 @@ export default async function LeadsPage() {
 
     return (
         <div className="space-y-6">
-            <div className="flex items-center justify-between shrink-0">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 shrink-0">
                 <div>
                     <h1 className="text-3xl font-bold tracking-tight">Lead Inbox</h1>
                     <p className="text-muted-foreground">

@@ -63,10 +63,10 @@ export default async function Home() {
   const [stats, tickets] = await Promise.all([getDashboardStats(), getTickets()]);
 
   return (
-    <div className="flex-1 space-y-4 p-8 pt-6">
-      <div className="flex items-center justify-between space-y-2">
+    <div className="flex-1 space-y-4 p-4 pt-4 md:p-8 md:pt-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <h2 className="text-3xl font-bold tracking-tight">Dashboard</h2>
-        <div className="flex items-center space-x-2">
+        <div className="flex flex-wrap items-center gap-2">
           <SyncStatus />
           <Link href="/app/crm/quotes/create">
             <Button>
@@ -151,9 +151,9 @@ export default async function Home() {
       </div>
 
       {/* Bottom Row */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
+      <div className="grid gap-4 lg:grid-cols-7">
         {/* Recent Activity */}
-        <Card className="col-span-4">
+        <Card className="col-span-full lg:col-span-4">
           <CardHeader>
             <CardTitle>Recent Activity</CardTitle>
           </CardHeader>
@@ -182,7 +182,7 @@ export default async function Home() {
         </Card>
 
         {/* Right column: Web Traffic + Lead Scraper + Tickets */}
-        <div className="col-span-3 space-y-4">
+        <div className="col-span-full lg:col-span-3 space-y-4">
           <WebTrafficCard />
           <LeadScraperCard />
           <TroubleTicketCard initialTickets={tickets as any} />
