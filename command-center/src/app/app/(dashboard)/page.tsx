@@ -13,6 +13,7 @@ import {
   ArrowUpRight,
   ArrowDownRight,
   Minus,
+  CircleDollarSign,
 } from "lucide-react";
 import Link from "next/link";
 import { LeadScraperCard } from "@/components/dashboard/lead-scraper-card";
@@ -45,18 +46,21 @@ const ACTIVITY_ICON_CLASS: Record<string, string> = {
   customer: "bg-primary text-primary-foreground",
   job: "bg-secondary text-secondary-foreground",
   quote: "bg-blue-600 text-white",
+  payment: "bg-emerald-600 text-white",
 };
 
 const ACTIVITY_ICON: Record<string, React.ReactNode> = {
   customer: <Users className="h-4 w-4" />,
   job: <Briefcase className="h-4 w-4" />,
   quote: <FileText className="h-4 w-4" />,
+  payment: <CircleDollarSign className="h-4 w-4" />,
 };
 
 const ACTIVITY_HREF: Record<string, (id: string) => string> = {
   customer: (id) => `/app/crm/customers/${id}`,
   job: (id) => `/app/crm/jobs/${id}`,
   quote: (id) => `/app/crm/quotes/${id}`,
+  payment: (_id) => `/app/crm/invoices`,
 };
 
 export default async function Home() {

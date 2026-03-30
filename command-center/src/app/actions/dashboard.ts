@@ -19,6 +19,7 @@ export async function getDashboardStats() {
         recentCustomers,
         recentJobs,
         recentQuotes,
+        recentPayments,
     ] = await Promise.all([
         db.job.count({ where: { status: { in: ["SCHEDULED", "IN_PROGRESS"] } } }),
         db.job.count({ where: { status: { in: ["SCHEDULED", "IN_PROGRESS"] }, createdAt: { gte: startOfLastMonth, lt: startOfMonth } } }),
@@ -31,6 +32,12 @@ export async function getDashboardStats() {
         db.customer.findMany({ orderBy: { createdAt: "desc" }, take: 3, select: { id: true, name: true, createdAt: true } }),
         db.job.findMany({ orderBy: { createdAt: "desc" }, take: 3, include: { customer: { select: { name: true } } } }),
         db.quote.findMany({ orderBy: { createdAt: "desc" }, take: 3, include: { customer: { select: { name: true } } } }),
+        db.invoice.findMany({
+            where: { status: { in: ["PAID", "DEPOSIT_PAID"] }, paidAt: { not: null } },
+            orderBy: { paidAt: "desc" },
+            take: 3,
+            select: { id: true, number: true, amount: true, status: true, paidAt: true, customer: { select: { name: true } } },
+        }),
     ]);
 
     // Build recent activity feed merged and sorted by time
@@ -55,6 +62,13 @@ export async function getDashboardStats() {
             label: `Quote #${q.number}`,
             detail: `${q.status} — ${q.customer.name}`,
             at: q.createdAt,
+        })),
+        ...recentPayments.map((inv) => ({
+            type: "payment" as const,
+            id: inv.id,
+            label: `$${Number(inv.amount).toLocaleString(undefined, { minimumFractionDigits: 2 })} received`,
+            detail: `${inv.status === "DEPOSIT_PAID" ? "Deposit" : "Full payment"} — ${inv.customer.name}`,
+            at: inv.paidAt!,
         })),
     ]
         .sort((a, b) => b.at.getTime() - a.at.getTime())
