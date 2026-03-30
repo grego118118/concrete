@@ -2,8 +2,9 @@
 
 import { useState, useTransition } from "react";
 import Link from "next/link";
-import { Trash2 } from "lucide-react";
+import { Trash2, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
     Table,
@@ -32,6 +33,18 @@ interface Customer {
     email: string | null;
     phone: string | null;
     leadSource: string | null;
+    createdAt: Date;
+}
+
+function SourceBadge({ source }: { source: string | null }) {
+    switch (source) {
+        case "SCRAPER":
+            return <Badge variant="outline" className="text-blue-600 bg-blue-50 border-blue-200 text-[10px] font-semibold">Scraped</Badge>;
+        case "WEBSITE":
+            return <Badge variant="outline" className="text-green-600 bg-green-50 border-green-200 text-[10px] font-semibold">Website</Badge>;
+        default:
+            return <Badge variant="outline" className="text-gray-500 bg-gray-50 text-[10px] font-semibold">Manual</Badge>;
+    }
 }
 
 export function CustomerTable({ customers }: { customers: Customer[] }) {
@@ -42,21 +55,15 @@ export function CustomerTable({ customers }: { customers: Customer[] }) {
     const someSelected = selected.size > 0 && selected.size < customers.length;
 
     function toggleAll() {
-        if (allSelected) {
-            setSelected(new Set());
-        } else {
-            setSelected(new Set(customers.map((c) => c.id)));
-        }
+        if (allSelected) setSelected(new Set());
+        else setSelected(new Set(customers.map((c) => c.id)));
     }
 
     function toggleOne(id: string) {
         setSelected((prev) => {
             const next = new Set(prev);
-            if (next.has(id)) {
-                next.delete(id);
-            } else {
-                next.add(id);
-            }
+            if (next.has(id)) next.delete(id);
+            else next.add(id);
             return next;
         });
     }
@@ -78,11 +85,7 @@ export function CustomerTable({ customers }: { customers: Customer[] }) {
                     </span>
                     <AlertDialog>
                         <AlertDialogTrigger asChild>
-                            <Button
-                                variant="destructive"
-                                size="sm"
-                                disabled={isPending}
-                            >
+                            <Button variant="destructive" size="sm" disabled={isPending}>
                                 <Trash2 className="mr-2 h-4 w-4" />
                                 {isPending ? "Deleting..." : `Delete Selected (${selected.size})`}
                             </Button>
@@ -97,10 +100,7 @@ export function CustomerTable({ customers }: { customers: Customer[] }) {
                             </AlertDialogHeader>
                             <AlertDialogFooter>
                                 <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                <AlertDialogAction
-                                    variant="destructive"
-                                    onClick={handleBulkDelete}
-                                >
+                                <AlertDialogAction variant="destructive" onClick={handleBulkDelete}>
                                     Delete
                                 </AlertDialogAction>
                             </AlertDialogFooter>
@@ -122,17 +122,17 @@ export function CustomerTable({ customers }: { customers: Customer[] }) {
                             </TableHead>
                             <TableHead>Name</TableHead>
                             <TableHead>Email</TableHead>
-                            <TableHead>Phone</TableHead>
-                            <TableHead>Lead Source</TableHead>
-                            <TableHead>Status</TableHead>
-                            <TableHead className="text-right">Actions</TableHead>
+                            <TableHead className="hidden sm:table-cell">Phone</TableHead>
+                            <TableHead>Source</TableHead>
+                            <TableHead className="hidden md:table-cell">Added</TableHead>
+                            <TableHead className="w-[40px]" />
                         </TableRow>
                     </TableHeader>
                     <TableBody>
                         {customers.length === 0 ? (
                             <TableRow>
                                 <TableCell colSpan={7} className="text-center h-24 text-muted-foreground">
-                                    No customers found. Add one to get started.
+                                    No customers found.
                                 </TableCell>
                             </TableRow>
                         ) : (
@@ -140,22 +140,43 @@ export function CustomerTable({ customers }: { customers: Customer[] }) {
                                 <TableRow
                                     key={customer.id}
                                     data-state={selected.has(customer.id) ? "selected" : undefined}
+                                    className="group"
                                 >
-                                    <TableCell>
+                                    <TableCell onClick={(e) => e.stopPropagation()}>
                                         <Checkbox
                                             checked={selected.has(customer.id)}
                                             onCheckedChange={() => toggleOne(customer.id)}
                                             aria-label={`Select ${customer.name}`}
                                         />
                                     </TableCell>
-                                    <TableCell className="font-medium">{customer.name}</TableCell>
-                                    <TableCell>{customer.email}</TableCell>
-                                    <TableCell>{customer.phone}</TableCell>
-                                    <TableCell>{customer.leadSource}</TableCell>
-                                    <TableCell>Active</TableCell>
-                                    <TableCell className="text-right flex items-center justify-end gap-2">
-                                        <Link href={`/app/crm/customers/${customer.id}/edit`}>
-                                            <Button variant="ghost" size="sm">Edit</Button>
+                                    <TableCell className="font-medium">
+                                        <Link href={`/app/crm/customers/${customer.id}`} className="hover:text-blue-600 transition-colors">
+                                            {customer.name}
+                                        </Link>
+                                    </TableCell>
+                                    <TableCell className="text-muted-foreground">
+                                        <Link href={`/app/crm/customers/${customer.id}`} className="block">
+                                            {customer.email}
+                                        </Link>
+                                    </TableCell>
+                                    <TableCell className="hidden sm:table-cell text-muted-foreground">
+                                        <Link href={`/app/crm/customers/${customer.id}`} className="block">
+                                            {customer.phone || "—"}
+                                        </Link>
+                                    </TableCell>
+                                    <TableCell>
+                                        <Link href={`/app/crm/customers/${customer.id}`} className="block">
+                                            <SourceBadge source={customer.leadSource} />
+                                        </Link>
+                                    </TableCell>
+                                    <TableCell className="hidden md:table-cell text-muted-foreground text-sm">
+                                        <Link href={`/app/crm/customers/${customer.id}`} className="block">
+                                            {new Date(customer.createdAt).toLocaleDateString()}
+                                        </Link>
+                                    </TableCell>
+                                    <TableCell>
+                                        <Link href={`/app/crm/customers/${customer.id}`} className="block">
+                                            <ChevronRight className="h-4 w-4 text-muted-foreground group-hover:text-blue-500 transition-colors" />
                                         </Link>
                                     </TableCell>
                                 </TableRow>

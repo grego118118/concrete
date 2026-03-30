@@ -1,18 +1,20 @@
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { UserPlus, Search } from "lucide-react";
+import { UserPlus } from "lucide-react";
 import Link from "next/link";
 
 import { getCustomers } from "@/app/actions/customers";
 import { CustomerSort } from "./customer-sort";
 import { CustomerSearch } from "./customer-search";
+import { CustomerSourceFilter } from "./customer-source-filter";
 import { CustomerTable } from "./customer-table";
 
-export default async function CustomersPage({ searchParams }: { searchParams: Promise<{ sort?: string, search?: string }> }) {
+export default async function CustomersPage({ searchParams }: { searchParams: Promise<{ sort?: string; search?: string; source?: string }> }) {
     const params = await searchParams;
     const sort = params.sort || 'newest';
     const search = params.search || '';
-    const customers = await getCustomers(sort, search);
+    const source = params.source || 'all';
+    const customers = await getCustomers(sort, search, source);
+
     return (
         <div className="space-y-6">
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
@@ -28,8 +30,9 @@ export default async function CustomersPage({ searchParams }: { searchParams: Pr
                 </Link>
             </div>
 
-            <div className="flex items-center justify-between gap-2">
+            <div className="flex flex-wrap items-center gap-2">
                 <CustomerSearch initialSearch={search} />
+                <CustomerSourceFilter currentSource={source} />
                 <CustomerSort currentSort={sort} />
             </div>
 
