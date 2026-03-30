@@ -11,7 +11,30 @@ const LEADS_CSV_PATH = "/tmp/leads.csv";
 const LOG_PATH = "/tmp/scraper.log";
 const PID_PATH = "/tmp/scraper.pid";
 
+export async function getScraperEnabled(): Promise<boolean> {
+    const business = await db.business.findFirst();
+    if (!business) return false;
+    const brandKit = business.brandKit as Record<string, any>;
+    // Default is FALSE — must be explicitly enabled
+    return brandKit?.scraperEnabled === true;
+}
+
+export async function setScraperEnabled(enabled: boolean) {
+    const business = await db.business.findFirst();
+    if (!business) return;
+    const brandKit = (business.brandKit as Record<string, any>) ?? {};
+    await db.business.update({
+        where: { id: business.id },
+        data: { brandKit: { ...brandKit, scraperEnabled: enabled } },
+    });
+}
+
 export async function runScraper() {
+    const enabled = await getScraperEnabled();
+    if (!enabled) {
+        throw new Error("Scraper is disabled. Enable it from the dashboard first.");
+    }
+
     return new Promise((resolve, reject) => {
         console.log("Starting scraper at:", SCRAPER_PATH);
 

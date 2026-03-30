@@ -3,8 +3,8 @@
 import { useState, useEffect, useRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Loader2, Search, Users, Activity, Database, RefreshCw, StopCircle } from "lucide-react";
-import { runScraper, getScrapedLeadsCount, getScraperStatus, importLeadsToDatabase, stopScraper } from "@/app/actions/leads";
+import { Loader2, Search, Users, Activity, Database, RefreshCw, StopCircle, PowerOff } from "lucide-react";
+import { runScraper, getScrapedLeadsCount, getScraperStatus, importLeadsToDatabase, stopScraper, getScraperEnabled, setScraperEnabled } from "@/app/actions/leads";
 import { toast } from "sonner";
 
 export function LeadScraperCard() {
@@ -14,6 +14,8 @@ export function LeadScraperCard() {
     const [csvCount, setCsvCount] = useState(0);
     const [dbCount, setDbCount] = useState(0);
     const [status, setStatus] = useState({ active: false, lastMessage: "" });
+    const [scraperEnabled, setScraperEnabledState] = useState(false);
+    const [togglingEnabled, setTogglingEnabled] = useState(false);
     const pollInterval = useRef<NodeJS.Timeout | null>(null);
 
     const fetchCount = async () => {
@@ -37,6 +39,7 @@ export function LeadScraperCard() {
     useEffect(() => {
         fetchCount();
         fetchStatus();
+        getScraperEnabled().then(setScraperEnabledState);
 
         pollInterval.current = setInterval(() => {
             fetchStatus();
@@ -47,8 +50,21 @@ export function LeadScraperCard() {
         };
     }, []);
 
+    const handleToggleEnabled = async () => {
+        setTogglingEnabled(true);
+        const next = !scraperEnabled;
+        try {
+            await setScraperEnabled(next);
+            setScraperEnabledState(next);
+            toast.success(next ? "Scraper enabled." : "Scraper disabled.");
+        } catch {
+            toast.error("Failed to update scraper setting.");
+        }
+        setTogglingEnabled(false);
+    };
+
     const handleScrape = async () => {
-        if (loading || status.active) return;
+        if (!scraperEnabled || loading || status.active) return;
 
         setLoading(true);
         try {
@@ -102,15 +118,34 @@ export function LeadScraperCard() {
     };
 
     return (
-        <Card className="border-blue-100 shadow-sm">
+        <Card className={`shadow-sm transition-colors ${scraperEnabled ? 'border-blue-100' : 'border-slate-200'}`}>
             <CardHeader className="pb-2">
                 <div className="flex items-center justify-between">
                     <CardTitle className="text-lg flex items-center gap-2">
-                        <Search className="h-5 w-5 text-blue-500" />
+                        <Search className={`h-5 w-5 ${scraperEnabled ? 'text-blue-500' : 'text-slate-400'}`} />
                         Lead Scraper
                     </CardTitle>
                     <div className="flex items-center gap-2">
-                        {status.active && (
+                        {/* Enabled/Disabled toggle */}
+                        <button
+                            onClick={handleToggleEnabled}
+                            disabled={togglingEnabled}
+                            title={scraperEnabled ? "Click to disable scraper" : "Click to enable scraper"}
+                            className={`relative inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border transition-all cursor-pointer select-none ${
+                                scraperEnabled
+                                    ? 'bg-blue-50 border-blue-200 text-blue-700 hover:bg-blue-100'
+                                    : 'bg-slate-100 border-slate-200 text-slate-500 hover:bg-slate-200'
+                            }`}
+                        >
+                            {togglingEnabled ? (
+                                <Loader2 className="h-3 w-3 animate-spin" />
+                            ) : (
+                                <PowerOff className="h-3 w-3" />
+                            )}
+                            {scraperEnabled ? 'Enabled' : 'Disabled'}
+                        </button>
+
+                        {status.active && scraperEnabled && (
                             <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-green-50 border border-green-200 animate-pulse">
                                 <span className="h-2 w-2 rounded-full bg-green-500"></span>
                                 <span className="text-[10px] font-bold text-green-700 uppercase tracking-tighter">Active</span>
@@ -131,13 +166,15 @@ export function LeadScraperCard() {
                     </div>
                 </div>
                 <CardDescription>
-                    Scan local business directories for new opportunities.
+                    {scraperEnabled
+                        ? "Scan local business directories for new opportunities."
+                        : "Scraper is disabled. Toggle to enable."}
                 </CardDescription>
             </CardHeader>
             <CardContent className="pt-0 pb-3">
                 <div className="flex flex-col items-center space-y-3 py-2 relative">
                     {/* Stats Row */}
-                    <div className="flex items-center gap-6 w-full justify-center">
+                    <div className={`flex items-center gap-6 w-full justify-center transition-opacity ${scraperEnabled ? 'opacity-100' : 'opacity-40'}`}>
                         <div className="flex flex-col items-center">
                             <div className="text-3xl font-black tracking-tighter text-blue-600">
                                 {csvCount}
@@ -157,8 +194,15 @@ export function LeadScraperCard() {
                         </div>
                     </div>
 
+                    {/* Disabled overlay message */}
+                    {!scraperEnabled && (
+                        <p className="text-xs text-slate-400 text-center px-4">
+                            Enable the scraper above to run a lead scan.
+                        </p>
+                    )}
+
                     {/* Live Progress */}
-                    {status.lastMessage && (
+                    {scraperEnabled && status.lastMessage && (
                         <div className="w-full mt-3 p-3 rounded-lg bg-gray-950 text-[10px] font-mono text-green-400 overflow-hidden border border-gray-800 shadow-inner max-h-[80px]">
                             <div className="flex items-center gap-2 mb-2 border-b border-gray-800 pb-1">
                                 <Activity className="h-3 w-3 text-green-500" />
@@ -180,8 +224,8 @@ export function LeadScraperCard() {
                 <div className="flex gap-2 w-full">
                     <Button
                         onClick={handleScrape}
-                        disabled={loading || status.active}
-                        className="flex-1 bg-blue-600 hover:bg-blue-700 font-bold shadow-md shadow-blue-200 h-9"
+                        disabled={!scraperEnabled || loading || status.active}
+                        className="flex-1 bg-blue-600 hover:bg-blue-700 font-bold shadow-md shadow-blue-200 h-9 disabled:opacity-40"
                     >
                         {loading || status.active ? (
                             <>
@@ -195,7 +239,7 @@ export function LeadScraperCard() {
                             </>
                         )}
                     </Button>
-                    {(loading || status.active) && (
+                    {(loading || status.active) && scraperEnabled && (
                         <Button
                             onClick={handleStop}
                             disabled={stopping}
@@ -212,9 +256,9 @@ export function LeadScraperCard() {
                     )}
                     <Button
                         onClick={handleImport}
-                        disabled={importing || csvCount === 0}
+                        disabled={!scraperEnabled || importing || csvCount === 0}
                         variant="outline"
-                        className="font-semibold h-9 border-green-200 text-green-700 hover:bg-green-50"
+                        className="font-semibold h-9 border-green-200 text-green-700 hover:bg-green-50 disabled:opacity-40"
                     >
                         {importing ? (
                             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
