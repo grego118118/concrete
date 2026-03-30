@@ -50,7 +50,7 @@ export default async function EditCustomerPage(props: { params: Promise<{ id: st
                 </div>
 
                 <div className="flex justify-end gap-4">
-                    <Link href="/crm/customers">
+                    <Link href="/app/crm/customers">
                         <Button variant="outline" type="button">Cancel</Button>
                     </Link>
                     <Button type="submit">Save Changes</Button>

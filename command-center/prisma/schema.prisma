@@ -378,3 +378,26 @@ model SyncLog {
 
   @@map("sync_logs")
 }
+
+model Ticket {
+  id          String       @id @default(cuid())
+  title       String
+  description String?
+  status      TicketStatus @default(OPEN)
+  priority    TicketPriority @default(MEDIUM)
+  createdBy   String       // name of who created it
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+}
+
+enum TicketStatus {
+  OPEN
+  IN_PROGRESS
+  DONE
+}
+
+enum TicketPriority {
+  LOW
+  MEDIUM
+  HIGH
+}

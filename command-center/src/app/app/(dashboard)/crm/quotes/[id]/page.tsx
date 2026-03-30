@@ -127,7 +127,7 @@ export default async function QuoteViewPage(props: {
             {/* Action Bar */}
             <div className="flex items-center justify-between print:hidden bg-slate-50 p-4 rounded-lg border">
                 <div className="flex items-center gap-4">
-                    <Link href="/crm/quotes">
+                    <Link href="/app/crm/quotes">
                         <Button variant="outline" size="sm">
                             <ArrowLeft className="mr-2 h-4 w-4" />
                             Back

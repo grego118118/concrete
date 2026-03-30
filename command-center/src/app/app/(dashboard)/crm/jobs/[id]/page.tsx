@@ -18,7 +18,7 @@ export default async function JobDetailPage({ params }: { params: { id: string }
 
     return (
         <div className="space-y-6 pb-12">
-            <Link href="/crm/jobs" className="flex items-center text-sm text-muted-foreground hover:text-blue-600 transition-colors">
+            <Link href="/app/crm/jobs" className="flex items-center text-sm text-muted-foreground hover:text-blue-600 transition-colors">
                 <ArrowLeft className="mr-2 h-4 w-4" /> Back to Jobs
             </Link>
 

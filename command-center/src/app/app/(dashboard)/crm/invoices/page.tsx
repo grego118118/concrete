@@ -24,7 +24,7 @@ export default async function InvoicesPage() {
                     <p className="text-muted-foreground">Track payments and revenue.</p>
                 </div>
                 {/* 
-                <Link href="/crm/invoices/create">
+                <Link href="/app/crm/invoices/create">
                     <Button>
                         <Plus className="mr-2 h-4 w-4" />
                         Create Invoice

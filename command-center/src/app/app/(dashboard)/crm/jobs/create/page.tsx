@@ -21,7 +21,7 @@ export default async function CreateJobPage({ searchParams }: { searchParams: { 
                     <p className="text-muted-foreground">Detailed project scoping and scheduling for Pioneer Concrete Coatings.</p>
                 </div>
                 <div className="flex gap-2">
-                    <Link href="/crm/jobs">
+                    <Link href="/app/crm/jobs">
                         <Button variant="outline" type="button">Cancel</Button>
                     </Link>
                 </div>

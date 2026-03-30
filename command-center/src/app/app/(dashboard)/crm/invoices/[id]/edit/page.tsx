@@ -57,7 +57,7 @@ export default async function EditInvoicePage(props: { params: Promise<{ id: str
 
                 <div className="flex justify-end gap-4">
                     <SendInvoiceButton invoiceId={invoice.id} currentStatus={invoice.status} />
-                    <Link href="/crm/invoices">
+                    <Link href="/app/crm/invoices">
                         <Button variant="outline" type="button">Cancel</Button>
                     </Link>
                     <Button type="submit">Update Status</Button>

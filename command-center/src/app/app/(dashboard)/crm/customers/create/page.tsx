@@ -49,7 +49,7 @@ export default function CreateCustomerPage() {
                         </div>
                     </CardContent>
                     <CardFooter className="flex justify-between">
-                        <Link href="/crm/customers">
+                        <Link href="/app/crm/customers">
                             <Button variant="outline" type="button">Cancel</Button>
                         </Link>
                         <Button type="submit">Save Customer</Button>

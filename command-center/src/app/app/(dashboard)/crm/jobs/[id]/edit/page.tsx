@@ -88,7 +88,7 @@ export default function EditJobPage({ params }: { params: { id: string } }) {
                         id="scheduledDate"
                         name="scheduledDate"
                         type="date"
-                        defaultValue={job.scheduledAt ? job.scheduledAt.toISOString().split('T')[0] : ''}
+                        defaultValue={job.scheduledAt ? new Date(job.scheduledAt).toISOString().split('T')[0] : ''}
                     />
                 </div>
 
