@@ -9,8 +9,10 @@ export async function authenticate(
     formData: FormData,
 ) {
     try {
-        await signIn("credentials", formData, { 
-            redirectTo: '/app'
+        await signIn("credentials", {
+            email: formData.get("email") as string,
+            password: formData.get("password") as string,
+            redirectTo: "/app",
         });
     } catch (error: any) {
         if (error instanceof AuthError) {
