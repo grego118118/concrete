@@ -3,24 +3,16 @@
 import * as React from "react"
 import {
     BookOpen,
-    Bot,
     Command,
-    Frame,
     LayoutDashboard,
-    LifeBuoy,
-    Map,
-    PieChart,
-    Send,
     Settings2,
     SquareTerminal,
-    User,
     Users,
     Share2,
 } from "lucide-react"
 
 
 import { NavMain } from "@/components/layout/nav-main"
-import { NavProjects } from "@/components/layout/nav-projects"
 import { NavUser } from "@/components/layout/nav-user"
 import { TeamSwitcher } from "@/components/layout/team-switcher"
 import {
@@ -88,23 +80,6 @@ const data = {
         },
     ],
 
-    projects: [
-        {
-            name: "Marketing Site",
-            url: "https://pioneerconcretecoatings.com",
-            icon: Frame,
-        },
-        {
-            name: "Sales & Marketing",
-            url: "/app/social/analytics",
-            icon: PieChart,
-        },
-        {
-            name: "Operations",
-            url: "/app/crm/jobs",
-            icon: Map,
-        },
-    ],
 }
 
 
@@ -131,7 +106,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             </SidebarHeader>
             <SidebarContent className="bg-white">
                 <NavMain items={data.navMain} />
-                <NavProjects projects={data.projects} />
             </SidebarContent>
             <SidebarFooter className="border-t bg-white">
                 <NavUser user={user} />

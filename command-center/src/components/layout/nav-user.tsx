@@ -1,12 +1,9 @@
 "use client"
 
 import {
-    BadgeCheck,
-    Bell,
     ChevronsUpDown,
-    CreditCard,
     LogOut,
-    Sparkles,
+    Settings2,
 } from "lucide-react"
 
 import {
@@ -88,21 +85,9 @@ export function NavUser({
                         <DropdownMenuSeparator />
                         <DropdownMenuGroup>
                             <DropdownMenuItem asChild>
-                                <Link href="/app/crm/customers">
-                                    <BadgeCheck />
-                                    Account
-                                </Link>
-                            </DropdownMenuItem>
-                            <DropdownMenuItem asChild>
-                                <Link href="/app/crm/invoices">
-                                    <CreditCard />
-                                    Billing
-                                </Link>
-                            </DropdownMenuItem>
-                            <DropdownMenuItem asChild>
-                                <Link href="/app/crm/jobs">
-                                    <Bell />
-                                    Notifications
+                                <Link href="/app/crm/settings">
+                                    <Settings2 />
+                                    Settings
                                 </Link>
                             </DropdownMenuItem>
                         </DropdownMenuGroup>
