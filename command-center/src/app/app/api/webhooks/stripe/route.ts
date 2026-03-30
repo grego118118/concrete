@@ -107,6 +107,76 @@ export async function POST(request: NextRequest) {
                 console.warn('[Stripe Webhook] Admin notification email failed (non-critical):', emailErr);
             }
 
+            // Send receipt email to customer
+            if (invoice.customer?.email) {
+                const balanceDue = isFullPayment ? 0 : Number(invoice.amount) - amountPaid;
+                try {
+                    await sendEmail({
+                        to: invoice.customer.email,
+                        subject: `Payment Receipt — Pioneer Concrete Coatings`,
+                        html: `
+                            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; color: #0f172a;">
+                                <div style="text-align: center; padding: 30px 0 20px;">
+                                    <h1 style="font-size: 28px; font-weight: 800; margin: 0; color: #0f172a;">Pioneer Concrete Coatings</h1>
+                                    <p style="color: #64748b; margin: 6px 0 0;">Payment Receipt</p>
+                                </div>
+
+                                <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 12px; padding: 24px; margin: 24px 0; text-align: center;">
+                                    <p style="color: #16a34a; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin: 0 0 8px;">✓ Payment Confirmed</p>
+                                    <p style="font-size: 42px; font-weight: 800; margin: 0; color: #0f172a;">$${amountPaid.toFixed(2)}</p>
+                                    <p style="color: #64748b; margin: 8px 0 0; font-size: 14px;">${paymentLabel} — Invoice #${invoice.number}</p>
+                                </div>
+
+                                <p style="font-size: 16px; line-height: 1.6;">Hi ${customerName},</p>
+                                <p style="font-size: 16px; line-height: 1.6; color: #475569;">
+                                    Thank you — your ${isFullPayment ? 'payment' : 'deposit'} has been received and confirmed.
+                                    ${isFullPayment
+                                        ? 'Your account is paid in full.'
+                                        : `The remaining balance of <strong>$${balanceDue.toFixed(2)}</strong> will be due upon completion of the project.`
+                                    }
+                                </p>
+
+                                <table style="width: 100%; border-collapse: collapse; margin: 24px 0; font-size: 14px;">
+                                    <tr style="background: #f8fafc;">
+                                        <td style="padding: 10px 14px; font-weight: 600; border: 1px solid #e2e8f0; color: #475569;">Invoice #</td>
+                                        <td style="padding: 10px 14px; border: 1px solid #e2e8f0;">${invoice.number}</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 10px 14px; font-weight: 600; border: 1px solid #e2e8f0; color: #475569;">Amount Paid</td>
+                                        <td style="padding: 10px 14px; border: 1px solid #e2e8f0; color: #16a34a; font-weight: 700;">$${amountPaid.toFixed(2)}</td>
+                                    </tr>
+                                    ${!isFullPayment ? `
+                                    <tr style="background: #f8fafc;">
+                                        <td style="padding: 10px 14px; font-weight: 600; border: 1px solid #e2e8f0; color: #475569;">Balance Due</td>
+                                        <td style="padding: 10px 14px; border: 1px solid #e2e8f0;">$${balanceDue.toFixed(2)}</td>
+                                    </tr>` : ''}
+                                    <tr ${!isFullPayment ? '' : 'style="background: #f8fafc;"'}>
+                                        <td style="padding: 10px 14px; font-weight: 600; border: 1px solid #e2e8f0; color: #475569;">Payment Method</td>
+                                        <td style="padding: 10px 14px; border: 1px solid #e2e8f0; text-transform: capitalize;">${session.payment_method_types?.[0] ?? 'Card'}</td>
+                                    </tr>
+                                    <tr ${!isFullPayment ? 'style="background: #f8fafc;"' : ''}>
+                                        <td style="padding: 10px 14px; font-weight: 600; border: 1px solid #e2e8f0; color: #475569;">Date</td>
+                                        <td style="padding: 10px 14px; border: 1px solid #e2e8f0;">${new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</td>
+                                    </tr>
+                                </table>
+
+                                <p style="font-size: 14px; color: #475569; line-height: 1.6;">
+                                    If you have any questions, reply to this email or call us at <strong>(413) 544-4933</strong>.
+                                </p>
+                                <p style="font-size: 14px; color: #475569;">Thank you for choosing Pioneer Concrete Coatings!</p>
+
+                                <div style="border-top: 1px solid #e2e8f0; margin-top: 32px; padding-top: 16px; text-align: center;">
+                                    <p style="color: #94a3b8; font-size: 12px; margin: 0;">Pioneer Concrete Coatings · (413) 544-4933 · admin@pioneerconcretecoatings.com</p>
+                                </div>
+                            </div>
+                        `,
+                    });
+                    console.log(`[Stripe Webhook] Customer receipt sent to ${invoice.customer.email}`);
+                } catch (emailErr) {
+                    console.warn('[Stripe Webhook] Customer receipt email failed (non-critical):', emailErr);
+                }
+            }
+
             // Record payment in QuickBooks if connected
             if (invoice.qbInvoiceId && quoteId) {
                 try {
