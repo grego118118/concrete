@@ -7,19 +7,13 @@ import { revalidatePath } from "next/cache";
 import { db } from "@/lib/db";
 
 const SCRAPER_PATH = path.join(process.cwd(), "..", "scraper", "scraper.py");
-const LEADS_CSV_PATH = path.join(process.cwd(), "..", "leads.csv");
-const LOG_PATH = path.join(process.cwd(), "..", "scraper", "scraper.log");
-const PID_PATH = path.join(process.cwd(), "..", "scraper", "scraper.pid");
+const LEADS_CSV_PATH = "/tmp/leads.csv";
+const LOG_PATH = "/tmp/scraper.log";
+const PID_PATH = "/tmp/scraper.pid";
 
 export async function runScraper() {
     return new Promise((resolve, reject) => {
         console.log("Starting scraper at:", SCRAPER_PATH);
-
-        // Ensure log directory exists
-        const logDir = path.dirname(LOG_PATH);
-        if (!fs.existsSync(logDir)) {
-            fs.mkdirSync(logDir, { recursive: true });
-        }
 
         // Clear previous log
         fs.writeFileSync(LOG_PATH, `[${new Date().toISOString()}] Scraper started\n`);
