@@ -8,7 +8,8 @@ import { getCustomer } from "@/app/actions/customers";
 import { notFound } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
 
-export default async function CustomerDetailPage({ params }: { params: { id: string } }) {
+export default async function CustomerDetailPage(props: { params: Promise<{ id: string }> }) {
+    const params = await props.params;
     const customer = await getCustomer(params.id);
 
     if (!customer) {
@@ -43,10 +44,10 @@ export default async function CustomerDetailPage({ params }: { params: { id: str
                     </div>
                 </div>
                 <div className="flex gap-2 w-full md:w-auto">
-                    <Link href={`/crm/customers/${customer.id}/edit`} className="flex-1 md:flex-none">
+                    <Link href={`/app/crm/customers/${customer.id}/edit`} className="flex-1 md:flex-none">
                         <Button variant="outline" className="w-full">Edit Profile</Button>
                     </Link>
-                    <Link href={`/crm/jobs/create?customerId=${customer.id}`} className="flex-1 md:flex-none">
+                    <Link href={`/app/crm/jobs/create?customerId=${customer.id}`} className="flex-1 md:flex-none">
                         <Button className="w-full bg-blue-600 hover:bg-blue-700">
                             <Plus className="mr-2 h-4 w-4" /> New Job
                         </Button>
@@ -120,7 +121,7 @@ export default async function CustomerDetailPage({ params }: { params: { id: str
                                     {customer.jobs.length === 0 ? (
                                         <div className="text-center py-8">
                                             <p className="text-muted-foreground">No jobs scheduled yet.</p>
-                                            <Link href={`/crm/jobs/create?customerId=${customer.id}`} className="mt-2 inline-block">
+                                            <Link href={`/app/crm/jobs/create?customerId=${customer.id}`} className="mt-2 inline-block">
                                                 <Button variant="link" className="text-blue-600">Schedule the first job</Button>
                                             </Link>
                                         </div>
@@ -130,7 +131,7 @@ export default async function CustomerDetailPage({ params }: { params: { id: str
                                                 <div key={job.id} className="py-4 flex items-center justify-between group">
                                                     <div>
                                                         <h4 className="font-semibold text-slate-900 group-hover:text-blue-600 transition-colors">
-                                                            <Link href={`/crm/jobs/${job.id}/edit`}>{job.title}</Link>
+                                                            <Link href={`/app/crm/jobs/${job.id}/edit`}>{job.title}</Link>
                                                         </h4>
                                                         <div className="text-sm text-muted-foreground flex items-center gap-3 mt-1">
                                                             <span className="flex items-center gap-1">
@@ -140,7 +141,7 @@ export default async function CustomerDetailPage({ params }: { params: { id: str
                                                             <Badge variant="outline" className="text-[10px] uppercase font-bold tracking-wider">{job.status}</Badge>
                                                         </div>
                                                     </div>
-                                                    <Link href={`/crm/jobs/${job.id}/edit`}>
+                                                    <Link href={`/app/crm/jobs/${job.id}/edit`}>
                                                         <Button variant="ghost" size="sm">Manage</Button>
                                                     </Link>
                                                 </div>

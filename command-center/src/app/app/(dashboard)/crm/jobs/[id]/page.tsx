@@ -9,7 +9,8 @@ import { notFound } from "next/navigation";
 import { PhotoUploader } from "@/components/crm/photo-uploader";
 import { JobAreaCalculator } from "@/components/crm/job-area-calculator";
 
-export default async function JobDetailPage({ params }: { params: { id: string } }) {
+export default async function JobDetailPage(props: { params: Promise<{ id: string }> }) {
+    const params = await props.params;
     const job = await getJob(params.id);
 
     if (!job) {
@@ -29,7 +30,7 @@ export default async function JobDetailPage({ params }: { params: { id: string }
                         <Badge className="bg-blue-600">{job.status}</Badge>
                     </div>
                     <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-muted-foreground">
-                        <Link href={`/crm/customers/${job.customer.id}`} className="font-semibold text-blue-600 hover:underline flex items-center gap-1">
+                        <Link href={`/app/crm/customers/${job.customer.id}`} className="font-semibold text-blue-600 hover:underline flex items-center gap-1">
                             {job.customer.name}
                         </Link>
                         {job.scheduledAt && (
@@ -47,7 +48,7 @@ export default async function JobDetailPage({ params }: { params: { id: string }
                             Add Photo
                         </Button>
                     </Link>
-                    <Link href={`/crm/jobs/${job.id}/edit`} className="flex-1 md:flex-none">
+                    <Link href={`/app/crm/jobs/${job.id}/edit`} className="flex-1 md:flex-none">
                         <Button className="w-full bg-blue-600 hover:bg-blue-700">Manage Job</Button>
                     </Link>
                 </div>
@@ -118,7 +119,7 @@ export default async function JobDetailPage({ params }: { params: { id: string }
                                     <span className="font-medium text-slate-700">{job.customer.phone || "No phone"}</span>
                                 </div>
                             </div>
-                            <Link href={`/crm/customers/${job.customer.id}`} className="block pt-2">
+                            <Link href={`/app/crm/customers/${job.customer.id}`} className="block pt-2">
                                 <Button variant="outline" size="sm" className="w-full border-blue-200 text-blue-700 hover:bg-blue-50">View Profile</Button>
                             </Link>
                         </CardContent>
