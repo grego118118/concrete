@@ -124,11 +124,17 @@ export async function updateJob(id: string, formData: FormData) {
     })
 
     // Trigger completion invoice when status changes to COMPLETED
+    // Must be awaited BEFORE redirect() — redirect() throws NEXT_REDIRECT which
+    // terminates the function and abandons any fire-and-forget promises.
     if (status === 'COMPLETED' && previousJob?.status !== 'COMPLETED') {
         const overageItems = overageItemsRaw ? JSON.parse(overageItemsRaw) : []
-        import('@/lib/invoices/completion-invoice')
-            .then(({ sendCompletionInvoice }) => sendCompletionInvoice(id, overageItems))
-            .catch(err => console.error('[updateJob] Completion invoice failed:', err))
+        try {
+            const { sendCompletionInvoice } = await import('@/lib/invoices/completion-invoice')
+            await sendCompletionInvoice(id, overageItems)
+            console.log(`[updateJob] Completion invoice sent for job ${id}`)
+        } catch (err) {
+            console.error('[updateJob] Completion invoice failed:', err)
+        }
     }
 
     revalidatePath("/app/crm/jobs")

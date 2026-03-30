@@ -29,13 +29,25 @@ export async function sendCompletionInvoice(jobId: string, overageItems: Overage
         }
     });
 
-    if (!job?.quote?.invoice) {
-        console.warn(`[Completion Invoice] No invoice found for job ${jobId}, skipping`);
+    if (!job) {
+        console.error(`[Completion Invoice] Job ${jobId} not found`);
+        return;
+    }
+
+    if (!job.quote) {
+        console.warn(`[Completion Invoice] Job ${jobId} has no linked quote — skipping (manually created job)`);
+        return;
+    }
+
+    if (!job.quote.invoice) {
+        console.warn(`[Completion Invoice] Quote ${job.quote.id} has no invoice yet — customer may not have accepted the quote`);
         return;
     }
 
     const { quote, customer } = job;
     const invoice = quote.invoice!;
+
+    console.log(`[Completion Invoice] Starting for job ${jobId}, invoice ${invoice.id}, balance $${quote.balance}`);
 
     // Calculate overage total
     const overageTotal = overageItems.reduce(
@@ -44,6 +56,12 @@ export async function sendCompletionInvoice(jobId: string, overageItems: Overage
 
     // Final amount = remaining balance + overages
     const balance = Number(quote.balance);
+
+    if (balance <= 0 && overageTotal <= 0) {
+        console.warn(`[Completion Invoice] Balance is $0 for job ${jobId} — skipping completion invoice`);
+        return;
+    }
+
     const finalAmount = balance + overageTotal;
 
     // Save overage items to the invoice

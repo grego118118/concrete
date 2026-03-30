@@ -194,7 +194,9 @@ export function EditJobForm({ job }: { job: Job }) {
                             <Button variant="outline" type="button">Cancel</Button>
                         </Link>
                         <Button type="submit" disabled={isSubmitting}>
-                            {isSubmitting ? "Saving..." : "Save Changes"}
+                            {isSubmitting
+                                ? (status === "COMPLETED" ? "Sending Invoice..." : "Saving...")
+                                : "Save Changes"}
                         </Button>
                     </div>
                 </div>
