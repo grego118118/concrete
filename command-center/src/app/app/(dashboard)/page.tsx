@@ -53,6 +53,12 @@ const ACTIVITY_ICON: Record<string, React.ReactNode> = {
   quote: <FileText className="h-4 w-4" />,
 };
 
+const ACTIVITY_HREF: Record<string, (id: string) => string> = {
+  customer: (id) => `/app/crm/customers/${id}`,
+  job: (id) => `/app/crm/jobs/${id}`,
+  quote: (id) => `/app/crm/quotes/${id}`,
+};
+
 export default async function Home() {
   const [stats, tickets] = await Promise.all([getDashboardStats(), getTickets()]);
 
@@ -156,8 +162,8 @@ export default async function Home() {
               <p className="text-sm text-muted-foreground">No recent activity yet.</p>
             ) : (
               <div className="space-y-3">
-                {stats.activity.map((item: { type: string; label: string; detail: string; at: Date }, i: number) => (
-                  <div key={i} className="flex items-center">
+                {stats.activity.map((item: { type: string; id: string; label: string; detail: string; at: Date }, i: number) => (
+                  <Link key={i} href={ACTIVITY_HREF[item.type](item.id)} className="flex items-center rounded-md px-1 py-0.5 -mx-1 hover:bg-accent transition-colors">
                     <span className="relative flex h-8 w-8 shrink-0 overflow-hidden rounded-full">
                       <div className={`flex h-full w-full items-center justify-center ${ACTIVITY_ICON_CLASS[item.type]}`}>
                         {ACTIVITY_ICON[item.type]}
@@ -168,7 +174,7 @@ export default async function Home() {
                       <p className="text-xs text-muted-foreground truncate">{item.detail}</p>
                     </div>
                     <div className="ml-auto pl-3 text-xs text-muted-foreground whitespace-nowrap">{timeAgo(item.at)}</div>
-                  </div>
+                  </Link>
                 ))}
               </div>
             )}

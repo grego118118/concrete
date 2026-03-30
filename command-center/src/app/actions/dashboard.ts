@@ -37,18 +37,21 @@ export async function getDashboardStats() {
     const activity = [
         ...recentCustomers.map((c) => ({
             type: "customer" as const,
+            id: c.id,
             label: c.name,
-            detail: "New customer added",
+            detail: "New lead added",
             at: c.createdAt,
         })),
         ...recentJobs.map((j) => ({
             type: "job" as const,
+            id: j.id,
             label: j.title,
             detail: `Job ${j.status.toLowerCase().replace("_", " ")} — ${j.customer.name}`,
             at: j.createdAt,
         })),
         ...recentQuotes.map((q) => ({
             type: "quote" as const,
+            id: q.id,
             label: `Quote #${q.number}`,
             detail: `${q.status} — ${q.customer.name}`,
             at: q.createdAt,
