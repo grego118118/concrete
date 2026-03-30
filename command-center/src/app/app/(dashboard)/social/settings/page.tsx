@@ -2,109 +2,112 @@
 
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { Facebook, Instagram, Linkedin, MapPin, Key, Save, Loader2 } from "lucide-react";
+import { Facebook, Instagram, Linkedin, MapPin, Key, Save, Loader2, CheckCircle2, XCircle } from "lucide-react";
 import { toast } from "sonner";
 import { upsertSocialConnection, getSocialConnections } from "@/app/actions/social";
 import { Platform } from "@prisma/client";
 
+const PLATFORMS = [
+    {
+        id: "FACEBOOK" as Platform,
+        icon: <Facebook className="h-5 w-5" />,
+        name: "Facebook Page",
+        description: "Post updates, photos, and promotions to your Facebook business page.",
+        color: "indigo",
+    },
+    {
+        id: "INSTAGRAM" as Platform,
+        icon: <Instagram className="h-5 w-5" />,
+        name: "Instagram Business",
+        description: "Share before/after photos and reels to grow your audience.",
+        color: "pink",
+    },
+    {
+        id: "GOOGLE_BUSINESS" as Platform,
+        icon: <MapPin className="h-5 w-5" />,
+        name: "Google Business Profile",
+        description: "Post updates directly to your Google listing to boost local SEO.",
+        color: "blue",
+    },
+    {
+        id: "LINKEDIN" as Platform,
+        icon: <Linkedin className="h-5 w-5" />,
+        name: "LinkedIn Page",
+        description: "Share project highlights and company news with professionals.",
+        color: "blue",
+    },
+];
+
 export default function SocialSettingsPage() {
     const [saving, setSaving] = useState(false);
     const [loading, setLoading] = useState(true);
-    const [businessId] = useState("clun12345"); // Mock business ID for now, usually from session
     const [connected, setConnected] = useState<Record<string, boolean>>({
         GOOGLE_BUSINESS: false,
         FACEBOOK: false,
         INSTAGRAM: false,
-        LINKEDIN: false
+        LINKEDIN: false,
     });
 
-    // API Credentials State
     const [credentials, setCredentials] = useState({
         FACEBOOK: { accessToken: "" },
+        INSTAGRAM: { accessToken: "" },
         GOOGLE_BUSINESS: { apiKey: "" },
-        LINKEDIN: { apiSecret: "" }
+        LINKEDIN: { apiSecret: "" },
     });
 
-    // Fetch existing connections on load
     useEffect(() => {
-        const fetchConnections = async () => {
-            const result = await getSocialConnections(businessId);
+        getSocialConnections().then((result) => {
             if (result.success && result.data) {
-                const connectionStates: Record<string, boolean> = {
-                    GOOGLE_BUSINESS: false,
-                    FACEBOOK: false,
-                    INSTAGRAM: false,
-                    LINKEDIN: false
+                const states: Record<string, boolean> = {
+                    GOOGLE_BUSINESS: false, FACEBOOK: false,
+                    INSTAGRAM: false, LINKEDIN: false,
                 };
-                const credentialStates = { ...credentials };
-
+                const creds = { ...credentials };
                 result.data.forEach((conn: any) => {
-                    connectionStates[conn.platform] = conn.isEnabled;
-                    if (conn.platform === "FACEBOOK") credentialStates.FACEBOOK.accessToken = conn.accessToken || "";
-                    if (conn.platform === "GOOGLE_BUSINESS") credentialStates.GOOGLE_BUSINESS.apiKey = conn.apiKey || "";
-                    if (conn.platform === "LINKEDIN") credentialStates.LINKEDIN.apiSecret = conn.apiSecret || "";
+                    states[conn.platform] = conn.isEnabled;
+                    if (conn.platform === "FACEBOOK") creds.FACEBOOK.accessToken = conn.accessToken || "";
+                    if (conn.platform === "INSTAGRAM") creds.INSTAGRAM.accessToken = conn.accessToken || "";
+                    if (conn.platform === "GOOGLE_BUSINESS") creds.GOOGLE_BUSINESS.apiKey = conn.apiKey || "";
+                    if (conn.platform === "LINKEDIN") creds.LINKEDIN.apiSecret = conn.apiSecret || "";
                 });
-
-                setConnected(connectionStates);
-                setCredentials(credentialStates);
+                setConnected(states);
+                setCredentials(creds);
             }
             setLoading(false);
-        };
-        fetchConnections();
-    }, [businessId]);
+        });
+    }, []);
 
-    const handleSave = async () => {
-        setSaving(true);
-        try {
-            // Save Meta/Facebook Token
-            await upsertSocialConnection({
-                platform: "FACEBOOK" as Platform,
-                accessToken: credentials.FACEBOOK.accessToken,
-                businessId
-            });
-
-            // Save Google OAuth Client ID (mapping to apiKey for now)
-            await upsertSocialConnection({
-                platform: "GOOGLE_BUSINESS" as Platform,
-                apiKey: credentials.GOOGLE_BUSINESS.apiKey,
-                businessId
-            });
-
-            // Save LinkedIn Secret
-            await upsertSocialConnection({
-                platform: "LINKEDIN" as Platform,
-                apiSecret: credentials.LINKEDIN.apiSecret,
-                businessId
-            });
-
-            toast.success("API credentials saved successfully");
-        } catch (error) {
-            toast.error("Failed to save credentials");
-        } finally {
-            setSaving(false);
+    const handleToggle = async (platform: Platform) => {
+        const newState = !connected[platform];
+        const result = await upsertSocialConnection({ platform, isEnabled: newState });
+        if (result.success) {
+            setConnected(prev => ({ ...prev, [platform]: newState }));
+            toast.success(`${platform.replace("_", " ")} ${newState ? "enabled" : "disabled"}`);
+        } else {
+            toast.error(result.error || "Failed to update");
         }
     };
 
-    const handleConnect = async (platform: string) => {
-        const newState = !connected[platform];
-        const result = await upsertSocialConnection({
-            platform: platform as Platform,
-            isEnabled: newState,
-            businessId
-        });
-
-        if (result.success) {
-            setConnected(prev => ({ ...prev, [platform]: newState }));
-            toast.success(`${platform.replace('_', ' ')} ${newState ? 'connected' : 'disconnected'}`);
-        } else {
-            toast.error("Failed to update connection");
+    const handleSaveCredentials = async () => {
+        setSaving(true);
+        try {
+            await Promise.all([
+                upsertSocialConnection({ platform: "FACEBOOK", accessToken: credentials.FACEBOOK.accessToken }),
+                upsertSocialConnection({ platform: "INSTAGRAM", accessToken: credentials.INSTAGRAM.accessToken }),
+                upsertSocialConnection({ platform: "GOOGLE_BUSINESS", apiKey: credentials.GOOGLE_BUSINESS.apiKey }),
+                upsertSocialConnection({ platform: "LINKEDIN", apiSecret: credentials.LINKEDIN.apiSecret }),
+            ]);
+            toast.success("Credentials saved");
+        } catch {
+            toast.error("Failed to save credentials");
         }
+        setSaving(false);
     };
 
     if (loading) {
@@ -116,142 +119,181 @@ export default function SocialSettingsPage() {
     }
 
     return (
-        <div className="space-y-6 max-w-5xl mx-auto px-4 py-8">
-            <div className="flex items-center justify-between">
-                <div>
-                    <h1 className="text-3xl font-black tracking-tighter text-gray-900 uppercase">Social <span className="text-blue-600">Settings</span></h1>
-                    <p className="text-gray-500 font-medium italic">Manage your platform connections and brand defaults.</p>
-                </div>
-                <Button onClick={handleSave} disabled={saving} className="bg-blue-600 hover:bg-blue-700 font-bold px-6 py-6 h-auto text-lg rounded-xl shadow-lg shadow-blue-500/20 active:scale-[0.98] transition-all">
-                    {saving ? <Loader2 className="h-5 w-5 animate-spin mr-2" /> : <Save className="h-5 w-5 mr-2" />}
-                    SAVE ALL CHANGES
-                </Button>
+        <div className="space-y-6 max-w-4xl mx-auto px-4 py-8">
+            <div>
+                <h1 className="text-3xl font-bold tracking-tight">Social Settings</h1>
+                <p className="text-muted-foreground mt-1">Connect your social accounts and enter your API credentials.</p>
             </div>
 
             <Tabs defaultValue="accounts" className="w-full">
-                <TabsList className="bg-gray-100/50 p-1.5 rounded-2xl h-14 border border-gray-100 flex gap-1 w-fit">
-                    <TabsTrigger value="accounts" className="rounded-xl px-8 font-bold text-xs data-[state=active]:bg-white data-[state=active]:shadow-md data-[state=active]:text-blue-600 transition-all h-full uppercase tracking-widest">CONNECTED ACCOUNTS</TabsTrigger>
-                    <TabsTrigger value="api" className="rounded-xl px-8 font-bold text-xs data-[state=active]:bg-white data-[state=active]:shadow-md data-[state=active]:text-blue-600 transition-all h-full uppercase tracking-widest">API CREDENTIALS</TabsTrigger>
-                    <TabsTrigger value="brand" className="rounded-xl px-8 font-bold text-xs data-[state=active]:bg-white data-[state=active]:shadow-md data-[state=active]:text-blue-600 transition-all h-full uppercase tracking-widest">BRAND KIT</TabsTrigger>
+                <TabsList>
+                    <TabsTrigger value="accounts">Connected Accounts</TabsTrigger>
+                    <TabsTrigger value="api">API Credentials</TabsTrigger>
+                    <TabsTrigger value="brand">Brand Kit</TabsTrigger>
                 </TabsList>
 
-                <TabsContent value="accounts" className="space-y-6 mt-6 focus-visible:outline-none">
-                    <div className="grid gap-6 md:grid-cols-2">
-                        {[
-                            { id: "GOOGLE_BUSINESS", icon: <MapPin className="h-5 w-5" />, name: "Google Business", detail: "TradeOps Springfield #129", color: "blue" },
-                            { id: "FACEBOOK", icon: <Facebook className="h-5 w-5" />, name: "Facebook Page", detail: "Pioneer Concrete Coatings", color: "indigo" },
-                            { id: "INSTAGRAM", icon: <Instagram className="h-5 w-5" />, name: "Instagram Business", detail: "@pioneerconcretecoatings", color: "pink" },
-                            { id: "LINKEDIN", icon: <Linkedin className="h-5 w-5" />, name: "LinkedIn Page", detail: "Pioneer Concrete LLC", color: "blue" }
-                        ].map((plat) => (
-                            <Card key={plat.id} className="border-2 shadow-xl shadow-gray-200/40 hover:shadow-gray-200 transition-all overflow-hidden group">
-                                <div className={`h-1.5 w-full bg-${plat.color}-500`} />
-                                <CardHeader className="flex flex-row items-center justify-between py-4 bg-gray-50/50 border-b">
-                                    <div className="flex items-center gap-3">
-                                        <div className={`p-2 bg-${plat.color}-50 rounded-lg text-${plat.color}-600`}>
-                                            {plat.icon}
-                                        </div>
-                                        <CardTitle className="text-base font-bold">{plat.name}</CardTitle>
-                                    </div>
-                                    <Badge className={connected[plat.id] ? "bg-green-100 text-green-700 border-green-200" : "bg-gray-100 text-gray-500 border-gray-200"} variant="outline">
-                                        {connected[plat.id] ? "READY" : "DISCONNECTED"}
-                                    </Badge>
-                                </CardHeader>
-                                <CardContent className="pt-6">
+                {/* Connected Accounts */}
+                <TabsContent value="accounts" className="space-y-4 mt-6">
+                    <p className="text-sm text-muted-foreground">
+                        Toggle platforms on/off. Enter your API credentials in the <strong>API Credentials</strong> tab first.
+                    </p>
+                    <div className="grid gap-4 md:grid-cols-2">
+                        {PLATFORMS.map((plat) => (
+                            <Card key={plat.id} className="flex flex-col">
+                                <CardHeader className="pb-3">
                                     <div className="flex items-center justify-between">
-                                        <div className="space-y-1">
-                                            <p className="text-sm font-bold text-gray-800">{connected[plat.id] ? plat.detail : "Link Required"}</p>
-                                            <p className="text-xs text-gray-500">{connected[plat.id] ? "Last verified 1 hour ago" : "Connect to enable automated posting"}</p>
+                                        <div className="flex items-center gap-3">
+                                            <div className="text-slate-600">{plat.icon}</div>
+                                            <CardTitle className="text-base">{plat.name}</CardTitle>
                                         </div>
-                                        <Button
-                                            variant={connected[plat.id] ? "ghost" : "outline"}
-                                            size="sm"
-                                            className="font-bold rounded-lg px-4"
-                                            onClick={() => handleConnect(plat.id)}
-                                        >
-                                            {connected[plat.id] ? "Change" : "Connect"}
-                                        </Button>
+                                        {connected[plat.id] ? (
+                                            <Badge className="bg-green-100 text-green-700 border-green-200 gap-1" variant="outline">
+                                                <CheckCircle2 className="h-3 w-3" /> Active
+                                            </Badge>
+                                        ) : (
+                                            <Badge className="bg-slate-100 text-slate-500 gap-1" variant="outline">
+                                                <XCircle className="h-3 w-3" /> Off
+                                            </Badge>
+                                        )}
                                     </div>
+                                    <CardDescription className="text-xs mt-1">{plat.description}</CardDescription>
+                                </CardHeader>
+                                <CardContent className="pt-0">
+                                    <Button
+                                        variant={connected[plat.id] ? "outline" : "default"}
+                                        size="sm"
+                                        className="w-full"
+                                        onClick={() => handleToggle(plat.id)}
+                                    >
+                                        {connected[plat.id] ? "Disable" : "Enable"}
+                                    </Button>
                                 </CardContent>
                             </Card>
                         ))}
                     </div>
                 </TabsContent>
 
-                <TabsContent value="api" className="space-y-6 mt-6 focus-visible:outline-none">
-                    <Card className="border-2 shadow-xl shadow-gray-200/40 max-w-2xl">
-                        <CardHeader className="border-b bg-gray-50/50">
-                            <CardTitle className="text-lg flex items-center gap-2">
-                                <Key className="h-5 w-5 text-gray-600" /> API Management
+                {/* API Credentials */}
+                <TabsContent value="api" className="mt-6">
+                    <Card>
+                        <CardHeader>
+                            <CardTitle className="flex items-center gap-2">
+                                <Key className="h-5 w-5" /> API Credentials
                             </CardTitle>
-                            <CardDescription className="text-gray-500 font-medium">Manual override for API keys and tokens.</CardDescription>
+                            <CardDescription>
+                                Enter your access tokens and API keys. These are stored securely and used to post on your behalf.
+                            </CardDescription>
                         </CardHeader>
-                        <CardContent className="space-y-6 pt-6">
-                            <div className="grid gap-6">
-                                <div className="space-y-2">
-                                    <Label className="text-xs font-bold uppercase tracking-wider text-gray-400">Meta/Facebook Access Token</Label>
-                                    <Input
-                                        type="password"
-                                        placeholder="EAAB..."
-                                        className="h-12 rounded-xl focus:ring-blue-500 border-gray-200 px-4"
-                                        value={credentials.FACEBOOK.accessToken}
-                                        onChange={(e) => setCredentials(prev => ({
-                                            ...prev,
-                                            FACEBOOK: { ...prev.FACEBOOK, accessToken: e.target.value }
-                                        }))}
-                                    />
+                        <CardContent className="space-y-6">
+                            {/* Facebook */}
+                            <div className="space-y-2 pb-6 border-b">
+                                <div className="flex items-center gap-2 mb-1">
+                                    <Facebook className="h-4 w-4 text-indigo-600" />
+                                    <Label className="font-semibold">Facebook — Long-Lived Access Token</Label>
                                 </div>
-                                <div className="space-y-2">
-                                    <Label className="text-xs font-bold uppercase tracking-wider text-gray-400">Google OAuth Client ID</Label>
-                                    <Input
-                                        placeholder="12345-abc.apps.googleusercontent.com"
-                                        className="h-12 rounded-xl focus:ring-blue-500 border-gray-200 px-4"
-                                        value={credentials.GOOGLE_BUSINESS.apiKey}
-                                        onChange={(e) => setCredentials(prev => ({
-                                            ...prev,
-                                            GOOGLE_BUSINESS: { ...prev.GOOGLE_BUSINESS, apiKey: e.target.value }
-                                        }))}
-                                    />
+                                <p className="text-xs text-muted-foreground">
+                                    Get this from <strong>Meta Business Suite → Settings → System Users → Generate Token</strong>. Needs <code>pages_manage_posts</code> permission.
+                                </p>
+                                <Input
+                                    type="password"
+                                    placeholder="EAAB..."
+                                    value={credentials.FACEBOOK.accessToken}
+                                    onChange={(e) => setCredentials(p => ({ ...p, FACEBOOK: { accessToken: e.target.value } }))}
+                                />
+                            </div>
+
+                            {/* Instagram */}
+                            <div className="space-y-2 pb-6 border-b">
+                                <div className="flex items-center gap-2 mb-1">
+                                    <Instagram className="h-4 w-4 text-pink-600" />
+                                    <Label className="font-semibold">Instagram — Access Token</Label>
                                 </div>
-                                <div className="space-y-2">
-                                    <Label className="text-xs font-bold uppercase tracking-wider text-gray-400">LinkedIn API Secret</Label>
-                                    <Input
-                                        type="password"
-                                        placeholder="••••••••••••"
-                                        className="h-12 rounded-xl focus:ring-blue-500 border-gray-200 px-4"
-                                        value={credentials.LINKEDIN.apiSecret}
-                                        onChange={(e) => setCredentials(prev => ({
-                                            ...prev,
-                                            LINKEDIN: { ...prev.LINKEDIN, apiSecret: e.target.value }
-                                        }))}
-                                    />
+                                <p className="text-xs text-muted-foreground">
+                                    Instagram uses the same Meta token as Facebook if your Instagram account is linked to the same Meta Business account.
+                                </p>
+                                <Input
+                                    type="password"
+                                    placeholder="EAAB..."
+                                    value={credentials.INSTAGRAM.accessToken}
+                                    onChange={(e) => setCredentials(p => ({ ...p, INSTAGRAM: { accessToken: e.target.value } }))}
+                                />
+                            </div>
+
+                            {/* Google Business */}
+                            <div className="space-y-2 pb-6 border-b">
+                                <div className="flex items-center gap-2 mb-1">
+                                    <MapPin className="h-4 w-4 text-blue-600" />
+                                    <Label className="font-semibold">Google Business Profile — API Key</Label>
                                 </div>
+                                <p className="text-xs text-muted-foreground">
+                                    Go to <strong>Google Cloud Console → APIs & Services → Credentials → Create API Key</strong>. Enable the "My Business API".
+                                </p>
+                                <Input
+                                    placeholder="AIzaSy..."
+                                    value={credentials.GOOGLE_BUSINESS.apiKey}
+                                    onChange={(e) => setCredentials(p => ({ ...p, GOOGLE_BUSINESS: { apiKey: e.target.value } }))}
+                                />
+                            </div>
+
+                            {/* LinkedIn */}
+                            <div className="space-y-2">
+                                <div className="flex items-center gap-2 mb-1">
+                                    <Linkedin className="h-4 w-4 text-blue-700" />
+                                    <Label className="font-semibold">LinkedIn — Client Secret</Label>
+                                </div>
+                                <p className="text-xs text-muted-foreground">
+                                    Create an app at <strong>LinkedIn Developer Portal → My Apps</strong> and copy the Client Secret from the Auth tab.
+                                </p>
+                                <Input
+                                    type="password"
+                                    placeholder="••••••••••••"
+                                    value={credentials.LINKEDIN.apiSecret}
+                                    onChange={(e) => setCredentials(p => ({ ...p, LINKEDIN: { apiSecret: e.target.value } }))}
+                                />
+                            </div>
+
+                            <div className="flex justify-end pt-2">
+                                <Button onClick={handleSaveCredentials} disabled={saving} className="bg-blue-600 hover:bg-blue-700">
+                                    {saving ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Save className="h-4 w-4 mr-2" />}
+                                    Save Credentials
+                                </Button>
                             </div>
                         </CardContent>
                     </Card>
                 </TabsContent>
 
-                <TabsContent value="brand" className="space-y-4 mt-6 focus-visible:outline-none">
-                    <Card className="border-2 shadow-xl shadow-gray-200/40">
-                        <CardHeader className="border-b bg-gray-50/50">
-                            <CardTitle className="text-lg font-black tracking-tight">AI BRAND VOICE</CardTitle>
-                            <CardDescription className="text-gray-500 font-medium">Teach the AI how to represent Pioneer Concrete Coatings.</CardDescription>
+                {/* Brand Kit */}
+                <TabsContent value="brand" className="mt-6">
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>AI Brand Voice</CardTitle>
+                            <CardDescription>
+                                Teach the AI how to write posts that sound like Pioneer Concrete Coatings.
+                            </CardDescription>
                         </CardHeader>
-                        <CardContent className="space-y-6 pt-6">
+                        <CardContent className="space-y-6">
                             <div className="space-y-2">
-                                <Label className="text-xs font-bold uppercase tracking-wider text-gray-400">Target Tone</Label>
-                                <Input defaultValue="Professional, Reliable, High-Quality, Local" className="h-12 rounded-xl border-gray-200 px-4 font-bold" />
+                                <Label>Target Tone</Label>
+                                <Input defaultValue="Professional, Reliable, High-Quality, Local" />
+                                <p className="text-xs text-muted-foreground">How you want to sound to customers.</p>
                             </div>
                             <div className="space-y-2">
-                                <Label className="text-xs font-bold uppercase tracking-wider text-gray-400">Core Value Proposition</Label>
+                                <Label>Core Value Proposition</Label>
                                 <Textarea
                                     defaultValue="1-Day Installation, 15-Year Warranty, Industrial Grade Materials, Family Owned & Operated"
-                                    className="min-h-[120px] rounded-xl border-gray-200 p-4 text-base leading-relaxed font-semibold focus:ring-blue-500"
+                                    className="min-h-[100px]"
                                 />
+                                <p className="text-xs text-muted-foreground">Key selling points the AI will emphasize in every post.</p>
                             </div>
                             <div className="space-y-2">
-                                <Label className="text-xs font-bold uppercase tracking-wider text-gray-400">Excluded Keywords</Label>
-                                <Input defaultValue="Cheap, Painting, Kits, DIY" className="h-12 rounded-xl border-gray-200 px-4 text-red-600 font-bold" />
-                                <p className="text-[10px] text-gray-400 uppercase font-black tracking-widest px-1 py-1">AI will strictly avoid these words in generated content</p>
+                                <Label>Excluded Keywords</Label>
+                                <Input defaultValue="Cheap, Painting, Kits, DIY" className="text-red-600" />
+                                <p className="text-xs text-muted-foreground">Words the AI will never use.</p>
+                            </div>
+                            <div className="flex justify-end">
+                                <Button className="bg-blue-600 hover:bg-blue-700">
+                                    <Save className="h-4 w-4 mr-2" /> Save Brand Kit
+                                </Button>
                             </div>
                         </CardContent>
                     </Card>
@@ -260,6 +302,3 @@ export default function SocialSettingsPage() {
         </div>
     );
 }
-
-
-

@@ -102,7 +102,7 @@ export function LeadScraperCard() {
     };
 
     return (
-        <Card className="h-full flex flex-col border-blue-100 shadow-sm">
+        <Card className="border-blue-100 shadow-sm">
             <CardHeader className="pb-2">
                 <div className="flex items-center justify-between">
                     <CardTitle className="text-lg flex items-center gap-2">
@@ -134,24 +134,24 @@ export function LeadScraperCard() {
                     Scan local business directories for new opportunities.
                 </CardDescription>
             </CardHeader>
-            <CardContent className="flex-1 pt-0">
-                <div className="flex flex-col items-center justify-center h-full space-y-3 py-4 relative">
+            <CardContent className="pt-0 pb-3">
+                <div className="flex flex-col items-center space-y-3 py-2 relative">
                     {/* Stats Row */}
                     <div className="flex items-center gap-6 w-full justify-center">
                         <div className="flex flex-col items-center">
-                            <div className="text-4xl font-black tracking-tighter text-blue-600">
+                            <div className="text-3xl font-black tracking-tighter text-blue-600">
                                 {csvCount}
                             </div>
-                            <p className="text-[9px] font-bold uppercase tracking-[0.15em] text-muted-foreground mt-1">
+                            <p className="text-[9px] font-bold uppercase tracking-[0.15em] text-muted-foreground mt-0.5">
                                 Found in CSV
                             </p>
                         </div>
-                        <div className="h-10 w-px bg-gray-200"></div>
+                        <div className="h-8 w-px bg-gray-200"></div>
                         <div className="flex flex-col items-center">
-                            <div className="text-4xl font-black tracking-tighter text-green-600">
+                            <div className="text-3xl font-black tracking-tighter text-green-600">
                                 {dbCount}
                             </div>
-                            <p className="text-[9px] font-bold uppercase tracking-[0.15em] text-muted-foreground mt-1">
+                            <p className="text-[9px] font-bold uppercase tracking-[0.15em] text-muted-foreground mt-0.5">
                                 In CRM
                             </p>
                         </div>
