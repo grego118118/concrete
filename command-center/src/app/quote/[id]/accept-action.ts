@@ -102,7 +102,7 @@ export async function acceptQuote(id: string, scheduledDate: string) {
                             <p style="color: #166534; font-weight: 700; font-size: 16px; margin: 0 0 12px;">Ready to pay the deposit?</p>
                             <a href="${paymentLink}" 
                                style="display: inline-block; background: #22c55e; color: white; text-decoration: none; padding: 14px 32px; border-radius: 10px; font-size: 16px; font-weight: 700; box-shadow: 0 4px 6px rgba(34, 197, 94, 0.2);">
-                                Pay 50% Deposit via QuickBooks
+                                Pay 50% Deposit
                             </a>
                         </div>
                         ` : `

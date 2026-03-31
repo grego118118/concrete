@@ -24,7 +24,7 @@ const CreateQuoteSchema = z.object({
     cleanupFee: z.number().optional(),
     notes: z.string().optional(),
     allowOverages: z.boolean().default(false),
-    showScheduler: z.boolean().default(true).optional(),
+    showScheduler: z.boolean().default(false).optional(),
 });
 
 export type CreateQuoteData = z.infer<typeof CreateQuoteSchema>;
@@ -88,7 +88,7 @@ export async function createQuote(data: CreateQuoteData) {
                 cleanupFee: cleanupFee || null,
                 notes: notes || null,
                 allowOverages: allowOverages ?? false,
-                showScheduler: showScheduler ?? true,
+                showScheduler: showScheduler ?? false,
                 validUntil: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // Default 30 days valid
                 items: {
                     create: finalItems.map(item => ({
@@ -200,7 +200,7 @@ export async function updateQuoteDetails(id: string, data: CreateQuoteData) {
                     cleanupFee: cleanupFee || null,
                     notes: notes || null,
                     allowOverages: allowOverages ?? false,
-                    showScheduler: showScheduler ?? true,
+                    showScheduler: showScheduler ?? false,
                     items: {
                         create: finalItems.map(item => ({
                             description: item.description,
@@ -229,20 +229,22 @@ export async function updateQuoteDetails(id: string, data: CreateQuoteData) {
 }
 
 export async function deleteQuote(id: string) {
-    // Disconnect related Job (nullify quoteId) to avoid FK constraint
-    await db.job.updateMany({
-        where: { quoteId: id },
-        data: { quoteId: null }
-    });
+    await db.$transaction(async (tx) => {
+        // Disconnect related Job (nullify quoteId) to avoid FK constraint
+        await tx.job.updateMany({
+            where: { quoteId: id },
+            data: { quoteId: null }
+        });
 
-    // Delete any related invoices
-    await db.invoice.deleteMany({
-        where: { quoteId: id }
-    });
+        // Delete any related invoices
+        await tx.invoice.deleteMany({
+            where: { quoteId: id }
+        });
 
-    // Now delete the quote (items + photos cascade automatically)
-    await db.quote.delete({
-        where: { id }
+        // Delete the quote (items + photos cascade automatically)
+        await tx.quote.delete({
+            where: { id }
+        });
     });
 
     revalidatePath("/app/crm/quotes");

@@ -12,14 +12,9 @@ export async function createJob(formData: FormData) {
     const photoUrls = formData.getAll("photoUrls") as string[]
 
     // Ensure business exists
-    let business = await db.business.findFirst()
+    const business = await db.business.findFirst()
     if (!business) {
-        business = await db.business.create({
-            data: {
-                name: "TradeOps Demo",
-                brandKit: {}
-            }
-        })
+        throw new Error("No business record found. Please complete setup before creating jobs.")
     }
 
     const job = await db.job.create({

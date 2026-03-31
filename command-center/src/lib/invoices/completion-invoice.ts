@@ -77,12 +77,13 @@ export async function sendCompletionInvoice(jobId: string, overageItems: Overage
         });
     }
 
-    // Update invoice amount to reflect final balance
+    // Update invoice amount — mark completionSentAt now regardless of Stripe outcome
+    // so the job stage tracker advances to "Invoiced" even if the payment link fails.
     await db.invoice.update({
         where: { id: invoice.id },
         data: {
             amount: finalAmount,
-            status: 'SENT' as any,
+            completionSentAt: new Date(),
         }
     });
 
@@ -99,10 +100,7 @@ export async function sendCompletionInvoice(jobId: string, overageItems: Overage
         if (completionPaymentLink) {
             await db.invoice.update({
                 where: { id: invoice.id },
-                data: {
-                    completionPaymentLink,
-                    completionSentAt: new Date(),
-                }
+                data: { completionPaymentLink }
             });
         }
     } catch (err) {
@@ -158,6 +156,8 @@ export async function sendCompletionInvoice(jobId: string, overageItems: Overage
         </div>
     ` : '';
 
+    // status: 'SENT' is set after email delivery to ensure the invoice is only
+    // marked sent when the customer actually received it.
     await sendEmail({
         to: customer.email,
         subject: `Your Project is Complete — Final Invoice #${invoice.number}`,
@@ -192,6 +192,11 @@ export async function sendCompletionInvoice(jobId: string, overageItems: Overage
             filename: `Invoice-${invoice.number}.pdf`,
             content: pdfBuffer,
         }] : [],
+    });
+
+    await db.invoice.update({
+        where: { id: invoice.id },
+        data: { status: 'SENT' as any }
     });
 
     console.log(`[Completion Invoice] Sent to ${customer.email} for job ${jobId}, amount $${finalAmount}`);

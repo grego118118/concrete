@@ -1,12 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
+import crypto from 'crypto';
 
 /**
  * POST /app/api/webhooks/quickbooks
- * 
+ *
  * Receives webhook notifications from QuickBooks Online.
  * Handles payment creation/update events to sync payment status back to CRM.
- * 
+ *
  * QuickBooks webhook payload structure:
  * {
  *   "eventNotifications": [{
@@ -22,13 +23,43 @@ import { db } from '@/lib/db';
  *   }]
  * }
  */
+
+function verifyQBSignature(rawBody: string, signature: string | null): boolean {
+    const verifierToken = process.env.QUICKBOOKS_WEBHOOK_VERIFIER_TOKEN;
+    if (!verifierToken) {
+        console.error('[QB Webhook] QUICKBOOKS_WEBHOOK_VERIFIER_TOKEN is not set');
+        return false;
+    }
+    if (!signature) return false;
+    const expected = crypto.createHmac('sha256', verifierToken).update(rawBody).digest('base64');
+    try {
+        return crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expected));
+    } catch {
+        return false;
+    }
+}
+
 export async function POST(request: NextRequest) {
     try {
-        const body = await request.json();
+        const rawBody = await request.text();
+        const signature = request.headers.get('intuit-signature');
 
-        // QuickBooks sends a verification challenge on webhook setup
+        // QuickBooks sends a verification challenge on webhook setup (no signature)
+        let body: any;
+        try {
+            body = JSON.parse(rawBody);
+        } catch {
+            return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 });
+        }
+
         if (body.challengeToken) {
             return NextResponse.json({ challengeToken: body.challengeToken });
+        }
+
+        // All real event payloads must have a valid signature
+        if (!verifyQBSignature(rawBody, signature)) {
+            console.error('[QB Webhook] Signature verification failed');
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
         const notifications = body.eventNotifications || [];
@@ -133,27 +164,19 @@ async function handlePaymentCreated(qbPaymentId: string, realmId: string) {
 }
 
 /**
- * Handle a deleted payment in QuickBooks (refund/void)
+ * Handle a deleted payment in QuickBooks.
+ * QB is used for accounting only — Stripe is the authoritative payment source.
+ * We log the deletion but do NOT revert CRM invoice status, since the Stripe
+ * payment may still be valid (e.g. a bookkeeper correcting a duplicate QB entry).
  */
 async function handlePaymentDeleted(qbPaymentId: string) {
     try {
-        // Find and revert any invoices that were paid by this payment
         const invoice = await db.invoice.findFirst({
             where: { paymentReference: qbPaymentId },
         });
 
         if (invoice) {
-            await db.invoice.update({
-                where: { id: invoice.id },
-                data: {
-                    status: 'PENDING',
-                    paidAt: null,
-                    paymentReference: null,
-                    paymentMethod: null,
-                },
-            });
-
-            console.log(`[QB Webhook] Invoice ${invoice.number} reverted to PENDING (payment deleted)`);
+            console.warn(`[QB Webhook] QB payment ${qbPaymentId} deleted — Invoice ${invoice.number} status unchanged (QB is accounting-only)`);
         }
     } catch (error) {
         console.error('[QB Webhook] handlePaymentDeleted error:', error);

@@ -158,31 +158,14 @@ export async function createQBInvoice(quoteId: string): Promise<string | null> {
             throw new Error('QuickBooks did not return an invoice ID');
         }
 
-        console.log(`[QB Sync] Created QB invoice: ${qbInvoiceId}. Syncing Payment Link...`);
+        console.log(`[QB Sync] Created QB invoice: ${qbInvoiceId}`);
 
-        // Only try to fetch payment link if we aren't in a stripped-down mode that likely blocks it
-        let paymentLink: string | null = null;
-        if (!syncStatusNote) {
-            try {
-                const invoiceDetail = await qbApiRequest(
-                    'GET',
-                    `invoice/${qbInvoiceId}?include=invoiceLink`,
-                    connection.realmId,
-                    connection.accessToken
-                );
-                paymentLink = invoiceDetail?.Invoice?.InvoiceLink || null;
-            } catch (err) {
-                console.warn(`[QB Sync] Skipping payment link retrieval for ${qbInvoiceId} due to restriction.`);
-            }
-        }
-
+        // Payments are handled exclusively via Stripe — do not fetch or store QB payment links.
         if (quote.invoice) {
             await db.invoice.update({
                 where: { id: quote.invoice.id },
                 data: {
                     qbInvoiceId,
-                    // Only overwrite paymentLink if QB returned one — don't clobber existing Stripe link with null
-                    ...(paymentLink ? { paymentLink } : {}),
                     status: 'PENDING',
                     lastSyncAt: new Date(),
                     lastSyncError: syncStatusNote || null,

@@ -42,7 +42,7 @@ export default function CreateQuoteForm({ customers, initialData }: { customers:
     const [cleanupFee, setCleanupFee] = useState<string>("");
     const [notes, setNotes] = useState<string>("");
     const [allowOverages, setAllowOverages] = useState<boolean>(initialData?.allowOverages ?? false);
-    const [showScheduler, setShowScheduler] = useState<boolean>(initialData?.showScheduler ?? true);
+    const [showScheduler, setShowScheduler] = useState<boolean>(initialData?.showScheduler ?? false);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const router = useRouter();
 

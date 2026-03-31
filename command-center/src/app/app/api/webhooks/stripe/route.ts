@@ -48,6 +48,12 @@ export async function POST(request: NextRequest) {
             const isFullPayment = amountPaid >= invoiceTotal;
             const newStatus = isFullPayment ? 'PAID' : 'DEPOSIT_PAID';
 
+            // Idempotency: skip if already in the target status
+            if (invoice.status === newStatus) {
+                console.log(`[Stripe Webhook] Invoice ${invoiceId} already ${newStatus}, skipping`);
+                return NextResponse.json({ received: true });
+            }
+
             await db.invoice.update({
                 where: { id: invoiceId },
                 data: {

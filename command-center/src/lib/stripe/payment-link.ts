@@ -34,6 +34,9 @@ export async function createDepositPaymentLink(params: {
                 invoiceId: params.invoiceId,
                 quoteNumber: params.quoteNumber,
             },
+            restrictions: {
+                completed_sessions: { limit: 1 },
+            },
             after_completion: {
                 type: 'hosted_confirmation',
                 hosted_confirmation: {
@@ -82,6 +85,9 @@ export async function createCompletionPaymentLink(params: {
                 quoteId: params.quoteId,
                 invoiceId: params.invoiceId,
                 quoteNumber: params.quoteNumber,
+            },
+            restrictions: {
+                completed_sessions: { limit: 1 },
             },
             after_completion: {
                 type: 'redirect',
