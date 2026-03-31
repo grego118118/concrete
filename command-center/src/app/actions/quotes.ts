@@ -24,7 +24,7 @@ const CreateQuoteSchema = z.object({
     cleanupFee: z.number().optional(),
     notes: z.string().optional(),
     allowOverages: z.boolean().default(false),
-    showScheduler: z.boolean().default(true),
+    showScheduler: z.boolean().default(true).optional(),
 });
 
 export type CreateQuoteData = z.infer<typeof CreateQuoteSchema>;
