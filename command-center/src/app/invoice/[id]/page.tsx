@@ -34,11 +34,15 @@ export default async function PublicInvoicePage(props: { params: Promise<{ id: s
 
                 {/* ── Header ── */}
                 <div className="flex justify-between items-start px-10 pt-10 pb-7 border-b-2 border-slate-900">
-                    <div>
-                        <p className="text-xl font-black text-slate-900 leading-tight">Pioneer Concrete Coatings</p>
-                        <p className="text-xs text-slate-500 mt-0.5">Serving Southern New England</p>
-                        <p className="text-xs text-slate-500">(413) 544-4933</p>
-                        <p className="text-xs text-slate-500">billing@pioneerconcretecoatings.com</p>
+                    <div className="flex items-start gap-4">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src="/logo.png" alt="Pioneer Concrete Coatings" className="w-14 h-14 object-contain" onError={e => (e.currentTarget.style.display = 'none')} />
+                        <div>
+                            <p className="text-xl font-black text-slate-900 leading-tight">Pioneer Concrete Coatings</p>
+                            <p className="text-xs text-slate-500 mt-0.5">Serving Southern New England</p>
+                            <p className="text-xs text-slate-500">(413) 544-4933</p>
+                            <p className="text-xs text-slate-500">billing@pioneerconcretecoatings.com</p>
+                        </div>
                     </div>
                     <div className="text-right">
                         <p className="text-4xl font-black text-slate-900 tracking-tight">INVOICE</p>
