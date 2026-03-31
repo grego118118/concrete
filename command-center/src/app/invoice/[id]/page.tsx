@@ -23,7 +23,7 @@ export default async function PublicInvoicePage(props: { params: Promise<{ id: s
     const overageTotal = overageItems.reduce((s: number, i: any) => s + Number(i.total), 0);
     const baseBalance = invoiceTotal - overageTotal;
     const isPaid = invoice.status === "PAID";
-    const paymentLink = invoice.completionPaymentLink;
+    const paymentLink = (invoice as any).completionPaymentLink || invoice.paymentLink;
 
     const fmt = (n: number) => n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     const dateStr = new Date(invoice.createdAt).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
