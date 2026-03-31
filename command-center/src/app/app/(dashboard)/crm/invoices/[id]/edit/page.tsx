@@ -11,7 +11,7 @@ export default async function EditInvoicePage(props: { params: Promise<{ id: str
     const invoice = await getInvoice(params.id);
 
     if (!invoice) {
-        redirect("/crm/invoices");
+        redirect("/app/crm/invoices");
     }
 
     const updateInvoiceWithId = updateInvoice.bind(null, invoice.id);

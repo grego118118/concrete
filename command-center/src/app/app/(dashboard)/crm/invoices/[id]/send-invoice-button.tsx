@@ -38,6 +38,7 @@ export function SendInvoiceButton({ invoiceId, currentStatus }: { invoiceId: str
         <Button
             variant="outline"
             size="sm"
+            type="button"
             onClick={handleSend}
             disabled={isLoading}
             className="hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200 transition-colors"

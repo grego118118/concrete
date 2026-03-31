@@ -167,7 +167,7 @@ export async function sendInvoice(id: string) {
     });
 
     revalidatePath("/app/crm/invoices");
-    revalidatePath(`/app/crm/invoices/${id}`);
+    revalidatePath(`/app/crm/invoices/${id}/edit`);
 }
 
 export async function syncQBInvoice(id: string) {
