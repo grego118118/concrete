@@ -36,7 +36,7 @@ export default async function PublicInvoicePage(props: { params: Promise<{ id: s
                 <div className="flex justify-between items-start px-10 pt-10 pb-7 border-b-2 border-slate-900">
                     <div className="flex items-start gap-4">
                         {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img src="/logo.png" alt="Pioneer Concrete Coatings" className="w-14 h-14 object-contain" onError={e => (e.currentTarget.style.display = 'none')} />
+                        <img src="/logo.png" alt="Pioneer Concrete Coatings" className="w-14 h-14 object-contain" />
                         <div>
                             <p className="text-xl font-black text-slate-900 leading-tight">Pioneer Concrete Coatings</p>
                             <p className="text-xs text-slate-500 mt-0.5">Serving Southern New England</p>
