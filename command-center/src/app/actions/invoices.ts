@@ -96,78 +96,75 @@ export async function sendInvoice(id: string) {
             customer: true,
             quote: {
                 include: { items: true }
-            }
+            },
         }
-    });
+    }) as any;
 
     if (!invoice || !invoice.customer) throw new Error("Invoice or customer not found");
 
-    // Sync to QuickBooks first to ensure we have a payment link
+    // Sync to QuickBooks (non-critical)
     try {
         const { createQBInvoice } = await import("@/lib/quickbooks/invoice-sync");
         await createQBInvoice(invoice.quoteId);
     } catch (err) {
-        console.warn('[sendInvoice] QB sync failed:', err);
+        console.warn('[sendInvoice] QB sync failed (non-critical):', err);
     }
 
-    // Refresh invoice data to get the link
-    const updatedInvoice = await db.invoice.findUnique({
-        where: { id },
-    });
-    const paymentLink = updatedInvoice?.paymentLink;
+    // Refresh to pick up any payment link from QB sync
+    const fresh = await db.invoice.findUnique({ where: { id } }) as any;
+    const paymentLink = fresh?.completionPaymentLink || fresh?.paymentLink;
 
-    // Generate PDF
-    const { generateInvoicePDF } = await import("@/lib/pdf-generator");
-    const pdfBuffer = await generateInvoicePDF(invoice);
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://pioneerconcretecoatings.com';
+    const invoiceUrl = `${baseUrl}/invoice/${id}`;
+    const amount = Number(invoice.amount);
 
-    // Send Email via Nodemailer
+    // Generate PDF — non-fatal, email sends with or without it
+    let pdfBuffer: Buffer | null = null;
+    try {
+        const { generateInvoicePDF } = await import("@/lib/pdf-generator");
+        pdfBuffer = await generateInvoicePDF({ ...invoice, paymentLink });
+    } catch (err) {
+        console.warn('[sendInvoice] PDF generation failed (non-critical):', err);
+    }
+
     await sendEmail({
         to: invoice.customer.email,
         subject: `Invoice #${invoice.number} from Pioneer Concrete Coatings`,
         html: `
-            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; color: #0f172a;">
                 <h2 style="color: #0f172a;">Your Invoice is Ready</h2>
                 <p>Hi ${invoice.customer.name},</p>
-                <p>Thank you for choosing Pioneer Concrete Coatings. Please find your invoice #${invoice.number} attached as a PDF.</p>
-                
+                <p>Please find your invoice from Pioneer Concrete Coatings below.</p>
+
                 <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 24px; margin: 24px 0; text-align: center;">
-                    <p style="color: #64748b; margin: 0 0 5px; font-size: 12px; text-transform: uppercase;">Amount Due</p>
-                    <p style="color: #0f172a; font-size: 32px; font-weight: 800; margin: 0;">$${Number(invoice.amount).toLocaleString(undefined, { minimumFractionDigits: 2 })}</p>
+                    <p style="color: #64748b; margin: 0 0 5px; font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em;">Invoice #${invoice.number}</p>
+                    <p style="color: #0f172a; font-size: 32px; font-weight: 800; margin: 0;">$${amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}</p>
                     ${invoice.dueDate ? `<p style="color: #ef4444; margin: 8px 0 0; font-size: 14px; font-weight: 600;">Due by ${new Date(invoice.dueDate).toLocaleDateString()}</p>` : ''}
                 </div>
 
-                ${paymentLink ? `
-                <div style="text-align: center; margin: 30px 0;">
-                    <a href="${paymentLink}" 
-                       style="display: inline-block; background: #2563eb; color: white; text-decoration: none; padding: 16px 40px; border-radius: 10px; font-size: 16px; font-weight: 700; box-shadow: 0 4px 6px rgba(37, 99, 235, 0.2);">
-                        Pay Securely via QuickBooks
+                <div style="background: #f0fdf4; border: 2px solid #bbf7d0; border-radius: 12px; padding: 24px; margin: 24px 0; text-align: center;">
+                    <p style="color: #166534; font-weight: 700; font-size: 16px; margin: 0 0 12px;">View &amp; Pay Your Invoice</p>
+                    <a href="${invoiceUrl}"
+                       style="display: inline-block; background: #22c55e; color: white; text-decoration: none; padding: 14px 32px; border-radius: 10px; font-size: 16px; font-weight: 700;">
+                        View Invoice &amp; Pay $${amount.toFixed(2)}
                     </a>
-                    <p style="color: #94a3b8; font-size: 12px; margin-top: 12px;">Secure credit card or ACH payment</p>
+                    <p style="color: #94a3b8; font-size: 12px; margin-top: 12px;">Secured by Stripe · All major cards accepted</p>
                 </div>
-                ` : ''}
 
-                <p style="color: #475569; line-height: 1.6;">If you have any questions, please feel free to reply to this email or call us at (413) 544-4933.</p>
-                <br/>
+                <p style="color: #475569; line-height: 1.6;">If you have any questions, please reply to this email or call us at <strong>(413) 544-4933</strong>.</p>
                 <p>Thank you,<br/>Pioneer Concrete Coatings</p>
             </div>
         `,
-        attachments: [
-            {
-                filename: `Invoice-${invoice.number}.pdf`,
-                content: pdfBuffer,
-            }
-        ]
+        attachments: pdfBuffer ? [{ filename: `Invoice-${invoice.number}.pdf`, content: pdfBuffer }] : [],
     });
 
     await db.invoice.update({
         where: { id },
-        data: {
-            status: 'SENT'
-        }
-    })
+        data: { status: 'SENT' }
+    });
 
-    revalidatePath("/app/crm/invoices")
-    revalidatePath(`/app/crm/invoices/${id}`)
+    revalidatePath("/app/crm/invoices");
+    revalidatePath(`/app/crm/invoices/${id}`);
 }
 
 export async function syncQBInvoice(id: string) {
