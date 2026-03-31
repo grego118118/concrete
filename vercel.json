@@ -31,6 +31,16 @@
       "check": true
     },
     {
+      "src": "/invoice/(.*)",
+      "dest": "/command-center/invoice/$1",
+      "check": true
+    },
+    {
+      "src": "/pay/(.*)",
+      "dest": "/command-center/pay/$1",
+      "check": true
+    },
+    {
       "src": "/app/(.*)",
       "dest": "/command-center/app/$1",
       "check": true
