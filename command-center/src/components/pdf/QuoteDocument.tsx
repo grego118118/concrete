@@ -1,18 +1,7 @@
 import React from 'react';
 import { Page, Text, View, Document, StyleSheet, Image } from '@react-pdf/renderer';
-import path from 'path';
-import fs from 'fs';
 
-// Load logo as base64 for PDF embedding
-function getLogoBase64(): string | null {
-    try {
-        const logoPath = path.join(process.cwd(), 'public', 'logo.png');
-        const logoBuffer = fs.readFileSync(logoPath);
-        return `data:image/png;base64,${logoBuffer.toString('base64')}`;
-    } catch {
-        return null;
-    }
-}
+const LOGO_URL = 'https://pioneerconcretecoatings.com/logo.png';
 
 const styles = StyleSheet.create({
     page: {
@@ -277,7 +266,7 @@ interface QuoteDocumentProps {
 }
 
 export const QuoteDocument: React.FC<QuoteDocumentProps> = ({ quote, customer, items, paymentLink }) => {
-    const logoSrc = getLogoBase64();
+    const logoSrc = LOGO_URL;
     const scopeData = quote.scopeData as any;
     const scopeArea = Number(quote.scopeArea) || 0;
 
@@ -302,9 +291,7 @@ export const QuoteDocument: React.FC<QuoteDocumentProps> = ({ quote, customer, i
                 {/* Header with Logo */}
                 <View style={styles.header}>
                     <View style={styles.logoSection}>
-                        {logoSrc && (
-                            <Image style={styles.logo} src={logoSrc} />
-                        )}
+                        <Image style={styles.logo} src={logoSrc} />
                         <View style={styles.logoTextContainer}>
                             <Text style={styles.logoText}>Pioneer Concrete Coatings</Text>
                             <Text style={styles.companyDetails}>Serving Southern New England</Text>
@@ -476,7 +463,7 @@ export const QuoteDocument: React.FC<QuoteDocumentProps> = ({ quote, customer, i
                     {paymentLink && (
                         <View style={{ marginTop: 10, alignItems: 'center' }}>
                             <Text style={{ ...styles.ctaTitle, color: '#1d4ed8' }}>Secure Online Deposit</Text>
-                            <Text style={styles.ctaText}>Pay your 50% deposit securely via QuickBooks to book your date:</Text>
+                            <Text style={styles.ctaText}>Pay your 50% deposit securely online to book your date:</Text>
                             <Text style={{ ...styles.ctaText, color: '#1d4ed8', fontWeight: 'bold', textDecoration: 'underline', marginTop: 4 }}>
                                 {paymentLink}
                             </Text>
