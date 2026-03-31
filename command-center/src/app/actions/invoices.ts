@@ -87,7 +87,6 @@ export async function deleteInvoice(id: string) {
 }
 
 import { sendEmail } from "@/lib/mailer";
-import { generateInvoicePDF } from "@/lib/pdf-generator";
 
 export async function sendInvoice(id: string) {
     const invoice = await db.invoice.findUnique({
@@ -102,6 +101,10 @@ export async function sendInvoice(id: string) {
 
     if (!invoice || !invoice.customer) throw new Error("Invoice or customer not found");
 
+    // Capture existing Stripe payment links before QB sync potentially modifies the row
+    const beforeSync = await db.invoice.findUnique({ where: { id } }) as any;
+    const stripeLink = beforeSync?.completionPaymentLink || beforeSync?.paymentLink;
+
     // Sync to QuickBooks (non-critical)
     try {
         const { createQBInvoice } = await import("@/lib/quickbooks/invoice-sync");
@@ -110,9 +113,9 @@ export async function sendInvoice(id: string) {
         console.warn('[sendInvoice] QB sync failed (non-critical):', err);
     }
 
-    // Refresh to pick up any payment link from QB sync
+    // Refresh to pick up any payment link from QB sync; fall back to original Stripe link
     const fresh = await db.invoice.findUnique({ where: { id } }) as any;
-    const paymentLink = fresh?.completionPaymentLink || fresh?.paymentLink;
+    const paymentLink = fresh?.completionPaymentLink || fresh?.paymentLink || stripeLink;
 
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://pioneerconcretecoatings.com';
     const invoiceUrl = `${baseUrl}/invoice/${id}`;

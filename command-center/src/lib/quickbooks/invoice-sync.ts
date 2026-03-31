@@ -181,10 +181,11 @@ export async function createQBInvoice(quoteId: string): Promise<string | null> {
                 where: { id: quote.invoice.id },
                 data: {
                     qbInvoiceId,
-                    paymentLink,
+                    // Only overwrite paymentLink if QB returned one — don't clobber existing Stripe link with null
+                    ...(paymentLink ? { paymentLink } : {}),
                     status: 'PENDING',
                     lastSyncAt: new Date(),
-                    lastSyncError: syncStatusNote || null, 
+                    lastSyncError: syncStatusNote || null,
                 },
             });
         }
