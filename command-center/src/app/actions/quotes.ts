@@ -24,6 +24,7 @@ const CreateQuoteSchema = z.object({
     cleanupFee: z.number().optional(),
     notes: z.string().optional(),
     allowOverages: z.boolean().default(false),
+    showScheduler: z.boolean().default(true),
 });
 
 export type CreateQuoteData = z.infer<typeof CreateQuoteSchema>;
@@ -31,7 +32,7 @@ export type CreateQuoteData = z.infer<typeof CreateQuoteSchema>;
 export async function createQuote(data: CreateQuoteData) {
     try {
         const validatedData = CreateQuoteSchema.parse(data);
-        const { customerId, items, status, scopeArea, baseRate, scopeData, cleanupFee, notes, allowOverages } = validatedData;
+        const { customerId, items, status, scopeArea, baseRate, scopeData, cleanupFee, notes, allowOverages, showScheduler } = validatedData;
 
         let subtotal = 0;
         const taxRate = 0.0625;
@@ -87,6 +88,7 @@ export async function createQuote(data: CreateQuoteData) {
                 cleanupFee: cleanupFee || null,
                 notes: notes || null,
                 allowOverages: allowOverages ?? false,
+                showScheduler: showScheduler ?? true,
                 validUntil: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // Default 30 days valid
                 items: {
                     create: finalItems.map(item => ({
@@ -137,7 +139,7 @@ export async function getQuote(id: string) {
 export async function updateQuoteDetails(id: string, data: CreateQuoteData) {
     try {
         const validatedData = CreateQuoteSchema.parse(data);
-        const { customerId, items, status, scopeArea, baseRate, scopeData, cleanupFee, notes, allowOverages } = validatedData;
+        const { customerId, items, status, scopeArea, baseRate, scopeData, cleanupFee, notes, allowOverages, showScheduler } = validatedData;
 
         // Financials source of truth: Calculator (if used) or manual Items
         let subtotal = 0;
@@ -198,6 +200,7 @@ export async function updateQuoteDetails(id: string, data: CreateQuoteData) {
                     cleanupFee: cleanupFee || null,
                     notes: notes || null,
                     allowOverages: allowOverages ?? false,
+                    showScheduler: showScheduler ?? true,
                     items: {
                         create: finalItems.map(item => ({
                             description: item.description,

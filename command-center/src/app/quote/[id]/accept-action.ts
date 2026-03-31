@@ -95,7 +95,7 @@ export async function acceptQuote(id: string, scheduledDate: string) {
                         <h2 style="color: #0f172a;">Project Confirmed!</h2>
                         <p>Hi ${quote.customer.name},</p>
                         <p>Great news! We've received your acceptance for Quote #${quote.number}.</p>
-                        <p><strong>Scheduled Start Date:</strong> ${new Date(scheduledDate).toLocaleDateString()}</p>
+                        ${scheduledDate ? `<p><strong>Scheduled Start Date:</strong> ${new Date(scheduledDate).toLocaleDateString()}</p>` : ""}
                         
                         ${paymentLink ? `
                         <div style="background: #f0fdf4; border: 2px solid #bbf7d0; border-radius: 12px; padding: 24px; margin: 24px 0; text-align: center;">

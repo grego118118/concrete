@@ -33,6 +33,7 @@ type InitialQuoteData = {
     baseRate?: number;
     scopeData?: any;
     allowOverages?: boolean;
+    showScheduler?: boolean;
 }
 
 export default function CreateQuoteForm({ customers, initialData }: { customers: Customer[], initialData?: InitialQuoteData }) {
@@ -41,6 +42,7 @@ export default function CreateQuoteForm({ customers, initialData }: { customers:
     const [cleanupFee, setCleanupFee] = useState<string>("");
     const [notes, setNotes] = useState<string>("");
     const [allowOverages, setAllowOverages] = useState<boolean>(initialData?.allowOverages ?? false);
+    const [showScheduler, setShowScheduler] = useState<boolean>(initialData?.showScheduler ?? true);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const router = useRouter();
 
@@ -85,6 +87,7 @@ export default function CreateQuoteForm({ customers, initialData }: { customers:
                 cleanupFee: cleanupFee ? parseFloat(cleanupFee) : undefined,
                 notes: notes || undefined,
                 allowOverages,
+                showScheduler,
             };
 
             // Include scope data from the calculator
@@ -226,6 +229,17 @@ export default function CreateQuoteForm({ customers, initialData }: { customers:
                                     <Switch
                                         checked={allowOverages}
                                         onCheckedChange={setAllowOverages}
+                                    />
+                                </div>
+
+                                <div className="flex items-center justify-between pt-2 border-t">
+                                    <div>
+                                        <Label className="text-sm font-medium text-slate-700">Show Start Date Scheduler</Label>
+                                        <p className="text-xs text-slate-400 mt-0.5">Let customer pick a preferred start date</p>
+                                    </div>
+                                    <Switch
+                                        checked={showScheduler}
+                                        onCheckedChange={setShowScheduler}
                                     />
                                 </div>
                             </div>

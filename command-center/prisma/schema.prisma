@@ -193,8 +193,9 @@ model Quote {
   scopeFinish    String? // e.g. "Polyaspartic"
   scopePsi       String? // Strength
 
-  validUntil DateTime?
-  customerId String
+  showScheduler Boolean   @default(true) // Show date scheduling to customer on quote page
+  validUntil    DateTime?
+  customerId    String
   customer   Customer    @relation(fields: [customerId], references: [id])
   items      QuoteItem[]
   photos     Photo[]

@@ -38,6 +38,7 @@ interface QuoteAcceptClientProps {
     jobLocation?: string | null;
     createdAt: string;
     photos?: { id: string; url: string; caption?: string | null }[];
+    showScheduler?: boolean;
 }
 
 function fmt(n: number) {
@@ -66,6 +67,7 @@ export function QuoteAcceptClient({
     jobLocation,
     createdAt,
     photos,
+    showScheduler = true,
 }: QuoteAcceptClientProps) {
     const [accepted, setAccepted] = useState(isAlreadyAccepted || isSuccess);
     const [isAccepting, setIsAccepting] = useState(false);
@@ -111,7 +113,7 @@ export function QuoteAcceptClient({
     }, [accepted, quoteId]);
 
     const handleAcceptAndSchedule = async () => {
-        if (!scheduledDate) { alert("Please select a preferred start date first."); return; }
+        if (showScheduler && !scheduledDate) { alert("Please select a preferred start date first."); return; }
         setIsAccepting(true);
         try {
             const result = await acceptQuote(quoteId, scheduledDate);
@@ -322,29 +324,33 @@ export function QuoteAcceptClient({
                                 <PartyPopper className="h-9 w-9 text-emerald-600 mx-auto" />
                                 <p className="text-lg font-black text-slate-900">Ready to Accept This Quote?</p>
                                 <p className="text-sm text-slate-600 max-w-md mx-auto">
-                                    Select your preferred start date below to accept this quote and schedule your project.
+                                    {showScheduler
+                                        ? "Select your preferred start date below to accept this quote and schedule your project."
+                                        : "Click below to accept this quote and we'll be in touch to schedule your project."}
                                 </p>
                             </div>
-                            <div className="space-y-1.5 max-w-sm mx-auto text-left">
-                                <label htmlFor="start-date" className="text-sm font-bold text-slate-700">Preferred Start Date</label>
-                                <input
-                                    id="start-date"
-                                    type="date"
-                                    className="w-full h-11 px-4 border-2 border-slate-200 rounded-lg text-slate-900 font-medium focus:border-emerald-500 focus:outline-none"
-                                    value={scheduledDate}
-                                    onChange={e => setScheduledDate(e.target.value)}
-                                    min={new Date().toISOString().split("T")[0]}
-                                />
-                                <p className="text-xs text-slate-500">We&apos;ll do our best to accommodate this date and confirm within 24 hours.</p>
-                            </div>
+                            {showScheduler && (
+                                <div className="space-y-1.5 max-w-sm mx-auto text-left">
+                                    <label htmlFor="start-date" className="text-sm font-bold text-slate-700">Preferred Start Date</label>
+                                    <input
+                                        id="start-date"
+                                        type="date"
+                                        className="w-full h-11 px-4 border-2 border-slate-200 rounded-lg text-slate-900 font-medium focus:border-emerald-500 focus:outline-none"
+                                        value={scheduledDate}
+                                        onChange={e => setScheduledDate(e.target.value)}
+                                        min={new Date().toISOString().split("T")[0]}
+                                    />
+                                    <p className="text-xs text-slate-500">We&apos;ll do our best to accommodate this date and confirm within 24 hours.</p>
+                                </div>
+                            )}
                             <button
                                 ref={acceptBtnRef}
                                 onClick={handleAcceptAndSchedule}
-                                disabled={isAccepting || !scheduledDate}
+                                disabled={isAccepting || (showScheduler && !scheduledDate)}
                                 className="inline-flex items-center justify-center gap-2 px-10 py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white text-base font-bold rounded-lg shadow-lg shadow-emerald-200 transition-all hover:scale-[1.02] active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed w-full sm:w-auto"
                             >
                                 {isAccepting ? <Loader2 className="h-5 w-5 animate-spin" /> : <CheckCircle2 className="h-5 w-5" />}
-                                {isAccepting ? "Confirming..." : "Accept & Schedule Project"}
+                                {isAccepting ? "Confirming..." : showScheduler ? "Accept & Schedule Project" : "Accept Quote"}
                             </button>
                             <div className="flex items-center justify-center gap-6 text-xs text-slate-400">
                                 <span className="flex items-center gap-1"><Shield className="h-3.5 w-3.5" /> Secure Acceptance</span>

@@ -105,6 +105,7 @@ export default async function PublicQuotePage(props: {
             jobLocation={quote.jobLocation}
             createdAt={quote.createdAt.toISOString()}
             photos={(quote.photos || []).map((p: any) => ({ id: p.id, url: p.url, caption: p.caption }))}
+        showScheduler={quote.showScheduler}
         />
     );
 }
