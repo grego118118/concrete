@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Search, FileText } from "lucide-react";
+import { Plus, Search, FileText, MailCheck, MailOpen, Clock } from "lucide-react";
 import Link from "next/link";
 
 import { getQuotes, deleteQuote } from "@/app/actions/quotes";
@@ -46,13 +46,14 @@ export default async function QuotesPage() {
                             <TableHead>Date</TableHead>
                             <TableHead>Amount</TableHead>
                             <TableHead>Status</TableHead>
+                            <TableHead>Receipt</TableHead>
                             <TableHead className="text-right">Actions</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
                         {quotes.length === 0 ? (
                             <TableRow>
-                                <TableCell colSpan={6} className="text-center h-24 text-muted-foreground">
+                                <TableCell colSpan={7} className="text-center h-24 text-muted-foreground">
                                     No quotes found. Create one to get started.
                                 </TableCell>
                             </TableRow>
@@ -68,6 +69,24 @@ export default async function QuotesPage() {
                                     <TableCell>${Number(quote.total).toFixed(2)}</TableCell>
                                     <TableCell>
                                         <Badge variant="outline" className="text-orange-600 border-orange-600">{quote.status}</Badge>
+                                    </TableCell>
+                                    <TableCell>
+                                        {(quote as any).openedAt ? (
+                                            <span className="flex items-center gap-1 text-xs text-green-600 font-medium">
+                                                <MailOpen className="h-3.5 w-3.5" />
+                                                Opened {new Date((quote as any).openedAt).toLocaleDateString()}
+                                            </span>
+                                        ) : (quote as any).sentAt ? (
+                                            <span className="flex items-center gap-1 text-xs text-blue-600">
+                                                <MailCheck className="h-3.5 w-3.5" />
+                                                Sent {new Date((quote as any).sentAt).toLocaleDateString()}
+                                            </span>
+                                        ) : (
+                                            <span className="flex items-center gap-1 text-xs text-muted-foreground">
+                                                <Clock className="h-3.5 w-3.5" />
+                                                Not sent
+                                            </span>
+                                        )}
                                     </TableCell>
                                     <TableCell className="text-right flex justify-end gap-2">
                                         <Link href={`/app/crm/quotes/${quote.id}`}>

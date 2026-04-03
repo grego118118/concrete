@@ -18,6 +18,7 @@ export async function processSendQuote(quoteId: string, logId: string) {
         const isProduction = process.env.NODE_ENV === "production" || process.env.VERCEL_ENV === "production";
         const productionDomain = "https://pioneerconcretecoatings.com";
         const origin = isProduction ? productionDomain : (process.env.NEXTAUTH_URL || "http://localhost:3000");
+        const trackingPixelUrl = `${origin}/app/api/track/quote/${quote.id}`;
 
         const acceptUrl = `${origin}/quote/${quote.id}`;
 
@@ -66,15 +67,16 @@ export async function processSendQuote(quoteId: string, logId: string) {
                             Link: <a href="${acceptUrl}" style="color: #93c5fd;">${acceptUrl}</a>
                         </p>
                     </div>
+                    <img src="${trackingPixelUrl}" width="1" height="1" style="display:block;border:0;margin:0;padding:0;" alt="" />
                 </div>
             `,
             attachments: [{ filename: `Quote-${quote.number}.pdf`, content: pdfBuffer }]
         });
 
-        // 4. Update Quote Status
+        // 4. Update Quote Status + sentAt
         await db.quote.update({
             where: { id: quote.id },
-            data: { status: 'SENT' }
+            data: { status: 'SENT', sentAt: new Date() }
         });
 
         // 5. Update Sync Log Success

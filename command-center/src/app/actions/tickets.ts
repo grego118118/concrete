@@ -24,6 +24,16 @@ export async function updateTicketStatus(id: string, status: 'OPEN' | 'IN_PROGRE
     revalidatePath('/app');
 }
 
+export async function updateTicket(id: string, data: {
+    title: string;
+    description?: string;
+    priority: 'LOW' | 'MEDIUM' | 'HIGH';
+    status: 'OPEN' | 'IN_PROGRESS' | 'DONE';
+}) {
+    await db.ticket.update({ where: { id }, data });
+    revalidatePath('/app');
+}
+
 export async function deleteTicket(id: string) {
     await db.ticket.delete({ where: { id } });
     revalidatePath('/app');

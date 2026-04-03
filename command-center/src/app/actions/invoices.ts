@@ -119,6 +119,7 @@ export async function sendInvoice(id: string) {
 
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://pioneerconcretecoatings.com';
     const invoiceUrl = `${baseUrl}/invoice/${id}`;
+    const trackingPixelUrl = `${baseUrl}/app/api/track/invoice/${id}`;
     const amount = Number(invoice.amount);
 
     // Generate PDF — non-fatal, email sends with or without it
@@ -156,6 +157,7 @@ export async function sendInvoice(id: string) {
 
                 <p style="color: #475569; line-height: 1.6;">If you have any questions, please reply to this email or call us at <strong>(413) 544-4933</strong>.</p>
                 <p>Thank you,<br/>Pioneer Concrete Coatings</p>
+                <img src="${trackingPixelUrl}" width="1" height="1" style="display:block;border:0;margin:0;padding:0;" alt="" />
             </div>
         `,
         attachments: pdfBuffer ? [{ filename: `Invoice-${invoice.number}.pdf`, content: pdfBuffer }] : [],
@@ -163,7 +165,7 @@ export async function sendInvoice(id: string) {
 
     await db.invoice.update({
         where: { id },
-        data: { status: 'SENT' }
+        data: { status: 'SENT', sentAt: new Date() }
     });
 
     revalidatePath("/app/crm/invoices");

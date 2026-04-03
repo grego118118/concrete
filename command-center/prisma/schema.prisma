@@ -195,6 +195,8 @@ model Quote {
 
   showScheduler Boolean   @default(true) // Show date scheduling to customer on quote page
   validUntil    DateTime?
+  sentAt        DateTime? // When the quote email was sent
+  openedAt      DateTime? // When the customer first opened the email
   customerId    String
   customer   Customer    @relation(fields: [customerId], references: [id])
   items      QuoteItem[]
@@ -233,6 +235,8 @@ model Invoice {
   paymentLink      String?       // Stripe or QB hosted payment URL
   lastSyncError    String?       @db.Text
   lastSyncAt       DateTime?
+  sentAt        DateTime? // When the invoice email was sent
+  openedAt      DateTime? // When the customer first opened the email
   // Completion invoice fields
   completionPaymentLink String?  // Stripe link for final balance + overages
   completionSentAt      DateTime?

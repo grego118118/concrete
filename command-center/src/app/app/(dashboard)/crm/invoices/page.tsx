@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Search, DollarSign } from "lucide-react";
+import { Plus, Search, DollarSign, MailCheck, MailOpen, Clock } from "lucide-react";
 import Link from "next/link";
 
 import { getInvoices, deleteInvoice } from "@/app/actions/invoices";
@@ -53,13 +53,14 @@ export default async function InvoicesPage() {
                             <TableHead>Due Date</TableHead>
                             <TableHead>Amount</TableHead>
                             <TableHead>Status</TableHead>
+                            <TableHead>Receipt</TableHead>
                             <TableHead className="text-right">Actions</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
                         {invoices.length === 0 ? (
                             <TableRow>
-                                <TableCell colSpan={6} className="text-center h-24 text-muted-foreground">
+                                <TableCell colSpan={7} className="text-center h-24 text-muted-foreground">
                                     No invoices found. Generate one from a quote.
                                 </TableCell>
                             </TableRow>
@@ -77,6 +78,24 @@ export default async function InvoicesPage() {
                                         <Badge variant={invoice.status === 'PAID' ? 'default' : 'secondary'} className={invoice.status === 'PAID' ? 'bg-green-600' : ''}>
                                             {invoice.status}
                                         </Badge>
+                                    </TableCell>
+                                    <TableCell>
+                                        {(invoice as any).openedAt ? (
+                                            <span className="flex items-center gap-1 text-xs text-green-600 font-medium">
+                                                <MailOpen className="h-3.5 w-3.5" />
+                                                Opened {new Date((invoice as any).openedAt).toLocaleDateString()}
+                                            </span>
+                                        ) : (invoice as any).sentAt ? (
+                                            <span className="flex items-center gap-1 text-xs text-blue-600">
+                                                <MailCheck className="h-3.5 w-3.5" />
+                                                Sent {new Date((invoice as any).sentAt).toLocaleDateString()}
+                                            </span>
+                                        ) : (
+                                            <span className="flex items-center gap-1 text-xs text-muted-foreground">
+                                                <Clock className="h-3.5 w-3.5" />
+                                                Not sent
+                                            </span>
+                                        )}
                                     </TableCell>
                                     <TableCell className="text-right flex justify-end gap-2">
                                         <SyncButton 
