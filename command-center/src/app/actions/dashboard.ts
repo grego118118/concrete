@@ -14,7 +14,8 @@ export async function getDashboardStats() {
         lastMonthLeadsCount,
         quotesCount,
         lastMonthQuotesCount,
-        paidTotal,
+        fullyPaidTotal,
+        depositInvoices,
         allTotal,
         recentCustomers,
         recentJobs,
@@ -27,7 +28,8 @@ export async function getDashboardStats() {
         db.customer.count({ where: { createdAt: { gte: startOfLastMonth, lt: startOfMonth } } }),
         db.quote.count({ where: { status: { in: ["DRAFT", "SENT"] } } }),
         db.quote.count({ where: { status: { in: ["DRAFT", "SENT"] }, createdAt: { gte: startOfLastMonth, lt: startOfMonth } } }),
-        db.invoice.aggregate({ _sum: { amount: true }, where: { status: { in: ["PAID", "DEPOSIT_PAID"] } } }),
+        db.invoice.aggregate({ _sum: { amount: true }, where: { status: "PAID" } }),
+        db.invoice.findMany({ where: { status: "DEPOSIT_PAID" }, select: { quote: { select: { deposit: true } } } }),
         db.invoice.aggregate({ _sum: { amount: true } }),
         db.customer.findMany({ orderBy: { createdAt: "desc" }, take: 3, select: { id: true, name: true, createdAt: true } }),
         db.job.findMany({ orderBy: { createdAt: "desc" }, take: 3, include: { customer: { select: { name: true } } } }),
@@ -87,7 +89,10 @@ export async function getDashboardStats() {
         quotesDelta: lastMonthQuotesCount > 0
             ? Math.round(((quotesCount - lastMonthQuotesCount) / lastMonthQuotesCount) * 100)
             : null,
-        revenue: paidTotal._sum.amount?.toString() || "0",
+        revenue: (
+            Number(fullyPaidTotal._sum.amount || 0) +
+            depositInvoices.reduce((sum, inv) => sum + Number(inv.quote.deposit), 0)
+        ).toFixed(2),
         invoicedTotal: allTotal._sum.amount?.toString() || "0",
         activity,
     };
