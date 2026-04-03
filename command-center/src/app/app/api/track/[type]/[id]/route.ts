@@ -9,9 +9,9 @@ const PIXEL = Buffer.from(
 
 export async function GET(
     request: NextRequest,
-    { params }: { params: { type: string; id: string } }
+    { params }: { params: Promise<{ type: string; id: string }> }
 ) {
-    const { type, id } = params;
+    const { type, id } = await params;
 
     try {
         if (type === 'quote') {
