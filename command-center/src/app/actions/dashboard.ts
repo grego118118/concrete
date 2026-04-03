@@ -27,7 +27,7 @@ export async function getDashboardStats() {
         db.customer.count({ where: { createdAt: { gte: startOfLastMonth, lt: startOfMonth } } }),
         db.quote.count({ where: { status: { in: ["DRAFT", "SENT"] } } }),
         db.quote.count({ where: { status: { in: ["DRAFT", "SENT"] }, createdAt: { gte: startOfLastMonth, lt: startOfMonth } } }),
-        db.invoice.aggregate({ _sum: { amount: true }, where: { status: "PAID" } }),
+        db.invoice.aggregate({ _sum: { amount: true }, where: { status: { in: ["PAID", "DEPOSIT_PAID"] } } }),
         db.invoice.aggregate({ _sum: { amount: true } }),
         db.customer.findMany({ orderBy: { createdAt: "desc" }, take: 3, select: { id: true, name: true, createdAt: true } }),
         db.job.findMany({ orderBy: { createdAt: "desc" }, take: 3, include: { customer: { select: { name: true } } } }),
