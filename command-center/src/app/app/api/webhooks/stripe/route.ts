@@ -61,6 +61,9 @@ export async function POST(request: NextRequest) {
                     paidAt: new Date(),
                     paymentMethod: session.payment_method_types?.[0] ?? 'card',
                     paymentReference: session.payment_intent as string ?? session.id,
+                    stripeAmountPaid: invoice.stripeAmountPaid
+                        ? Number(invoice.stripeAmountPaid) + amountPaid
+                        : amountPaid,
                 },
             });
 

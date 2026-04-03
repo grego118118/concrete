@@ -235,6 +235,7 @@ model Invoice {
   paymentLink      String?       // Stripe or QB hosted payment URL
   lastSyncError    String?       @db.Text
   lastSyncAt       DateTime?
+  stripeAmountPaid Decimal?  @db.Decimal(10, 2) // Actual amount Stripe collected
   sentAt        DateTime? // When the invoice email was sent
   openedAt      DateTime? // When the customer first opened the email
   // Completion invoice fields
