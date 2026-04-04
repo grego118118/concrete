@@ -363,3 +363,17 @@ export async function sendQuote(id: string) {
         return { success: false, error: sendError.message || "Failed to send email" };
     }
 }
+
+export async function toggleQuoteCashPayment(quoteId: string) {
+    const quote = await db.quote.findUnique({ where: { id: quoteId }, select: { cashPayment: true } });
+    if (!quote) throw new Error("Quote not found");
+
+    const updated = await db.quote.update({
+        where: { id: quoteId },
+        data: { cashPayment: !quote.cashPayment },
+        select: { cashPayment: true },
+    });
+
+    revalidatePath(`/app/crm/quotes/${quoteId}`);
+    return { cashPayment: updated.cashPayment };
+}

@@ -131,6 +131,27 @@ export async function sendInvoice(id: string) {
         console.warn('[sendInvoice] PDF generation failed (non-critical):', err);
     }
 
+    const isCashPayment = (fresh as any)?.cashPayment === true;
+
+    const paymentSection = isCashPayment
+        ? `
+        <div style="background: #fffbeb; border: 2px solid #fde68a; border-radius: 12px; padding: 24px; margin: 24px 0; text-align: center;">
+            <p style="color: #92400e; font-weight: 700; font-size: 16px; margin: 0 0 8px;">Cash / Check Payment</p>
+            <p style="color: #78350f; font-size: 15px; margin: 0;">Amount due: <strong>$${amount.toFixed(2)}</strong></p>
+            <p style="color: #78350f; font-size: 14px; margin: 12px 0 0;">Please arrange payment with our team. We accept cash and check.</p>
+        </div>
+        `
+        : `
+        <div style="background: #f0fdf4; border: 2px solid #bbf7d0; border-radius: 12px; padding: 24px; margin: 24px 0; text-align: center;">
+            <p style="color: #166534; font-weight: 700; font-size: 16px; margin: 0 0 12px;">View &amp; Pay Your Invoice</p>
+            <a href="${invoiceUrl}"
+               style="display: inline-block; background: #22c55e; color: white; text-decoration: none; padding: 14px 32px; border-radius: 10px; font-size: 16px; font-weight: 700;">
+                View Invoice &amp; Pay $${amount.toFixed(2)}
+            </a>
+            <p style="color: #94a3b8; font-size: 12px; margin-top: 12px;">Secured by Stripe · All major cards accepted</p>
+        </div>
+        `;
+
     await sendEmail({
         to: invoice.customer.email,
         subject: `Invoice #${invoice.number} from Pioneer Concrete Coatings`,
@@ -146,14 +167,7 @@ export async function sendInvoice(id: string) {
                     ${invoice.dueDate ? `<p style="color: #ef4444; margin: 8px 0 0; font-size: 14px; font-weight: 600;">Due by ${new Date(invoice.dueDate).toLocaleDateString()}</p>` : ''}
                 </div>
 
-                <div style="background: #f0fdf4; border: 2px solid #bbf7d0; border-radius: 12px; padding: 24px; margin: 24px 0; text-align: center;">
-                    <p style="color: #166534; font-weight: 700; font-size: 16px; margin: 0 0 12px;">View &amp; Pay Your Invoice</p>
-                    <a href="${invoiceUrl}"
-                       style="display: inline-block; background: #22c55e; color: white; text-decoration: none; padding: 14px 32px; border-radius: 10px; font-size: 16px; font-weight: 700;">
-                        View Invoice &amp; Pay $${amount.toFixed(2)}
-                    </a>
-                    <p style="color: #94a3b8; font-size: 12px; margin-top: 12px;">Secured by Stripe · All major cards accepted</p>
-                </div>
+                ${paymentSection}
 
                 <p style="color: #475569; line-height: 1.6;">If you have any questions, please reply to this email or call us at <strong>(413) 544-4933</strong>.</p>
                 <p>Thank you,<br/>Pioneer Concrete Coatings</p>
@@ -170,6 +184,20 @@ export async function sendInvoice(id: string) {
 
     revalidatePath("/app/crm/invoices");
     revalidatePath(`/app/crm/invoices/${id}/edit`);
+}
+
+export async function toggleInvoiceCashPayment(invoiceId: string) {
+    const invoice = await db.invoice.findUnique({ where: { id: invoiceId }, select: { cashPayment: true } });
+    if (!invoice) throw new Error("Invoice not found");
+
+    const updated = await db.invoice.update({
+        where: { id: invoiceId },
+        data: { cashPayment: !invoice.cashPayment },
+        select: { cashPayment: true },
+    });
+
+    revalidatePath(`/app/crm/invoices/${invoiceId}/edit`);
+    return { cashPayment: updated.cashPayment };
 }
 
 export async function syncQBInvoice(id: string) {

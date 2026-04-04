@@ -50,29 +50,31 @@ export async function acceptQuote(id: string, scheduledDate: string) {
             });
         });
 
-        // 3. Create CRM invoice, Stripe payment link, then QB invoice for bookkeeping
-        console.log(`[acceptQuote] Creating invoice and payment link for Quote ${id}`);
+        // 3. Create CRM invoice, and (if not cash payment) Stripe payment link + QB sync
+        console.log(`[acceptQuote] Creating invoice for Quote ${id} (cashPayment=${quote.cashPayment})`);
         let paymentLink: string | undefined;
 
         try {
             const { createInvoiceFromQuote } = await import("@/lib/quickbooks/invoice-sync");
             const invoice = await createInvoiceFromQuote(id);
 
-            // Create Stripe payment link for the deposit amount
-            const { createDepositPaymentLink } = await import("@/lib/stripe/payment-link");
-            const stripeLink = await createDepositPaymentLink({
-                quoteNumber: quote.number,
-                depositAmount: Number(quote.deposit),
-                quoteId: id,
-                invoiceId: invoice.id,
-            });
-
-            if (stripeLink) {
-                paymentLink = stripeLink;
-                await db.invoice.update({
-                    where: { id: invoice.id },
-                    data: { paymentLink: stripeLink },
+            if (!quote.cashPayment) {
+                // Create Stripe payment link for the deposit amount
+                const { createDepositPaymentLink } = await import("@/lib/stripe/payment-link");
+                const stripeLink = await createDepositPaymentLink({
+                    quoteNumber: quote.number,
+                    depositAmount: Number(quote.deposit),
+                    quoteId: id,
+                    invoiceId: invoice.id,
                 });
+
+                if (stripeLink) {
+                    paymentLink = stripeLink;
+                    await db.invoice.update({
+                        where: { id: invoice.id },
+                        data: { paymentLink: stripeLink },
+                    });
+                }
             }
 
             // Sync to QB in the background for bookkeeping (non-blocking)
@@ -86,6 +88,7 @@ export async function acceptQuote(id: string, scheduledDate: string) {
 
         // 4. Send Confirmation Email IMMEDIATELY
         console.log(`[acceptQuote] Sending confirmation email to ${quote.customer.email}`);
+        const depositAmount = Number(quote.deposit);
         try {
             await sendEmail({
                 to: quote.customer.email,
@@ -96,11 +99,17 @@ export async function acceptQuote(id: string, scheduledDate: string) {
                         <p>Hi ${quote.customer.name},</p>
                         <p>Great news! We've received your acceptance for Quote #${quote.number}.</p>
                         ${scheduledDate ? `<p><strong>Scheduled Start Date:</strong> ${new Date(scheduledDate).toLocaleDateString()}</p>` : ""}
-                        
-                        ${paymentLink ? `
+
+                        ${quote.cashPayment ? `
+                        <div style="background: #fffbeb; border: 2px solid #fde68a; border-radius: 12px; padding: 24px; margin: 24px 0; text-align: center;">
+                            <p style="color: #92400e; font-weight: 700; font-size: 16px; margin: 0 0 8px;">Payment Instructions</p>
+                            <p style="color: #78350f; font-size: 15px; margin: 0;">A 50% deposit of <strong>$${depositAmount.toFixed(2)}</strong> is due prior to the start of your project.</p>
+                            <p style="color: #78350f; font-size: 14px; margin: 12px 0 0;">Our team will be in touch to arrange payment. We accept cash and check.</p>
+                        </div>
+                        ` : paymentLink ? `
                         <div style="background: #f0fdf4; border: 2px solid #bbf7d0; border-radius: 12px; padding: 24px; margin: 24px 0; text-align: center;">
                             <p style="color: #166534; font-weight: 700; font-size: 16px; margin: 0 0 12px;">Ready to pay the deposit?</p>
-                            <a href="${paymentLink}" 
+                            <a href="${paymentLink}"
                                style="display: inline-block; background: #22c55e; color: white; text-decoration: none; padding: 14px 32px; border-radius: 10px; font-size: 16px; font-weight: 700; box-shadow: 0 4px 6px rgba(34, 197, 94, 0.2);">
                                 Pay 50% Deposit
                             </a>

@@ -1,10 +1,11 @@
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { getInvoice, updateInvoice } from "@/app/actions/invoices";
+import { getInvoice, updateInvoice, toggleInvoiceCashPayment } from "@/app/actions/invoices";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { SendInvoiceButton } from "../send-invoice-button";
+import { CashPaymentToggle } from "@/components/crm/cash-payment-toggle";
 
 export default async function EditInvoicePage(props: { params: Promise<{ id: string }> }) {
     const params = await props.params;
@@ -55,7 +56,12 @@ export default async function EditInvoicePage(props: { params: Promise<{ id: str
                     </Select>
                 </div>
 
-                <div className="flex justify-end gap-4">
+                <div className="flex flex-wrap justify-end gap-4">
+                    <CashPaymentToggle
+                        entityId={invoice.id}
+                        isCashPayment={(invoice as any).cashPayment ?? false}
+                        onToggle={toggleInvoiceCashPayment}
+                    />
                     <SendInvoiceButton invoiceId={invoice.id} currentStatus={invoice.status} />
                     <Link href="/app/crm/invoices">
                         <Button variant="outline" type="button">Cancel</Button>

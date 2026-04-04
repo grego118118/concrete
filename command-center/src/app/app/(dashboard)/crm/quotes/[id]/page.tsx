@@ -14,6 +14,8 @@ import { PrintQuoteButton } from "./print-button";
 import { DownloadQuoteButton } from "./download-button";
 import { SendQuoteButton } from "./send-quote-button";
 import { SyncButton } from "@/components/crm/sync-button";
+import { CashPaymentToggle } from "@/components/crm/cash-payment-toggle";
+import { toggleQuoteCashPayment } from "@/app/actions/quotes";
 import { auth } from "@/auth";
 import { getQBStatus } from "@/lib/quickbooks/connection";
 
@@ -146,6 +148,11 @@ export default async function QuoteViewPage(props: {
                             Edit
                         </Button>
                     </a>
+                    <CashPaymentToggle
+                        entityId={quote.id}
+                        isCashPayment={quote.cashPayment ?? false}
+                        onToggle={toggleQuoteCashPayment}
+                    />
                     <SendQuoteButton quoteId={quote.id} currentStatus={quote.status} />
                     <DownloadQuoteButton quoteId={quote.id} />
                     <PrintQuoteButton />

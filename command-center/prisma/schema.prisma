@@ -194,6 +194,7 @@ model Quote {
   scopePsi       String? // Strength
 
   showScheduler Boolean   @default(true) // Show date scheduling to customer on quote page
+  cashPayment   Boolean   @default(false) // Manual override: cash payment, no Stripe link sent
   validUntil    DateTime?
   sentAt        DateTime? // When the quote email was sent
   openedAt      DateTime? // When the customer first opened the email
@@ -236,6 +237,7 @@ model Invoice {
   lastSyncError    String?       @db.Text
   lastSyncAt       DateTime?
   stripeAmountPaid Decimal?  @db.Decimal(10, 2) // Actual amount Stripe collected
+  cashPayment   Boolean   @default(false) // Manual override: cash payment, no Stripe link sent
   sentAt        DateTime? // When the invoice email was sent
   openedAt      DateTime? // When the customer first opened the email
   // Completion invoice fields
