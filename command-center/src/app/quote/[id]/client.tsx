@@ -39,6 +39,7 @@ interface QuoteAcceptClientProps {
     createdAt: string;
     photos?: { id: string; url: string; caption?: string | null }[];
     showScheduler?: boolean;
+    isCashPayment?: boolean;
 }
 
 function fmt(n: number) {
@@ -68,6 +69,7 @@ export function QuoteAcceptClient({
     createdAt,
     photos,
     showScheduler = true,
+    isCashPayment = false,
 }: QuoteAcceptClientProps) {
     const [accepted, setAccepted] = useState(isAlreadyAccepted || isSuccess);
     const [isAccepting, setIsAccepting] = useState(false);
@@ -94,7 +96,7 @@ export function QuoteAcceptClient({
     useEffect(() => {
         let interval: NodeJS.Timeout;
         let timeout: NodeJS.Timeout;
-        if (accepted && !paymentLinkState && !isPolling) {
+        if (accepted && !paymentLinkState && !isPolling && !isCashPayment) {
             setIsPolling(true);
             const poll = async () => {
                 try {
@@ -172,7 +174,13 @@ export function QuoteAcceptClient({
                                     </p>
                                 </div>
                             </div>
-                            {paymentLinkState ? (
+                            {isCashPayment ? (
+                                <div className="pt-3 border-t border-emerald-200 space-y-1">
+                                    <p className="text-sm font-bold text-emerald-800">Payment Instructions</p>
+                                    <p className="text-sm text-emerald-700">A 50% deposit of <span className="font-bold">${fmt(deposit)}</span> is due prior to the start of your project.</p>
+                                    <p className="text-sm text-emerald-700">Our team will be in touch to arrange payment. We accept cash and check.</p>
+                                </div>
+                            ) : paymentLinkState ? (
                                 <div className="flex flex-col sm:flex-row items-center gap-4 pt-3 border-t border-emerald-200">
                                     <div className="flex-1 text-sm text-emerald-700">
                                         <p className="font-bold">Ready to pay the deposit?</p>

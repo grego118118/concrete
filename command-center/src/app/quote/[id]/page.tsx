@@ -100,6 +100,7 @@ export default async function PublicQuotePage(props: {
             cleanupFee={quote.cleanupFee ? Number(quote.cleanupFee) : undefined}
             notes={quote.notes || undefined}
             paymentLink={quote.invoice?.paymentLink || undefined}
+            isCashPayment={quote.cashPayment ?? false}
             scopeData={scopeData}
             scopeArea={scopeArea}
             jobLocation={quote.jobLocation}
