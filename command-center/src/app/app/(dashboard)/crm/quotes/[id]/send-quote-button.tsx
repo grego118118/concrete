@@ -67,14 +67,7 @@ export function SendQuoteButton({ quoteId, currentStatus, customerEmail }: { quo
         return () => clearInterval(interval);
     }, [status, taskName, router]);
 
-    if (currentStatus === "SENT" && status !== 'FAILED') {
-        return (
-            <Button variant="outline" size="sm" disabled className="text-emerald-600 border-emerald-200 bg-emerald-50">
-                <Check className="mr-2 h-4 w-4" />
-                Quote Sent
-            </Button>
-        );
-    }
+    const isSent = currentStatus === "SENT" && status === 'IDLE';
 
     return (
         <Button
@@ -83,17 +76,18 @@ export function SendQuoteButton({ quoteId, currentStatus, customerEmail }: { quo
             onClick={handleSend}
             disabled={status === 'RUNNING' || status === 'COMPLETED'}
             className={`transition-colors ${status === 'FAILED' ? 'border-red-200 bg-red-50 text-red-600 hover:bg-red-100' :
+                isSent ? 'text-emerald-600 border-emerald-200 bg-emerald-50 hover:bg-emerald-100 hover:text-emerald-700' :
                 'hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200'
                 }`}
         >
             {status === 'RUNNING' ? (
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            ) : status === 'FAILED' ? (
-                <Mail className="mr-2 h-4 w-4" />
+            ) : isSent ? (
+                <Check className="mr-2 h-4 w-4" />
             ) : (
                 <Mail className="mr-2 h-4 w-4" />
             )}
-            {status === 'RUNNING' ? 'Sending...' : status === 'FAILED' ? 'Retry Sending' : 'Send to Customer'}
+            {status === 'RUNNING' ? 'Sending...' : status === 'FAILED' ? 'Retry Sending' : isSent ? 'Resend Quote' : 'Send to Customer'}
         </Button>
     );
 }
